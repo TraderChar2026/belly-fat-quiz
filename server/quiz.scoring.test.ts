@@ -87,19 +87,19 @@ describe("getAlertLevel", () => {
 
 // ── CRM tag ───────────────────────────────────────────────────────────────────
 describe("getCrmTag", () => {
-  it("returns null for green range (0–8)", () => {
-    expect(getCrmTag(0)).toBeNull();
-    expect(getCrmTag(8)).toBeNull();
+  it("returns 'Green Alert' for green range (0–8)", () => {
+    expect(getCrmTag(0)).toBe("Green Alert");
+    expect(getCrmTag(8)).toBe("Green Alert");
   });
 
-  it("returns yellow_alert for scores 9–22", () => {
-    expect(getCrmTag(9)).toBe("yellow_alert");
-    expect(getCrmTag(22)).toBe("yellow_alert");
+  it("returns 'Yellow Alert' for scores 9–22", () => {
+    expect(getCrmTag(9)).toBe("Yellow Alert");
+    expect(getCrmTag(22)).toBe("Yellow Alert");
   });
 
-  it("returns red_alert for scores 23+", () => {
-    expect(getCrmTag(23)).toBe("red_alert");
-    expect(getCrmTag(51)).toBe("red_alert");
+  it("returns 'Red Alert' for scores 23+", () => {
+    expect(getCrmTag(23)).toBe("Red Alert");
+    expect(getCrmTag(51)).toBe("Red Alert");
   });
 });
 

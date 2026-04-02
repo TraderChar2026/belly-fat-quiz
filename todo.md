@@ -13,3 +13,4 @@
 - [x] Elegant design system: warm neutrals, serif headings, smooth transitions
 - [x] Responsive layout for mobile and desktop
 - [x] Vitest tests for scoring logic and CRM tag assignment
+- [x] Fix CRM tags to use correct values: "Red Alert", "Yellow Alert", "Green Alert" (all three levels, proper casing)

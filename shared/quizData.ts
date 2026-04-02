@@ -206,10 +206,10 @@ export function getAlertLevel(totalScore: number): AlertLevel {
   return "red";
 }
 
-export function getCrmTag(totalScore: number): string | null {
-  if (totalScore >= 23) return "red_alert";
-  if (totalScore >= 9) return "yellow_alert";
-  return null; // green — no automation tag
+export function getCrmTag(totalScore: number): string {
+  if (totalScore >= 23) return "Red Alert";
+  if (totalScore >= 9) return "Yellow Alert";
+  return "Green Alert";
 }
 
 export function computeScores(answers: { questionId: number; points: number }[]) {

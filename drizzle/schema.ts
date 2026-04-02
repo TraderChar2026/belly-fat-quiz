@@ -25,7 +25,7 @@ export const quizSubmissions = mysqlTable("quiz_submissions", {
   digestiveScore: int("digestiveScore").notNull(),
   appetiteScore: int("appetiteScore").notNull(),
   gutScore: int("gutScore").notNull(),
-  crmTag: varchar("crmTag", { length: 64 }), // yellow_alert | red_alert | null
+  crmTag: varchar("crmTag", { length: 64 }), // "Red Alert" | "Yellow Alert" | "Green Alert"
   ghlContactId: varchar("ghlContactId", { length: 128 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

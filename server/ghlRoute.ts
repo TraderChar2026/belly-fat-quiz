@@ -29,11 +29,8 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
     const { digestiveScore, appetiteScore, gutScore, totalScore } = computeScores(answers);
     const crmTag = getCrmTag(totalScore);
 
-    // Build tags array — only add tag if applicable
-    const tags: string[] = [];
-    if (crmTag) tags.push(crmTag);
-    // Always tag as quiz taker
-    tags.push("belly_fat_quiz");
+    // Build tags array — always include the alert tag and quiz source tag
+    const tags: string[] = [crmTag, "belly_fat_quiz"];
 
     // Upsert contact in GoHighLevel via MCP
     let ghlContactId: string | null = null;
