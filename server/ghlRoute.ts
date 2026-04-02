@@ -105,8 +105,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       ghlContactId,
     });
 
-    // ── Send owner notification email ─────────────────────────────────────────
-    const alertEmoji = alertLevel === "red" ? "🔴" : alertLevel === "yellow" ? "🟡" : "🟢";
+    // ── Send owner notification email (HTML table format) ───────────────────────
     const alertLabel = alertLevel === "red" ? "Red Alert" : alertLevel === "yellow" ? "Yellow Alert" : "Green Alert";
 
     // Build a lookup: questionId + points → selected answer text
@@ -117,43 +116,55 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       return option ? option.text : `(unknown answer, points: ${points})`;
     };
 
-    // Build Q&A lines grouped by category
-    const qaLines: string[] = [];
-    const categories: Array<{ key: "digestive" | "appetite" | "gut"; label: string }> = [
-      { key: "digestive", label: CATEGORY_META.digestive.label },
-      { key: "appetite", label: CATEGORY_META.appetite.label },
-      { key: "gut", label: CATEGORY_META.gut.label },
-    ];
-    for (const cat of categories) {
-      qaLines.push(`--- ${cat.label} ---`);
-      const catQuestions = QUESTIONS.filter((q) => q.category === cat.key);
-      for (const q of catQuestions) {
-        const answer = answers.find((a) => a.questionId === q.id);
-        const answerText = answer ? pointsToAnswerText(q.id, answer.points) : "(no answer)";
-        qaLines.push(`Q${q.id}. ${q.text}`);
-        qaLines.push(`   → ${answerText}`);
-      }
-      qaLines.push("");
-    }
+    // Build HTML table rows for each question
+    const qaRows = QUESTIONS.map((q) => {
+      const answer = answers.find((a) => a.questionId === q.id);
+      const answerText = answer ? pointsToAnswerText(q.id, answer.points) : "(no answer)";
+      return `<tr><td style="padding:8px 12px;border-bottom:1px solid #e0e0e0;color:#555;width:50%">${q.text}</td><td style="padding:8px 12px;border-bottom:1px solid #e0e0e0;color:#222">${answerText}</td></tr>`;
+    }).join("");
 
-    const notificationContent = [
-      `Name: ${fullName}`,
-      `Email: ${email}`,
-      phone ? `Phone: ${phone}` : null,
-      ``,
-      `Total Score: ${totalScore} / 51`,
-      `Alert Level: ${alertEmoji} ${alertLabel}`,
-      ``,
-      `Score Breakdown:`,
-      `  ${CATEGORY_META.digestive.label}: ${digestiveScore} / ${CATEGORY_META.digestive.maxScore}`,
-      `  ${CATEGORY_META.appetite.label}: ${appetiteScore} / ${CATEGORY_META.appetite.maxScore}`,
-      `  ${CATEGORY_META.gut.label}: ${gutScore} / ${CATEGORY_META.gut.maxScore}`,
-      ``,
-      `Quiz Answers:`,
-      ...qaLines,
-    ]
-      .filter((line) => line !== null)
-      .join("\n");
+    // Determine highest and lowest scoring categories
+    const catScores = [
+      { label: `${CATEGORY_META.digestive.label} -- Max score ${CATEGORY_META.digestive.maxScore}`, score: digestiveScore },
+      { label: `${CATEGORY_META.appetite.label} -- Max score ${CATEGORY_META.appetite.maxScore}`, score: appetiteScore },
+      { label: `${CATEGORY_META.gut.label} -- Max score ${CATEGORY_META.gut.maxScore}`, score: gutScore },
+    ];
+    const highestCat = catScores.reduce((a, b) => (a.score >= b.score ? a : b));
+    const lowestCat = catScores.reduce((a, b) => (a.score <= b.score ? a : b));
+
+    const row = (label: string, value: string | number, isLink = false) =>
+      `<tr><td style="padding:8px 12px;border-bottom:1px solid #e0e0e0;color:#555;width:50%">${label}</td><td style="padding:8px 12px;border-bottom:1px solid #e0e0e0;color:#222">${isLink ? `<a href="${value}" style="color:#1a73e8">${value}</a>` : value}</td></tr>`;
+
+    const submissionDate = new Date().toLocaleString("en-US", {
+      timeZone: "America/Chicago",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    const notificationContent = `
+<p style="font-weight:bold;font-size:16px">You have received a quiz submission. Please review the quiz details below.</p>
+<table style="width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px">
+  <tbody>
+    ${row("Full Name", fullName)}
+    ${phone ? row("Phone", phone) : ""}
+    ${row("Email", email)}
+    ${qaRows}
+    ${row("Overall Score", `${totalScore} / 51`)}
+    ${row(`${CATEGORY_META.digestive.label} -- Max score ${CATEGORY_META.digestive.maxScore}`, digestiveScore)}
+    ${row(`${CATEGORY_META.appetite.label} -- Max score ${CATEGORY_META.appetite.maxScore}`, appetiteScore)}
+    ${row(`${CATEGORY_META.gut.label} -- Max score ${CATEGORY_META.gut.maxScore}`, gutScore)}
+    ${row("Alert Level", alertLabel)}
+    ${row("Highest Score", highestCat.score)}
+    ${row("Lowest Score", lowestCat.score)}
+    ${row("Highest Score Category", highestCat.label)}
+    ${row("Lowest Score Category", lowestCat.label)}
+    ${row("Submission Date", submissionDate)}
+  </tbody>
+</table>`.trim();
 
     notifyOwner({
       title: `${fullName} Quiz Submitted`,
