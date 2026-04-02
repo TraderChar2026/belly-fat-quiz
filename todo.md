@@ -15,3 +15,6 @@
 - [x] Vitest tests for scoring logic and CRM tag assignment
 - [x] Fix CRM tags to use correct values: "Red Alert", "Yellow Alert", "Green Alert" (all three levels, proper casing)
 - [x] Fix CRM tags to use lowercase ("red alert", "yellow alert", "green alert") to match existing GHL automation triggers
+- [x] Remove extra "belly_fat_quiz" tag — only send the alert tag (red alert / yellow alert / green alert)
+- [x] Send owner email notification on each quiz submission (name, email, phone, score, alert level)
+- [x] Include each question and the person's selected answer text in the notification email
