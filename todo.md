@@ -18,3 +18,4 @@
 - [x] Remove extra "belly_fat_quiz" tag — only send the alert tag (red alert / yellow alert / green alert)
 - [x] Send owner email notification on each quiz submission (name, email, phone, score, alert level)
 - [x] Include each question and the person's selected answer text in the notification email
+- [x] Fix automation trigger: upsert contact WITHOUT tags first, then add tag separately via contacts_add-tags endpoint so GHL tag-based automation fires

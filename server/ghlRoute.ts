@@ -18,6 +18,22 @@ interface GhlSubmitBody {
   answers: { questionId: number; points: number }[];
 }
 
+/** Run an MCP tool call and return the parsed JSON result, or null on failure. */
+async function mcpCall(toolName: string, inputPayload: Record<string, unknown>): Promise<unknown> {
+  const inputJson = JSON.stringify(inputPayload).replace(/'/g, "'\\''");
+  const { stdout, stderr } = await execAsync(
+    `manus-mcp-cli tool call ${toolName} --server prod-ghl-mcp --input '${inputJson}'`,
+    { timeout: 30000 }
+  );
+  if (stderr) console.warn(`[GHL/${toolName}] stderr:`, stderr.slice(0, 200));
+  const jsonMatch = stdout.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    console.warn(`[GHL/${toolName}] No JSON in output:`, stdout.slice(0, 200));
+    return null;
+  }
+  return JSON.parse(jsonMatch[0]);
+}
+
 ghlRouter.post("/api/ghl-submit", async (req, res) => {
   try {
     const body = req.body as GhlSubmitBody;
@@ -31,59 +47,51 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
     const crmTag = getCrmTag(totalScore);
     const alertLevel = getAlertLevel(totalScore);
 
-    // Only send the single alert tag — no extra tags that could interfere with automations
-    const tags: string[] = [crmTag];
-
-    // Upsert contact in GoHighLevel via MCP
     let ghlContactId: string | null = null;
+
     try {
+      // ── Step 1: Upsert contact WITHOUT tags ──────────────────────────────────
+      // Tags included in upsert do NOT fire tag-based automations in GHL.
+      // We must add the tag as a separate API call after the contact exists.
       const nameParts = fullName.trim().split(/\s+/);
       const firstName = nameParts[0] ?? fullName;
       const lastName = nameParts.slice(1).join(" ") || undefined;
 
-      const inputPayload: Record<string, unknown> = {
+      const upsertPayload: Record<string, unknown> = {
         body_firstName: firstName,
         body_email: email,
         body_locationId: GHL_LOCATION_ID,
         body_source: "belly_fat_quiz",
-        body_tags: tags,
       };
-      if (lastName) inputPayload.body_lastName = lastName;
-      if (phone) inputPayload.body_phone = phone;
+      if (lastName) upsertPayload.body_lastName = lastName;
+      if (phone) upsertPayload.body_phone = phone;
 
-      // Escape single quotes in JSON for shell safety
-      const inputJson = JSON.stringify(inputPayload).replace(/'/g, "'\\''");
-      const { stdout, stderr } = await execAsync(
-        `manus-mcp-cli tool call contacts_upsert-contact --server prod-ghl-mcp --input '${inputJson}'`,
-        { timeout: 30000 }
-      );
+      const upsertResult = await mcpCall("contacts_upsert-contact", upsertPayload) as Record<string, unknown> | null;
+      ghlContactId =
+        (upsertResult as any)?.data?.contact?.id ??
+        (upsertResult as any)?.contact?.id ??
+        (upsertResult as any)?.id ??
+        null;
 
-      if (stderr) console.warn("[GHL] MCP stderr:", stderr.slice(0, 300));
+      console.log("[GHL] Upserted contact ID:", ghlContactId);
 
-      // MCP CLI prints a "Tool execution result saved to: <path>" line then the JSON.
-      // Extract the JSON block from stdout.
-      try {
-        const jsonMatch = stdout.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          ghlContactId =
-            parsed?.data?.contact?.id ??
-            parsed?.contact?.id ??
-            parsed?.id ??
-            null;
-          console.log("[GHL] Upserted contact ID:", ghlContactId);
-        } else {
-          console.warn("[GHL] No JSON block found in MCP output:", stdout.slice(0, 300));
-        }
-      } catch {
-        console.warn("[GHL] Could not parse MCP response as JSON:", stdout.slice(0, 300));
+      // ── Step 2: Add alert tag via dedicated endpoint ─────────────────────────
+      // This is what fires the "Gut Health Trial Workflow" automation in GHL.
+      if (ghlContactId) {
+        await mcpCall("contacts_add-tags", {
+          path_contactId: ghlContactId,
+          body_tags: [crmTag],
+        });
+        console.log(`[GHL] Added tag "${crmTag}" to contact ${ghlContactId}`);
+      } else {
+        console.warn("[GHL] Could not add tag — no contact ID returned from upsert");
       }
     } catch (mcpError) {
-      // GHL failure is non-fatal — we still save the submission and send notification
-      console.error("[GHL] MCP upsert failed:", mcpError);
+      // GHL failure is non-fatal — we still save the submission and notify owner
+      console.error("[GHL] MCP call failed:", mcpError);
     }
 
-    // Persist submission to database
+    // ── Persist submission to database ────────────────────────────────────────
     await saveQuizSubmission({
       fullName,
       email,
@@ -97,11 +105,11 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       ghlContactId,
     });
 
-    // Send owner notification email
+    // ── Send owner notification email ─────────────────────────────────────────
     const alertEmoji = alertLevel === "red" ? "🔴" : alertLevel === "yellow" ? "🟡" : "🟢";
     const alertLabel = alertLevel === "red" ? "Red Alert" : alertLevel === "yellow" ? "Yellow Alert" : "Green Alert";
 
-    // Build a lookup: questionId -> selected answer text
+    // Build a lookup: questionId + points → selected answer text
     const pointsToAnswerText = (questionId: number, points: number): string => {
       const question = QUESTIONS.find((q) => q.id === questionId);
       if (!question) return `(unknown question ${questionId})`;
@@ -109,7 +117,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       return option ? option.text : `(unknown answer, points: ${points})`;
     };
 
-    // Build question/answer lines grouped by category
+    // Build Q&A lines grouped by category
     const qaLines: string[] = [];
     const categories: Array<{ key: "digestive" | "appetite" | "gut"; label: string }> = [
       { key: "digestive", label: CATEGORY_META.digestive.label },
