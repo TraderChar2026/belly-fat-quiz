@@ -207,9 +207,9 @@ export function getAlertLevel(totalScore: number): AlertLevel {
 }
 
 export function getCrmTag(totalScore: number): string {
-  if (totalScore >= 23) return "Red Alert";
-  if (totalScore >= 9) return "Yellow Alert";
-  return "Green Alert";
+  if (totalScore >= 23) return "red alert";
+  if (totalScore >= 9) return "yellow alert";
+  return "green alert";
 }
 
 export function computeScores(answers: { questionId: number; points: number }[]) {
