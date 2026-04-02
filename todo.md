@@ -20,3 +20,4 @@
 - [x] Include each question and the person's selected answer text in the notification email
 - [x] Fix automation trigger: upsert contact WITHOUT tags first, then add tag separately via contacts_add-tags endpoint so GHL tag-based automation fires
 - [x] Reformat notification email as HTML table (bold header, two-column table: contact info, Q&A rows, score summary) matching old quiz email format
+- [x] Fix notification email: convert from HTML to clean plain text (Manus notification system does not render HTML)
