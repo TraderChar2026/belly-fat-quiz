@@ -24,3 +24,4 @@
 - [x] Add landing page header above quiz: green attention bar, pre-headline, bold blue main headline, post-headline copy block
 - [x] Apply green accent color inside the quiz UI (progress bar, selected answer highlight, CTA button)
 - [x] Improve notification email format: send as HTML two-column table (question/answer) matching preferred format
+- [x] Remove duplicate plain-text Manus notification — only send the single HTML table email via GHL

@@ -3,7 +3,6 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import { computeScores, getCrmTag, getAlertLevel, CATEGORY_META, QUESTIONS } from "../shared/quizData";
 import { saveQuizSubmission } from "./db";
-import { notifyOwner } from "./_core/notification";
 
 const execAsync = promisify(exec);
 const ghlRouter = Router();
@@ -206,13 +205,6 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       crmTag,
       ghlContactId,
     });
-
-    // ── Fallback: also send plain-text Manus notification ─────────────────────
-    // This ensures the owner always gets notified even if the GHL email fails.
-    notifyOwner({
-      title: `${fullName} Quiz Submitted`,
-      content: `New quiz submission received.\n\nName: ${fullName}\nEmail: ${email}${phone ? `\nPhone: ${phone}` : ""}\n\nScore: ${totalScore}/51 — ${alertLabel}\nDigestive: ${digestiveScore} | Appetite: ${appetiteScore} | Gut Health: ${gutScore}`,
-    }).catch((err) => console.warn("[Notification] Failed to notify owner:", err));
 
     return res.json({
       success: true,
