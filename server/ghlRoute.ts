@@ -10,6 +10,30 @@ const ghlRouter = Router();
 // GoHighLevel location ID for Gateway Solutions / charwinnen.com
 const GHL_LOCATION_ID = "Md5Bp8ZfS4SI5pEFdV7e";
 
+/**
+ * Maps each quiz question ID to its corresponding GHL custom field ID.
+ * Field IDs retrieved from locations_get-custom-fields (parentId: yQDwalloDButzz58ElJK).
+ */
+const QUESTION_TO_CUSTOM_FIELD: Record<number, string> = {
+  1:  "RiCSRIBdcmgvuersMUQy", // How would you describe your digestion?
+  2:  "uY0lZJy5Lly7AtOrJY5W", // Do you have heartburn after meals?
+  3:  "rYBc2sMoS7yzypqQuAW7", // How do you experience unexplained weight changes?
+  4:  "H758XGs3mgbaZXicXlzz", // How do you feel after meals?
+  5:  "oCVFP1w7vX1iTNwQERGb", // How would you rate your energy levels throughout the day?
+  6:  "uRD9qyDRhECvnEx9E0iC", // How well do you control your eating?
+  7:  "KRwgTa0IrAaAELh909dO", // How difficult is it for you to lose weight?
+  8:  "OhldEzczmvsmi8bCY038", // What do you typically eat for breakfast?
+  9:  "9N5T3G7N8Q8ozXmyRZy8", // Do you have problems sleeping?
+  10: "9BuWqOv6riYfGxDDqSvM", // Do you often experience brain fog?
+  11: "t57QcGqjVEaz33JOu4dS", // Do you experience mood swings?
+  12: "jMjoeu3yOsbiOoUM1qw8", // How would you describe your typical diet?
+  13: "wldZY43hp0JmF13kOiZ7", // How often do you eat fermented foods?
+  14: "ReUO2vVL2k5x6vwNMICL", // How often do you eat prebiotic foods?
+  15: "ltQfDO6T2s3YBuLqQckQ", // Do you take antacids or acid blockers?
+  16: "SUDDSiB02WFLsChmTdLE", // Do you take pain pills?
+  17: "SiVmEW9qNGXos25LoiME", // Recent antibiotic use?
+};
+
 interface GhlSubmitBody {
   fullName: string;
   email: string;
@@ -122,11 +146,29 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       const firstName = nameParts[0] ?? fullName;
       const lastName = nameParts.slice(1).join(" ") || undefined;
 
+      // Build custom fields array — map each answer to its GHL custom field ID
+      const customFields = answers
+        .filter((a) => QUESTION_TO_CUSTOM_FIELD[a.questionId])
+        .map((a) => {
+          const q = QUESTIONS.find((q) => q.id === a.questionId);
+          let answerText = "";
+          if (q) {
+            if (a.optionIndex !== undefined && q.options[a.optionIndex]) {
+              answerText = q.options[a.optionIndex]!.text;
+            } else {
+              answerText = q.options.find((o) => o.points === a.points)?.text ?? "";
+            }
+          }
+          return { id: QUESTION_TO_CUSTOM_FIELD[a.questionId], field_value: answerText };
+        })
+        .filter((cf) => cf.field_value !== "");
+
       const upsertPayload: Record<string, unknown> = {
         body_firstName: firstName,
         body_email: email,
         body_locationId: GHL_LOCATION_ID,
         body_source: "belly_fat_quiz",
+        body_customFields: customFields,
       };
       if (lastName) upsertPayload.body_lastName = lastName;
       if (phone) upsertPayload.body_phone = phone;

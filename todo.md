@@ -25,3 +25,4 @@
 - [x] Apply green accent color inside the quiz UI (progress bar, selected answer highlight, CTA button)
 - [x] Improve notification email format: send as HTML two-column table (question/answer) matching preferred format
 - [x] Remove duplicate plain-text Manus notification — only send the single HTML table email via GHL
+- [x] Map all 17 quiz answers to GHL custom field IDs in the upsert payload so answers appear in AwesomeCRM custom fields view
