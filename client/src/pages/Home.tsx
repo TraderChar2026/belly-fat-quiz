@@ -24,51 +24,65 @@ interface ResultData {
   crmTag: string | null;
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
+// ── Landing Page Header (shown only on intro stage) ───────────────────────────
 
-function IntroPage({ onStart }: { onStart: () => void }) {
+function LandingHeader({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex flex-col items-center text-center max-w-2xl mx-auto px-4 py-12 md:py-20">
-      {/* Decorative leaf icon */}
-      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-8">
-        <Leaf className="w-8 h-8 text-primary" />
+    <div className="w-full">
+      {/* Attention bar */}
+      <div className="w-full bg-[#c8d8b8] py-3 px-4 text-center">
+        <p className="text-sm md:text-base font-medium text-[#2d4a1e]">
+          Attention Women 40+ Who Are Struggling Trying to Lose Stubborn Belly Fat
+        </p>
       </div>
 
-      <p className="text-sm font-medium tracking-widest uppercase text-muted-foreground mb-4">
-        Free Assessment
-      </p>
+      {/* Headline section */}
+      <div className="max-w-3xl mx-auto px-4 pt-10 pb-6 text-center">
+        <p className="text-lg md:text-xl text-foreground/80 mb-3 italic">
+          It's Not Your Fault... It's Not Willpower...
+        </p>
 
-      <h1 className="text-4xl md:text-5xl font-bold leading-tight text-foreground mb-6">
-        Stubborn Belly Fat Quiz
-      </h1>
+        <h1
+          className="text-4xl md:text-6xl font-extrabold leading-tight mb-6"
+          style={{ color: "#2b2fa8", fontFamily: "'Playfair Display', serif" }}
+        >
+          Take The Free Stubborn<br />Belly Fat Quiz
+        </h1>
 
-      <p className="text-lg text-muted-foreground leading-relaxed mb-4 max-w-xl">
-        Discover what's really driving your stubborn belly fat — and why diet and exercise alone may not be enough.
-      </p>
+        <p className="text-xl md:text-2xl font-semibold text-foreground/85 leading-snug mb-2">
+          Discover Why You Can't Lose The Fat No Matter What You Try
+        </p>
+        <p className="text-xl md:text-2xl font-semibold text-foreground/85 leading-snug mb-10">
+          And How To Finally Lose Up To 25 Pounds In 12 Weeks
+        </p>
 
-      <p className="text-base text-muted-foreground leading-relaxed mb-10 max-w-xl">
-        This 2-minute assessment evaluates your digestive health, metabolism, and gut function to reveal your personal risk level. Answer honestly for the most accurate results.
-      </p>
+        {/* Copy block */}
+        <div className="max-w-xl mx-auto text-left mb-10 space-y-4 text-base md:text-lg text-foreground/80">
+          <p className="text-center font-semibold text-foreground/70 mb-2">Let's End The Weight Loss Struggle.</p>
+          <p>You're not at fault.<br />It's not willpower.<br />It's not your hormones.<br />It's not your age.</p>
+          <p>Take this quiz to...</p>
+          <ul className="list-none space-y-2">
+            <li>✓ Discover the real reason you're struggling to lose weight after 40</li>
+            <li>✓ Find out if your gut is secretly sabotaging your metabolism</li>
+            <li>✓ Get your personalized risk score and what it means for you</li>
+            <li>✓ Learn what to do next to finally get results</li>
+          </ul>
+        </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 items-center text-sm text-muted-foreground mb-10">
-        <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-primary" /> 17 questions</span>
-        <span className="hidden sm:block text-border">·</span>
-        <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-primary" /> Takes ~2 minutes</span>
-        <span className="hidden sm:block text-border">·</span>
-        <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-primary" /> Personalized results</span>
+        <Button
+          onClick={onStart}
+          size="lg"
+          className="px-12 py-6 text-lg font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
+        >
+          Start the Quiz Now →
+        </Button>
+        <p className="mt-4 text-xs text-muted-foreground">Takes ~2 minutes · Your answers are private and never shared.</p>
       </div>
 
-      <Button
-        onClick={onStart}
-        size="lg"
-        className="px-10 py-6 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
-      >
-        Start the Quiz
-      </Button>
-
-      <p className="mt-6 text-xs text-muted-foreground">
-        Your answers are private and never shared.
-      </p>
+      {/* Divider before embedded quiz */}
+      <div className="max-w-3xl mx-auto px-4 pb-4">
+        <hr className="border-border/40" />
+      </div>
     </div>
   );
 }
@@ -500,29 +514,31 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="w-full border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Leaf className="w-5 h-5 text-primary" />
-            <span
-              className="text-base font-semibold text-foreground"
-              style={{ fontFamily: "'Playfair Display', serif" }}
-            >
-              Stubborn Belly Fat Quiz
-            </span>
+      {/* Slim sticky nav — only shown during quiz flow (not on intro) */}
+      {stage !== "intro" && (
+        <header className="w-full border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Leaf className="w-5 h-5 text-primary" />
+              <span
+                className="text-base font-semibold text-foreground"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
+                Stubborn Belly Fat Quiz
+              </span>
+            </div>
+            {stage === "questions" && (
+              <span className="text-xs text-muted-foreground">
+                {answers.length} / {QUESTIONS.length} answered
+              </span>
+            )}
           </div>
-          {stage === "questions" && (
-            <span className="text-xs text-muted-foreground">
-              {answers.length} / {QUESTIONS.length} answered
-            </span>
-          )}
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main content */}
       <main className="flex-1 flex flex-col items-center justify-center py-10 px-2">
-        {stage === "intro" && <IntroPage onStart={() => setStage("questions")} />}
+        {stage === "intro" && <LandingHeader onStart={() => setStage("questions")} />}
 
         {stage === "questions" && (
           <QuestionPage
