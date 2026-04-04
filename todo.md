@@ -26,3 +26,21 @@
 - [x] Improve notification email format: send as HTML two-column table (question/answer) matching preferred format
 - [x] Remove duplicate plain-text Manus notification — only send the single HTML table email via GHL
 - [x] Map all 17 quiz answers to GHL custom field IDs in the upsert payload so answers appear in AwesomeCRM custom fields view
+- [ ] Submit to GHL quiz form endpoint so responses appear in Quiz Submissions list in AwesomeCRM
+- [ ] Deploy Yellow Alert VSL page as standalone web app
+- [x] Remove stats boxes (245%, 25 lbs, 27%) from hero section of Yellow Alert VSL
+- [ ] Wire up VSL redirect URLs on quiz results page (Yellow Alert → Yellow VSL, Red Alert → Red VSL)
+- [x] Remove white header block (GLP-1 Gut Restoration Protocol) from Yellow Alert VSL
+- [x] Enlarge the green alert banner and its text for easier reading
+- [x] Match Yellow Alert VSL colors to quiz sage green palette
+- [x] Remove "Gateway Solutions" from Yellow Alert VSL footer
+- [x] Update Yellow Alert VSL offer section to match Red Alert VSL offer
+- [x] Apply same color/style edits to Red Alert VSL (quiz palette, remove header, remove stat boxes, enlarge banner, remove Gateway Solutions)
+- [x] Remove "Accelerate My Results with the Full GLP-1 System" secondary CTA from Yellow Alert VSL
+- [x] Remove "Accelerate My Results with the Full GLP-1 System" secondary CTA from Red Alert VSL
+- [x] Restyle Red Alert VSL to match quiz sage green color palette
+- [x] Remove PDF download link from Yellow Alert VSL
+- [x] Remove PDF download link from Red Alert VSL
+- [x] Make CTA button clearly clickable (better text, hover effect, arrow) on Yellow Alert VSL
+- [x] Make CTA button clearly clickable (better text, hover effect, arrow) on Red Alert VSL
+- [x] Add 7-second countdown auto-redirect on quiz results page (Yellow → yellow-alert-preview.html, Red → red-alert-preview.html, Green stays)

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { QUESTIONS, CATEGORY_META, getAlertLevel, computeScores } from "../../../shared/quizData";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -312,6 +312,26 @@ function ContactForm({
 function ResultsPage({ result, answers }: { result: ResultData; answers: Answer[] }) {
   const alertLevel = getAlertLevel(result.totalScore);
 
+  // ── Auto-redirect countdown for yellow/red alert ───────────────────────────
+  const redirectUrl =
+    alertLevel === "yellow"
+      ? "/yellow-alert-preview.html"
+      : alertLevel === "red"
+      ? "/red-alert-preview.html"
+      : null;
+
+  const [countdown, setCountdown] = useState(redirectUrl ? 7 : 0);
+
+  useEffect(() => {
+    if (!redirectUrl) return;
+    if (countdown <= 0) {
+      window.location.href = redirectUrl;
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown, redirectUrl]);
+
   const alertConfig = {
     green: {
       label: "Green Alert",
@@ -350,6 +370,25 @@ function ResultsPage({ result, answers }: { result: ResultData; answers: Answer[
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-8">
+
+      {/* Countdown redirect banner — only for yellow/red */}
+      {redirectUrl && (
+        <div className="mb-6 rounded-xl bg-[#c8d8b8] border border-[#4a7c59] px-5 py-4 text-center">
+          <p className="text-sm font-semibold text-[#2d4a1e]">
+            📺 Char has a personal message for you based on your results.
+          </p>
+          <p className="text-sm text-[#2d4a1e] mt-1">
+            Redirecting you in <span className="font-bold text-lg">{countdown}</span> second{countdown !== 1 ? "s" : ""}...
+          </p>
+          <a
+            href={redirectUrl}
+            className="inline-block mt-3 text-sm font-bold text-[#2d4a1e] underline underline-offset-2"
+          >
+            Click here to watch now →
+          </a>
+        </div>
+      )}
+
       <div className="text-center mb-8">
         <p className="text-sm font-medium tracking-widest uppercase text-muted-foreground mb-3">
           Your Results

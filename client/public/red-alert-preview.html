@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Quiz Results — Red Alert | Char Winnen Ed.D.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Quiz-matched Sage Green Palette ─────────────────────────────
+       Background:    #f4f8f4  (soft sage cream)
+       Primary:       #4a7c59  (deep sage green)
+       Primary dark:  #2d4a1e  (forest green — headings, strong text)
+       Attention bar: #c8d8b8  (light sage) / text #2d4a1e
+       Border:        #d0e0d0  (sage border)
+       Muted bg:      #e8f0e8  (very light sage)
+       Card bg:       #ffffff
+       Body text:     #1e2e1e  (near-black green)
+       Muted text:    #5a7a5a
+       Accent light:  #f0f7f0
+    ────────────────────────────────────────────────────────────────── */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      color: #1e2e1e;
+      background: #f4f8f4;
+    }
+    .container { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+    h1, h2, h3 { font-family: 'Playfair Display', ui-serif, Georgia, serif; line-height: 1.2; }
+
+    /* ── Alert Banner ─────────────────────────────────────────────── */
+    .alert-banner {
+      background: #c8d8b8;
+      color: #2d4a1e;
+      text-align: center;
+      padding: 18px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      border-bottom: 2px solid #4a7c59;
+    }
+
+    /* ── Header — hidden */
+    header { display: none; }
+
+    /* ── Hero Section ─────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(160deg, #f4f8f4 0%, #e8f0e8 100%);
+      padding: 60px 24px 52px;
+      text-align: center;
+      border-bottom: 1px solid #d0e0d0;
+    }
+    .result-badge {
+      display: inline-block;
+      background: #e8f0e8;
+      color: #2d4a1e;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 20px;
+      border-radius: 30px;
+      margin-bottom: 22px;
+      border: 1px solid #4a7c59;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      color: #1e2e1e;
+      max-width: 680px;
+      margin: 0 auto 16px;
+    }
+    .hero h1 span { color: #4a7c59; }
+    .hero-sub {
+      font-size: 18px;
+      color: #5a7a5a;
+      max-width: 580px;
+      margin: 0 auto 36px;
+      font-style: italic;
+      line-height: 1.65;
+    }
+
+    /* ── Video Box ────────────────────────────────────────────────── */
+    .video-section { padding: 52px 24px 44px; background: #ffffff; }
+    .video-label {
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #4a7c59;
+      margin-bottom: 14px;
+    }
+    .video-wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(74,124,89,0.15);
+      border: 2px solid #d0e0d0;
+      background: #f4f8f4;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .video-placeholder-icon { font-size: 44px; color: #c8d8b8; }
+    .video-placeholder-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #4a7c59;
+    }
+    .video-placeholder-sub {
+      font-size: 13px;
+      color: #5a7a5a;
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    /* ── Pain Validation ──────────────────────────────────────────── */
+    .validation-section {
+      background: linear-gradient(160deg, #f0f7f0 0%, #ffffff 100%);
+      padding: 52px 24px;
+      border-top: 1px solid #d0e0d0;
+      border-bottom: 1px solid #d0e0d0;
+    }
+    .validation-section h2 {
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 700;
+      color: #1e2e1e;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .validation-section p {
+      max-width: 680px;
+      margin: 0 auto 18px;
+      font-size: 17px;
+      color: #1e2e1e;
+      line-height: 1.75;
+    }
+    .not-your-fault {
+      background: #e8f0e8;
+      border-left: 5px solid #4a7c59;
+      border-radius: 0 12px 12px 0;
+      padding: 22px 26px;
+      max-width: 680px;
+      margin: 28px auto 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e2e1e;
+      font-style: italic;
+      line-height: 1.65;
+    }
+
+    /* ── Science Section ──────────────────────────────────────────── */
+    .science-section { padding: 52px 24px; background: #ffffff; }
+    .science-section h2 {
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 700;
+      color: #1e2e1e;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .science-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      max-width: 720px;
+      margin: 0 auto 32px;
+    }
+    .science-card {
+      background: #f0f7f0;
+      border-radius: 12px;
+      padding: 24px 20px;
+      border-top: 4px solid #4a7c59;
+      text-align: center;
+      border: 1px solid #d0e0d0;
+      border-top: 4px solid #4a7c59;
+    }
+    .science-card .icon { font-size: 32px; margin-bottom: 10px; }
+    .science-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e2e1e;
+      margin-bottom: 8px;
+    }
+    .science-card p { font-size: 14px; color: #5a7a5a; line-height: 1.5; }
+    .science-summary {
+      max-width: 680px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #c8d8b8 0%, #4a7c59 100%);
+      border-radius: 14px;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .science-summary p { font-size: 17px; line-height: 1.7; color: #1e2e1e; }
+    .science-summary strong { color: #ffffff; }
+
+    /* ── Testimonials ─────────────────────────────────────────────── */
+    .testimonials-section {
+      background: linear-gradient(160deg, rgba(200,216,184,0.15) 0%, #f4f8f4 100%);
+      padding: 52px 24px;
+      border-top: 1px solid #d0e0d0;
+    }
+    .testimonials-section h2 {
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 700;
+      color: #1e2e1e;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .testimonial-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 22px;
+      border: 1px solid #d0e0d0;
+    }
+    .testimonial-card .stars { color: #4a7c59; margin-bottom: 10px; }
+    .testimonial-card blockquote {
+      font-style: italic;
+      color: #1e2e1e;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .testimonial-card .attribution {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #4a7c59;
+    }
+    .char-testimonial {
+      max-width: 680px;
+      margin: 24px auto 0;
+      background: #e8f0e8;
+      border-radius: 14px;
+      padding: 26px 30px;
+      text-align: center;
+      border: 1px solid #4a7c59;
+    }
+    .char-testimonial p { font-size: 17px; line-height: 1.75; color: #1e2e1e; font-style: italic; margin-bottom: 12px; }
+    .char-testimonial .char-name {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #4a7c59;
+    }
+
+    /* ── Urgency Strip ────────────────────────────────────────────── */
+    .urgency-strip {
+      background: #c8d8b8;
+      color: #2d4a1e;
+      text-align: center;
+      padding: 16px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      border-top: 1px solid #4a7c59;
+      border-bottom: 1px solid #4a7c59;
+    }
+
+    /* ── Offer Section ────────────────────────────────────────────── */
+    .offer-section {
+      padding: 60px 24px 72px;
+      background: #f4f8f4;
+    }
+    .offer-section h2 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 700;
+      color: #1e2e1e;
+      text-align: center;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .offer-section .offer-sub {
+      text-align: center;
+      color: #5a7a5a;
+      font-size: 16px;
+      margin-bottom: 36px;
+      line-height: 1.65;
+    }
+    .offer-box {
+      max-width: 680px;
+      margin: 0 auto;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 48px rgba(74,124,89,0.12);
+      border: 1px solid #d0e0d0;
+      background: #ffffff;
+    }
+    .offer-box-header {
+      background: linear-gradient(135deg, #c8d8b8 0%, #4a7c59 100%);
+      padding: 26px 30px;
+      text-align: center;
+    }
+    .offer-box-header h3 {
+      font-size: clamp(20px, 3.5vw, 26px);
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 7px;
+    }
+    .offer-box-header p { font-size: 15px; color: #e8f0e8; opacity: 0.9; }
+    .offer-box-body { padding: 30px; }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-box {
+      background: #f0f7f0;
+      border-radius: 10px;
+      padding: 18px 12px;
+      text-align: center;
+      border-top: 3px solid #4a7c59;
+      border: 1px solid #d0e0d0;
+      border-top: 3px solid #4a7c59;
+    }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #4a7c59;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .stat-label { font-size: 12px; color: #5a7a5a; line-height: 1.4; }
+
+    .offer-items { list-style: none; margin-bottom: 26px; }
+    .offer-items li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 15px 0;
+      border-bottom: 1px solid #d0e0d0;
+      font-size: 15px;
+      color: #1e2e1e;
+      line-height: 1.65;
+    }
+    .offer-items li:last-child { border-bottom: none; }
+    .offer-items li .check {
+      background: #c8d8b8;
+      color: #2d4a1e;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* ── Bonus Section ────────────────────────────────────────────── */
+    .bonus-section {
+      background: #f0f7f0;
+      border: 1px dashed #4a7c59;
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 26px;
+    }
+    .bonus-section h3 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #1e2e1e;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .bonus-section h3 span { color: #4a7c59; }
+    .bonus-items { list-style: none; }
+    .bonus-items li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 14px;
+      color: #1e2e1e;
+      border-bottom: 1px solid #d0e0d0;
+      line-height: 1.65;
+    }
+    .bonus-items li:last-child { border-bottom: none; }
+    .bonus-items li .gift { font-size: 20px; flex-shrink: 0; }
+    .bonus-items li strong { color: #1e2e1e; }
+    .bonus-value {
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e2e1e;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #d0e0d0;
+    }
+    .bonus-value span { color: #4a7c59; font-size: 18px; }
+
+    /* ── CTA Buttons ──────────────────────────────────────────────── */
+    .cta-primary {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #4a7c59 0%, #2d4a1e 100%);
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      text-align: center;
+      padding: 20px 28px;
+      border-radius: 50px;
+      text-decoration: none;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 24px rgba(74,124,89,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+    }
+    .cta-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(74,124,89,0.50);
+    }
+    .guarantee-note {
+      text-align: center;
+      font-size: 14px;
+      color: #5a7a5a;
+      margin-bottom: 14px;
+    }
+    .pdf-link {
+      display: block;
+      text-align: center;
+      font-size: 14px;
+      color: #4a7c59;
+      text-decoration: underline;
+      margin-top: 4px;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────── */
+    footer {
+      background: #e8f0e8;
+      border-top: 1px solid #d0e0d0;
+      color: #5a7a5a;
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    footer strong { color: #1e2e1e; }
+
+    /* ── Mobile ───────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .stat-number { font-size: 22px; }
+      .offer-box-body { padding: 20px; }
+      .bonus-section { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Alert Banner -->
+  <div class="alert-banner">⚠️ &nbsp; Important: Your Quiz Results Are Ready — Watch Char's Message Now</div>
+
+  <!-- Header removed -->
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="result-badge">🔴 Your Result: Red Alert — Score 23–45</div>
+      <h1>Your Quiz Results Are In.<br><span>Watch This Important Message From Char.</span></h1>
+      <p class="hero-sub">This short video explains exactly what your score means and what you can do about it — starting today.</p>
+    </div>
+  </section>
+
+  <!-- Video -->
+  <section class="video-section">
+    <div class="container">
+      <div class="video-label">▶ &nbsp; Watch Now — 3 Minutes</div>
+      <div class="video-wrapper">
+        <!-- ═══════════════════════════════════════════════════════════
+             REPLACE THIS BLOCK WITH YOUR VIDEO EMBED WHEN READY
+             Example: <iframe src="https://www.youtube.com/embed/YOUR_ID"
+             frameborder="0" allowfullscreen
+             style="width:100%;height:100%;position:absolute;top:0;left:0;">
+             </iframe>
+        ═══════════════════════════════════════════════════════════ -->
+        <div class="video-placeholder-icon">▶</div>
+        <div class="video-placeholder-text">Your Personal Message from Char</div>
+        <div class="video-placeholder-sub">Add your video embed link here</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pain Validation -->
+  <section class="validation-section">
+    <div class="container">
+      <h2>Your Results Confirm What You've Been Feeling</h2>
+      <p>Your quiz score shows clear signs of <strong>severe gut imbalance and high inflammation</strong>. This is why weight loss feels impossible right now — even when you're eating well and exercising. Every calorie seems to turn into fat. You never feel truly full. The cravings feel completely out of your control.</p>
+      <p>You've probably been blaming yourself. Wondering if you just don't have enough willpower. Wondering what's wrong with you. The truth is, nothing is wrong with you. Your body is fighting against the wrong kind of bacteria in your gut — the kind that causes you to gain weight and hold onto every pound.</p>
+      <div class="not-your-fault">
+        "This is not your fault. Your willpower is not broken. Your gut is — and we can fix it."
+        <div style="font-size:14px;font-weight:400;color:#5a7a5a;font-family:'Inter',sans-serif;margin-top:10px;font-style:normal;">— Char Winnen Ed.D., Nutritionist</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Science -->
+  <section class="science-section">
+    <div class="container">
+      <h2>Here's What's Really Happening Inside Your Body</h2>
+      <div class="science-cards">
+        <div class="science-card">
+          <div class="icon">🦠</div>
+          <h3>Gut Imbalance</h3>
+          <p>Bad bacteria have overtaken the good, creating hidden inflammation that sabotages your metabolism.</p>
+        </div>
+        <div class="science-card">
+          <div class="icon">🔥</div>
+          <h3>High Inflammation</h3>
+          <p>Chronic inflammation signals your body to store fat and blocks your natural fat-burning hormones.</p>
+        </div>
+        <div class="science-card">
+          <div class="icon">⚡</div>
+          <h3>Low GLP-1 Hormone</h3>
+          <p>Inflammation shuts down your body's GLP-1 hormone production — the hormone that tells your brain "I'm full."</p>
+        </div>
+      </div>
+      <div class="science-summary">
+        <p>Once you <strong>restore your gut balance</strong>, inflammation calms and your body can begin naturally producing the <strong>GLP-1 hormone</strong> again — unlocking your ability to finally lose that stubborn belly fat that's been holding on for years.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials-section">
+    <div class="container">
+      <h2>Real Women. Real Results.</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"What an incredible journey it has been! After 64 years, I've finally discovered what truly works for me. Embracing a lifestyle change with the MindBody GLP-1 system has been nothing short of transformative."</blockquote>
+          <div class="attribution">— Jane</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"The best part — no cravings because I love to eat! Feeling energized and great throughout the whole process."</blockquote>
+          <div class="attribution">— Mark, lost 9 lbs in 3 weeks</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"In 12 weeks, I went from a size 14 to a size 10, losing 29.5 pounds. I can't believe how different I feel."</blockquote>
+          <div class="attribution">— Mary, lost 29.5 lbs in 12 weeks</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"I never expected my sugar cravings to stop after just being on the system one day!"</blockquote>
+          <div class="attribution">— Diane</div>
+        </div>
+      </div>
+      <div class="char-testimonial">
+        <p>"I used this exact system to lose 50 pounds — and I did it in my late 70s. If I can do it, you absolutely can too."</p>
+        <div class="char-name">— Char Winnen Ed.D., Nutritionist</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Urgency Strip -->
+  <div class="urgency-strip">
+    🎁 &nbsp; Order today and receive $435 in FREE bonuses — including a private consultation with Char
+  </div>
+
+  <!-- Offer -->
+  <section class="offer-section">
+    <div class="container">
+      <h2>Your Red Alert Solution</h2>
+      <p class="offer-sub">Start losing weight in 2–3 months by restoring your gut health and naturally boosting your GLP-1 hormone.</p>
+
+      <div class="offer-box">
+        <div class="offer-box-header">
+          <h3>The GLP-1 Gut Restoration Protocol</h3>
+          <p>The complete system to restore your gut, reduce inflammation, and start losing weight naturally</p>
+        </div>
+        <div class="offer-box-body">
+
+          <!-- Stats -->
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-number">245%</div>
+              <div class="stat-label">Increase in GLP-1 Hormone Levels</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">25 lbs</div>
+              <div class="stat-label">Average Weight Loss in 12 Weeks</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">27%</div>
+              <div class="stat-label">Belly Fat Reduction in 12 Weeks</div>
+            </div>
+          </div>
+
+          <!-- What You Get -->
+          <div style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#4a7c59;margin-bottom:10px;">✅ &nbsp; What You Get</div>
+          <ul class="offer-items">
+            <li><span class="check">✓</span><div><strong>Healthy Edge Stack</strong> — Two powerhouse products working together: <em>Protandim® Nrf2 Synergizer®</em> (reduces oxidative stress and calms inflammation at the cellular level) + <em>P84 (PhytoPower 84)</em> (a complete microbiome system with 84 ingredients — probiotics, prebiotics, postbiotics, digestive enzymes, and superfood blends — that activates 14 key gut peptides to regulate, repair, and restore your gut balance).</div></li>
+            <li><span class="check">✓</span><div><strong>MindBody GLP-1 System</strong> — Helps your body naturally produce more of its own GLP-1 hormone, without injections or side effects. Start losing weight in as little as one month.</div></li>
+            <li><span class="check">✓</span><div><strong>Step-by-Step Protocol</strong> — Char's exact roadmap for using the system to get maximum results, including what to take, when, and how to accelerate your progress.</div></li>
+          </ul>
+
+          <!-- Bonuses -->
+          <div class="bonus-section">
+            <h3>🎁 &nbsp; Free Bonuses Included Today &nbsp;<span>(Value $435)</span></h3>
+            <ul class="bonus-items">
+              <li><span class="gift">📞</span><div><strong>Free 30-Minute Private Consultation with Char</strong> — Personalized one-on-one guidance to accelerate your results. ($197 value)</div></li>
+              <li><span class="gift">📋</span><div><strong>Char's Personal Weight Loss Protocol</strong> — The exact steps she used to lose 50 pounds in her late 70s. ($97 value)</div></li>
+              <li><span class="gift">🥗</span><div><strong>Protein Guide for Weight Loss</strong> — Know exactly what to eat to fuel your gut restoration and speed up fat loss. ($47 value)</div></li>
+              <li><span class="gift">📊</span><div><strong>GLP-1 Hormone Weight Loss Tracker</strong> — Track your progress week by week and stay motivated. ($47 value)</div></li>
+              <li><span class="gift">🥦</span><div><strong>Foods To Eat &amp; Foods To Avoid Guide</strong> — The complete gut-friendly food list for faster results. ($47 value)</div></li>
+            </ul>
+            <div class="bonus-value">Total Bonus Value: $435 &nbsp;→&nbsp; <span>FREE with your order today</span></div>
+          </div>
+
+          <!-- CTA -->
+          <a href="https://cart.lifevantage.com/US/shoppingcart/share/792b7ca9-b39b-445b-9cfe-00128d01555f" target="_blank" class="cta-primary">
+            👉 &nbsp; Click Here to Order Now — Yes, I'm Ready to Reclaim My Body
+          </a>
+          <p class="guarantee-note">✅ <strong>100% Money-Back Guarantee</strong> &nbsp;·&nbsp; No risk. No fear. Just results.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><strong>Char Winnen Ed.D.</strong> &nbsp;·&nbsp; Nutritionist &amp; Wellness Coach</p>
+      <p style="margin-top:8px;">These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease. Individual results may vary.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
