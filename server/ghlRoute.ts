@@ -191,7 +191,65 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
         });
         console.log(`[GHL] Added tag "${crmTag}" to contact ${ghlContactId}`);
 
-        // ── Step 3: Send HTML notification email via GHL ─────────────────────
+        // ── Step 3: Submit to GHL Forms API so entry appears in Quiz Submissions ─
+        // POST to the Forms v2 submit endpoint using form ID e5R9PsrieIyZg7lqVcU5
+        try {
+          const GHL_FORM_ID = "e5R9PsrieIyZg7lqVcU5";
+          const GHL_API_KEY = process.env.GHL_API_KEY || "";
+
+          // Build form field payload: standard fields + all question custom fields
+          const formFields: Record<string, string> = {
+            full_name: fullName,
+            first_name: firstName,
+            email: email,
+          };
+          if (lastName) formFields.last_name = lastName;
+          if (phone) formFields.phone = phone;
+
+          // Map each answer to its custom field ID
+          for (const a of answers) {
+            const fieldId = QUESTION_TO_CUSTOM_FIELD[a.questionId];
+            if (!fieldId) continue;
+            const q = QUESTIONS.find((q) => q.id === a.questionId);
+            if (!q) continue;
+            let answerText = "";
+            if (a.optionIndex !== undefined && q.options[a.optionIndex]) {
+              answerText = q.options[a.optionIndex]!.text;
+            } else {
+              answerText = q.options.find((o) => o.points === a.points)?.text ?? "";
+            }
+            if (answerText) formFields[fieldId] = answerText;
+          }
+
+          const formRes = await fetch(
+            `https://services.leadconnectorhq.com/forms/submit`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${GHL_API_KEY}`,
+                "Version": "2021-07-28",
+              },
+              body: JSON.stringify({
+                formId: GHL_FORM_ID,
+                locationId: GHL_LOCATION_ID,
+                contactId: ghlContactId,
+                fieldData: formFields,
+              }),
+            }
+          );
+
+          if (formRes.ok) {
+            console.log("[GHL] Form submission recorded in Quiz Submissions");
+          } else {
+            const errText = await formRes.text().catch(() => "");
+            console.warn("[GHL] Form submission failed:", formRes.status, errText.slice(0, 200));
+          }
+        } catch (formErr) {
+          console.warn("[GHL] Form submission error (non-fatal):", formErr);
+        }
+
+        // ── Step 4: Send HTML notification email via GHL ─────────────────────
         // GHL's conversations_send-a-new-message supports body_html, which renders
         // a proper two-column table in the owner's email — matching the preferred format.
         const catScores = [

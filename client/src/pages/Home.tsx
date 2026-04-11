@@ -312,6 +312,14 @@ function ContactForm({
 function ResultsPage({ result, answers }: { result: ResultData; answers: Answer[] }) {
   const alertLevel = getAlertLevel(result.totalScore);
 
+  // ── Red Alert sub-group: Lower (23–30) vs Upper (31–54) ───────────────────
+  const redAlertSubGroup: "lower" | "upper" | null =
+    alertLevel === "red"
+      ? result.totalScore <= 30
+        ? "lower"
+        : "upper"
+      : null;
+
   // ── Auto-redirect countdown for yellow/red alert ───────────────────────────
   const redirectUrl =
     alertLevel === "yellow"
@@ -352,13 +360,21 @@ function ResultsPage({ result, answers }: { result: ResultData; answers: Answer[
         "Your results suggest moderate gut health disruption that may be contributing to stubborn belly fat. There are clear, actionable steps you can take to improve.",
     },
     red: {
-      label: "Red Alert",
+      label: alertLevel === "red" && redAlertSubGroup === "lower" ? "Red Alert" : "Red Alert",
       color: "text-red-700",
       bg: "bg-red-50",
       border: "border-red-200",
       dot: "bg-red-500",
       message:
-        "Your results indicate significant gut health disruption. This level of imbalance is strongly linked to stubborn belly fat and metabolic resistance — but it is reversible.",
+        redAlertSubGroup === "lower"
+          ? // ── PLACEHOLDER: Lower Red Alert message (score 23–30) ──────────────
+            // TODO: Replace with personalized message for lower Red Alert group
+            "Your results indicate significant gut health disruption. This level of imbalance is strongly linked to stubborn belly fat and metabolic resistance — but it is reversible."
+          : redAlertSubGroup === "upper"
+          ? // ── PLACEHOLDER: Upper Red Alert message (score 31–54) ──────────────
+            // TODO: Replace with personalized message for upper Red Alert group
+            "Your results indicate significant gut health disruption. This level of imbalance is strongly linked to stubborn belly fat and metabolic resistance — but it is reversible."
+          : "Your results indicate significant gut health disruption. This level of imbalance is strongly linked to stubborn belly fat and metabolic resistance — but it is reversible.",
     },
   }[alertLevel];
 
@@ -376,6 +392,11 @@ function ResultsPage({ result, answers }: { result: ResultData; answers: Answer[
         <div className="mb-6 rounded-xl bg-[#c8d8b8] border border-[#4a7c59] px-5 py-4 text-center">
           <p className="text-sm font-semibold text-[#2d4a1e]">
             📺 Char has a personal message for you based on your results.
+            {redAlertSubGroup && (
+              <span className="ml-1 text-xs font-normal opacity-70">
+                ({redAlertSubGroup === "lower" ? "Score 23–30" : "Score 31–54"})
+              </span>
+            )}
           </p>
           <p className="text-sm text-[#2d4a1e] mt-1">
             Redirecting you in <span className="font-bold text-lg">{countdown}</span> second{countdown !== 1 ? "s" : ""}...

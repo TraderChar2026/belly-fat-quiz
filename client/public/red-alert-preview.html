@@ -100,28 +100,8 @@
       overflow: hidden;
       box-shadow: 0 8px 40px rgba(74,124,89,0.15);
       border: 2px solid #d0e0d0;
-      background: #f4f8f4;
-      aspect-ratio: 16/9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
     }
-    .video-placeholder-icon { font-size: 44px; color: #c8d8b8; }
-    .video-placeholder-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 16px;
-      font-weight: 700;
-      color: #4a7c59;
-    }
-    .video-placeholder-sub {
-      font-size: 13px;
-      color: #5a7a5a;
-      text-align: center;
-      max-width: 320px;
-      line-height: 1.5;
-    }
+    .video-wrapper wistia-player { display: block; width: 100%; }
 
     /* ── Pain Validation ──────────────────────────────────────────── */
     .validation-section {
@@ -486,20 +466,15 @@
   </section>
 
   <!-- Video -->
+  <script src="https://fast.wistia.com/player.js" async></script>
+  <script src="https://fast.wistia.com/embed/9384761b7n.js" async type="module"></script>
+  <style>wistia-player[media-id='9384761b7n']:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/9384761b7n/swatch'); display: block; filter: blur(5px); padding-top:56.25%; }</style>
+
   <section class="video-section">
     <div class="container">
       <div class="video-label">▶ &nbsp; Watch Now — 3 Minutes</div>
       <div class="video-wrapper">
-        <!-- ═══════════════════════════════════════════════════════════
-             REPLACE THIS BLOCK WITH YOUR VIDEO EMBED WHEN READY
-             Example: <iframe src="https://www.youtube.com/embed/YOUR_ID"
-             frameborder="0" allowfullscreen
-             style="width:100%;height:100%;position:absolute;top:0;left:0;">
-             </iframe>
-        ═══════════════════════════════════════════════════════════ -->
-        <div class="video-placeholder-icon">▶</div>
-        <div class="video-placeholder-text">Your Personal Message from Char</div>
-        <div class="video-placeholder-sub">Add your video embed link here</div>
+        <wistia-player media-id="9384761b7n" aspect="1.7777777777777777"></wistia-player>
       </div>
     </div>
   </section>

@@ -29,7 +29,7 @@
 - [ ] Submit to GHL quiz form endpoint so responses appear in Quiz Submissions list in AwesomeCRM
 - [ ] Deploy Yellow Alert VSL page as standalone web app
 - [x] Remove stats boxes (245%, 25 lbs, 27%) from hero section of Yellow Alert VSL
-- [ ] Wire up VSL redirect URLs on quiz results page (Yellow Alert → Yellow VSL, Red Alert → Red VSL)
+- [x] Wire up VSL redirect URLs on quiz results page (Yellow Alert → Yellow VSL, Red Alert → Red VSL)
 - [x] Remove white header block (GLP-1 Gut Restoration Protocol) from Yellow Alert VSL
 - [x] Enlarge the green alert banner and its text for easier reading
 - [x] Match Yellow Alert VSL colors to quiz sage green palette
@@ -44,3 +44,9 @@
 - [x] Make CTA button clearly clickable (better text, hover effect, arrow) on Yellow Alert VSL
 - [x] Make CTA button clearly clickable (better text, hover effect, arrow) on Red Alert VSL
 - [x] Add 7-second countdown auto-redirect on quiz results page (Yellow → yellow-alert-preview.html, Red → red-alert-preview.html, Green stays)
+- [ ] Submit quiz responses to GHL Forms API (form ID: e5R9PsrieIyZg7lqVcU5) so entries appear in Quiz Submissions list
+- [x] Embed Wistia video (9384761b7n) into Red Alert VSL page
+- [x] Embed Wistia video (g4s4s1m6ta) into Yellow Alert VSL page
+- [x] Split Red Alert results into Lower (23-30) and Upper (31-54) sub-groups with placeholder messaging
+- [ ] Add personalized messaging for Lower Red Alert group (pending user content after trip)
+- [ ] Add personalized messaging for Upper Red Alert group (pending user content after trip)
