@@ -50,3 +50,14 @@
 - [x] Split Red Alert results into Lower (23-30) and Upper (31-54) sub-groups with placeholder messaging
 - [ ] Add personalized messaging for Lower Red Alert group (pending user content after trip)
 - [ ] Add personalized messaging for Upper Red Alert group (pending user content after trip)
+- [x] Expand quiz_submissions table with all missing fields (session_id, score_band, ad attribution, UTM, etc.)
+- [x] Create funnel_events table in database
+- [x] Capture UTM params, ad_name, fbclid, session_id, referrer on quiz page load
+- [x] Pass attribution data through quiz submission to server and store in database
+- [x] Server-side funnel.track tRPC procedure ready (page_view, quiz_start, quiz_complete, order_click)
+- [x] Wire frontend event dispatch to funnel.track for page_view, quiz_start, quiz_complete
+- [ ] Add order_click event to VSL pages buy buttons (post-launch)
+- [x] Build dashboard: submissions summary section
+- [x] Build dashboard: ad performance table section
+- [x] Build dashboard: individual submissions table (searchable/filterable)
+- [x] Build dashboard: manual sales entry form

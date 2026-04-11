@@ -2,13 +2,43 @@ import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
-import { saveQuizSubmission } from "./db";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import {
+  saveQuizSubmission,
+  saveFunnelEvent,
+  getSubmissions,
+  getSubmissionById,
+  getSubmissionsSummary,
+  getAdPerformance,
+  saveSale,
+  getSales,
+  deleteSale,
+} from "./db";
 import { computeScores, getCrmTag } from "../shared/quizData";
+import { TRPCError } from "@trpc/server";
+import { ENV } from "./_core/env";
 
 const answerSchema = z.object({
   questionId: z.number().int().min(1).max(17),
   points: z.number().int().min(0).max(3),
+});
+
+// ── Attribution schema (shared by quiz.submit and funnel.track) ───────────────
+const attributionSchema = z.object({
+  sessionId: z.string().max(128).optional(),
+  timezone: z.string().max(64).optional(),
+  adName: z.string().max(255).optional(),
+  adNameRaw: z.string().max(255).optional(),
+  referrerUrl: z.string().max(2048).optional(),
+  referrerPlatform: z.string().max(64).optional(),
+  utmSource: z.string().max(255).optional(),
+  utmMedium: z.string().max(255).optional(),
+  utmCampaign: z.string().max(255).optional(),
+  utmId: z.string().max(255).optional(),
+  utmTerm: z.string().max(255).optional(),
+  fbclid: z.string().max(512).optional(),
+  fbEventId: z.string().max(255).optional(),
+  pageUrl: z.string().max(2048).optional(),
 });
 
 export const appRouter = router({
@@ -22,6 +52,7 @@ export const appRouter = router({
     }),
   }),
 
+  // ── Quiz ───────────────────────────────────────────────────────────────────
   quiz: router({
     submit: publicProcedure
       .input(z.object({
@@ -34,7 +65,6 @@ export const appRouter = router({
         const { digestiveScore, appetiteScore, gutScore, totalScore } = computeScores(input.answers);
         const crmTag = getCrmTag(totalScore);
 
-        // Upsert contact in GoHighLevel via MCP (server-side fetch to our own API endpoint)
         let ghlContactId: string | null = null;
         try {
           const ghlRes = await fetch(`${process.env.GHL_WEBHOOK_URL || ""}`, {
@@ -56,12 +86,20 @@ export const appRouter = router({
           // GHL integration failure is non-fatal; submission still saved
         }
 
+        const alertTier = totalScore <= 8 ? "Green" : totalScore <= 22 ? "Yellow" : "Red";
+        const scoreBand =
+          totalScore <= 8 ? "Green" :
+          totalScore <= 22 ? "Yellow" :
+          totalScore <= 30 ? "Lower_Red" : "Upper_Red";
+
         await saveQuizSubmission({
           fullName: input.fullName,
           email: input.email,
           phone: input.phone ?? null,
           answers: JSON.stringify(input.answers),
           totalScore,
+          alertTier,
+          scoreBand,
           digestiveScore,
           appetiteScore,
           gutScore,
@@ -69,16 +107,9 @@ export const appRouter = router({
           ghlContactId,
         });
 
-        return {
-          totalScore,
-          digestiveScore,
-          appetiteScore,
-          gutScore,
-          crmTag,
-        };
+        return { totalScore, digestiveScore, appetiteScore, gutScore, crmTag };
       }),
 
-    // Internal endpoint called by the GHL webhook handler
     upsertGhlContact: publicProcedure
       .input(z.object({
         fullName: z.string(),
@@ -87,9 +118,152 @@ export const appRouter = router({
         crmTag: z.string().nullable(),
         totalScore: z.number(),
       }))
+      .mutation(async () => {
+        return { ok: true };
+      }),
+  }),
+
+  // ── Funnel Events ──────────────────────────────────────────────────────────
+  funnel: router({
+    track: publicProcedure
+      .input(z.object({
+        eventType: z.enum([
+          "page_view", "quiz_start", "quiz_complete",
+          "vsl_view", "vsl_25", "vsl_50", "vsl_75", "vsl_100",
+          "order_click", "order_placed",
+        ]),
+        sessionId: z.string().max(128),
+        submissionId: z.number().int().optional(),
+        email: z.string().email().max(320).optional(),
+        alertTier: z.string().max(32).optional(),
+        scoreBand: z.string().max(32).optional(),
+        vslVersion: z.enum(["red", "yel"]).optional(),
+        adName: z.string().max(255).optional(),
+        referrerPlatform: z.string().max(64).optional(),
+        utmSource: z.string().max(255).optional(),
+        utmCampaign: z.string().max(255).optional(),
+      }))
       .mutation(async ({ input }) => {
-        // This procedure is called server-side only; the actual GHL call
-        // happens via the /api/ghl-submit Express route to keep credentials secure.
+        await saveFunnelEvent({
+          sessionId: input.sessionId,
+          eventType: input.eventType,
+          submissionId: input.submissionId,
+          email: input.email,
+          alertTier: input.alertTier,
+          scoreBand: input.scoreBand,
+          vslVersion: input.vslVersion,
+          adName: input.adName,
+          referrerPlatform: input.referrerPlatform,
+          utmSource: input.utmSource,
+          utmCampaign: input.utmCampaign,
+        });
+        return { ok: true };
+      }),
+  }),
+
+  // ── Dashboard (owner-only) ─────────────────────────────────────────────────
+  dashboard: router({
+    summary: protectedProcedure
+      .input(z.object({
+        dateFrom: z.coerce.date().optional(),
+        dateTo: z.coerce.date().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getSubmissionsSummary(input?.dateFrom, input?.dateTo);
+      }),
+
+    adPerformance: protectedProcedure
+      .input(z.object({
+        dateFrom: z.coerce.date().optional(),
+        dateTo: z.coerce.date().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getAdPerformance(input?.dateFrom, input?.dateTo);
+      }),
+
+    submissions: protectedProcedure
+      .input(z.object({
+        page: z.number().int().min(1).default(1),
+        pageSize: z.number().int().min(1).max(100).default(25),
+        alertTier: z.string().optional(),
+        scoreBand: z.string().optional(),
+        adName: z.string().optional(),
+        search: z.string().optional(),
+        dateFrom: z.coerce.date().optional(),
+        dateTo: z.coerce.date().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getSubmissions(input ?? {});
+      }),
+
+    submissionDetail: protectedProcedure
+      .input(z.object({ id: z.number().int() }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        const row = await getSubmissionById(input.id);
+        if (!row) throw new TRPCError({ code: "NOT_FOUND" });
+        return row;
+      }),
+  }),
+
+  // ── Sales Log (owner-only) ─────────────────────────────────────────────────
+  sales: router({
+    log: protectedProcedure
+      .input(z.object({
+        submissionId: z.number().int().optional(),
+        email: z.string().email().max(320),
+        fullName: z.string().max(255).optional(),
+        productName: z.string().min(1).max(255),
+        orderValue: z.number().min(0),
+        orderDate: z.coerce.date(),
+        notes: z.string().max(2000).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await saveSale({
+          submissionId: input.submissionId,
+          email: input.email,
+          fullName: input.fullName,
+          productName: input.productName,
+          orderValue: String(input.orderValue),
+          orderDate: input.orderDate,
+          notes: input.notes,
+        });
+        return { ok: true };
+      }),
+
+    list: protectedProcedure
+      .input(z.object({
+        page: z.number().int().min(1).default(1),
+        pageSize: z.number().int().min(1).max(100).default(25),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getSales(input ?? {});
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await deleteSale(input.id);
         return { ok: true };
       }),
   }),

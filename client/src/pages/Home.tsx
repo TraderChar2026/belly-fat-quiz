@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useAttribution } from "@/hooks/useAttribution";
 import { QUESTIONS, CATEGORY_META, getAlertLevel, computeScores } from "../../../shared/quizData";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -537,13 +538,46 @@ export default function Home() {
     }
   }, [questionIndex]);
 
+  const attribution = useAttribution();
+  const trackEvent = trpc.funnel.track.useMutation();
+
+  // Fire page_view on mount
+  useEffect(() => {
+    if (attribution.sessionId) {
+      trackEvent.mutate({
+        eventType: "page_view",
+        sessionId: attribution.sessionId,
+        adName: attribution.adNameRaw,
+        referrerPlatform: attribution.referrerPlatform,
+        utmSource: attribution.utmSource,
+        utmCampaign: attribution.utmCampaign,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attribution.sessionId]);
+
   const handleContactSubmit = useCallback(
     async (contactData: { fullName: string; email: string; phone?: string }) => {
       setIsSubmitting(true);
       try {
         const payload = {
           ...contactData,
-          answers: answers.map(({ questionId, points }) => ({ questionId, points })),
+          answers: answers.map(({ questionId, points, optionIndex }) => ({ questionId, points, optionIndex })),
+          // Attribution data
+          sessionId: attribution.sessionId,
+          timezone: attribution.timezone,
+          adName: attribution.adNameRaw, // normalized server-side
+          adNameRaw: attribution.adNameRaw,
+          referrerUrl: attribution.referrerUrl,
+          referrerPlatform: attribution.referrerPlatform,
+          utmSource: attribution.utmSource,
+          utmMedium: attribution.utmMedium,
+          utmCampaign: attribution.utmCampaign,
+          utmId: attribution.utmId,
+          utmTerm: attribution.utmTerm,
+          fbclid: attribution.fbclid,
+          fbEventId: attribution.fbEventId,
+          pageUrl: attribution.pageUrl,
         };
 
         const res = await fetch("/api/ghl-submit", {
@@ -555,6 +589,19 @@ export default function Home() {
         if (!res.ok) throw new Error("Submission failed");
 
         const data = await res.json();
+        // Fire quiz_complete funnel event
+        if (attribution.sessionId) {
+          trackEvent.mutate({
+            eventType: "quiz_complete",
+            sessionId: attribution.sessionId,
+            email: contactData.email,
+            alertTier: data.crmTag?.includes("red") ? "Red" : data.crmTag?.includes("yellow") ? "Yellow" : "Green",
+            adName: attribution.adNameRaw,
+            referrerPlatform: attribution.referrerPlatform,
+            utmSource: attribution.utmSource,
+            utmCampaign: attribution.utmCampaign,
+          });
+        }
         setResult({
           totalScore: data.totalScore,
           digestiveScore: data.digestiveScore,
@@ -598,7 +645,19 @@ export default function Home() {
 
       {/* Main content */}
       <main className="flex-1 flex flex-col items-center justify-center py-10 px-2">
-        {stage === "intro" && <LandingHeader onStart={() => setStage("questions")} />}
+        {stage === "intro" && <LandingHeader onStart={() => {
+          setStage("questions");
+          if (attribution.sessionId) {
+            trackEvent.mutate({
+              eventType: "quiz_start",
+              sessionId: attribution.sessionId,
+              adName: attribution.adNameRaw,
+              referrerPlatform: attribution.referrerPlatform,
+              utmSource: attribution.utmSource,
+              utmCampaign: attribution.utmCampaign,
+            });
+          }
+        }} />}
 
         {stage === "questions" && (
           <QuestionPage

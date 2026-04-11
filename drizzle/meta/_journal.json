@@ -15,6 +15,13 @@
       "when": 1775154267917,
       "tag": "0001_black_natasha_romanoff",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775912634179,
+      "tag": "0002_magical_spacker_dave",
+      "breakpoints": true
     }
   ]
 }

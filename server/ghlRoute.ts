@@ -2,7 +2,7 @@ import { Router } from "express";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { computeScores, getCrmTag, getAlertLevel, CATEGORY_META, QUESTIONS } from "../shared/quizData";
-import { saveQuizSubmission } from "./db";
+import { saveQuizSubmission, checkIsRepeatSubmission } from "./db";
 
 const execAsync = promisify(exec);
 const ghlRouter = Router();
@@ -39,6 +39,21 @@ interface GhlSubmitBody {
   email: string;
   phone?: string;
   answers: { questionId: number; points: number; optionIndex?: number }[];
+  // Attribution & session fields
+  sessionId?: string;
+  timezone?: string;
+  adName?: string;
+  adNameRaw?: string;
+  referrerUrl?: string;
+  referrerPlatform?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmId?: string;
+  utmTerm?: string;
+  fbclid?: string;
+  fbEventId?: string;
+  pageUrl?: string;
 }
 
 /** Run an MCP tool call and return the parsed JSON result, or null on failure. */
@@ -125,7 +140,11 @@ function buildHtmlEmail(params: {
 ghlRouter.post("/api/ghl-submit", async (req, res) => {
   try {
     const body = req.body as GhlSubmitBody;
-    const { fullName, email, phone, answers } = body;
+    const {
+      fullName, email, phone, answers,
+      sessionId, timezone, adName, adNameRaw, referrerUrl, referrerPlatform,
+      utmSource, utmMedium, utmCampaign, utmId, utmTerm, fbclid, fbEventId, pageUrl,
+    } = body;
 
     if (!fullName || !email || !Array.isArray(answers) || answers.length !== 17) {
       return res.status(400).json({ error: "Invalid payload" });
@@ -292,18 +311,95 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       console.error("[GHL] MCP call failed:", mcpError);
     }
 
+    // ── Compute category insights ─────────────────────────────────────────────
+    const catScoresForDb = [
+      { label: CATEGORY_META.digestive.label, score: digestiveScore },
+      { label: CATEGORY_META.appetite.label, score: appetiteScore },
+      { label: CATEGORY_META.gut.label, score: gutScore },
+    ];
+    const highestCatDb = catScoresForDb.reduce((a, b) => (a.score >= b.score ? a : b));
+    const lowestCatDb = catScoresForDb.reduce((a, b) => (a.score <= b.score ? a : b));
+
+    // ── Compute score band ────────────────────────────────────────────────────
+    const scoreBand =
+      totalScore <= 8 ? "Green" :
+      totalScore <= 22 ? "Yellow" :
+      totalScore <= 30 ? "Lower_Red" : "Upper_Red";
+
+    // ── Check for repeat submission ───────────────────────────────────────────
+    const isRepeat = await checkIsRepeatSubmission(email);
+
+    // ── Build individual question answer map ─────────────────────────────────
+    const getAnswerText = (qId: number): string | undefined => {
+      const a = answers.find((a) => a.questionId === qId);
+      if (!a) return undefined;
+      const q = QUESTIONS.find((q) => q.id === qId);
+      if (!q) return undefined;
+      if (a.optionIndex !== undefined && q.options[a.optionIndex]) return q.options[a.optionIndex]!.text;
+      return q.options.find((o) => o.points === a.points)?.text;
+    };
+
+    // ── Normalize ad name ─────────────────────────────────────────────────────
+    const normalizeAdName = (raw?: string): string => {
+      if (!raw || raw.trim() === "") return "Direct / Unknown";
+      return raw.trim().replace(/\s+/g, " ");
+    };
+    const normalizedAdName = normalizeAdName(adName);
+
     // ── Persist submission to database ────────────────────────────────────────
+    const tagAppliedAt = new Date();
     await saveQuizSubmission({
       fullName,
       email,
       phone: phone ?? null,
       answers: JSON.stringify(answers),
       totalScore,
+      alertTier: alertLevel.charAt(0).toUpperCase() + alertLevel.slice(1), // "Red"|"Yellow"|"Green"
+      scoreBand,
       digestiveScore,
       appetiteScore,
       gutScore,
+      highestScoreCategory: highestCatDb.label,
+      lowestScoreCategory: lowestCatDb.label,
+      tagApplied: crmTag,
+      tagAppliedAt,
+      isRepeatSubmission: isRepeat,
+      awesomecrmContactId: ghlContactId ?? undefined,
       crmTag,
       ghlContactId,
+      // Individual question answers
+      q1Digestion: getAnswerText(1),
+      q2Heartburn: getAnswerText(2),
+      q3WeightChanges: getAnswerText(3),
+      q4Energy: getAnswerText(4),
+      q5AfterMeals: getAnswerText(5),
+      q6EatingControl: getAnswerText(6),
+      q7LoseWeight: getAnswerText(7),
+      q8Breakfast: getAnswerText(8),
+      q9Sleep: getAnswerText(9),
+      q10BrainFog: getAnswerText(10),
+      q11MoodSwings: getAnswerText(11),
+      q12Diet: getAnswerText(12),
+      q13FermentedFoods: getAnswerText(13),
+      q14PrebioticFoods: getAnswerText(14),
+      q15Antacids: getAnswerText(15),
+      q16PainPills: getAnswerText(16),
+      q17Antibiotics: getAnswerText(17),
+      // Attribution
+      sessionId,
+      timezone,
+      adName: normalizedAdName,
+      adNameRaw: adNameRaw ?? adName,
+      referrerUrl,
+      referrerPlatform,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmId,
+      utmTerm,
+      fbclid,
+      fbEventId,
+      pageUrl,
     });
 
     return res.json({

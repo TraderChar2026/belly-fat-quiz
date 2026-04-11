@@ -1,6 +1,11 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, asc, sql, and, gte, lte, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, quizSubmissions, InsertQuizSubmission } from "../drizzle/schema";
+import {
+  InsertUser, users,
+  quizSubmissions, InsertQuizSubmission,
+  funnelEvents, InsertFunnelEvent,
+  salesLog, InsertSalesLog,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -54,9 +59,182 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+// ── Quiz Submissions ──────────────────────────────────────────────────────────
+
 export async function saveQuizSubmission(data: InsertQuizSubmission) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const result = await db.insert(quizSubmissions).values(data);
   return result;
+}
+
+export async function getSubmissions(opts: {
+  page?: number;
+  pageSize?: number;
+  alertTier?: string;
+  scoreBand?: string;
+  adName?: string;
+  search?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { page = 1, pageSize = 25, alertTier, scoreBand, adName, search, dateFrom, dateTo } = opts;
+  const offset = (page - 1) * pageSize;
+
+  const conditions = [];
+  if (alertTier) conditions.push(eq(quizSubmissions.alertTier, alertTier));
+  if (scoreBand) conditions.push(eq(quizSubmissions.scoreBand, scoreBand));
+  if (adName) conditions.push(eq(quizSubmissions.adName, adName));
+  if (dateFrom) conditions.push(gte(quizSubmissions.submissionDate, dateFrom));
+  if (dateTo) conditions.push(lte(quizSubmissions.submissionDate, dateTo));
+  if (search) {
+    conditions.push(
+      or(
+        like(quizSubmissions.fullName, `%${search}%`),
+        like(quizSubmissions.email, `%${search}%`)
+      )
+    );
+  }
+
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const [rows, countResult] = await Promise.all([
+    db.select().from(quizSubmissions)
+      .where(where)
+      .orderBy(desc(quizSubmissions.submissionDate))
+      .limit(pageSize)
+      .offset(offset),
+    db.select({ count: sql<number>`COUNT(*)` }).from(quizSubmissions).where(where),
+  ]);
+
+  return { rows, total: Number(countResult[0]?.count ?? 0) };
+}
+
+export async function getSubmissionById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(quizSubmissions).where(eq(quizSubmissions.id, id)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function checkIsRepeatSubmission(email: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  const result = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(quizSubmissions)
+    .where(eq(quizSubmissions.email, email));
+  return Number(result[0]?.count ?? 0) > 0;
+}
+
+// ── Funnel Events ─────────────────────────────────────────────────────────────
+
+export async function saveFunnelEvent(data: InsertFunnelEvent) {
+  const db = await getDb();
+  if (!db) { console.warn("[Database] Cannot save funnel event: db not available"); return; }
+  try {
+    await db.insert(funnelEvents).values(data);
+  } catch (err) {
+    console.error("[Database] Failed to save funnel event:", err);
+  }
+}
+
+export async function getFunnelEventsBySession(sessionId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(funnelEvents)
+    .where(eq(funnelEvents.sessionId, sessionId))
+    .orderBy(asc(funnelEvents.eventTimestamp));
+}
+
+// ── Dashboard Aggregates ──────────────────────────────────────────────────────
+
+export async function getSubmissionsSummary(dateFrom?: Date, dateTo?: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions = [];
+  if (dateFrom) conditions.push(gte(quizSubmissions.submissionDate, dateFrom));
+  if (dateTo) conditions.push(lte(quizSubmissions.submissionDate, dateTo));
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const [totals, tierCounts, avgScores, bandCounts] = await Promise.all([
+    db.select({
+      total: sql<number>`COUNT(*)`,
+      uniqueEmails: sql<number>`COUNT(DISTINCT email)`,
+      avgScore: sql<number>`AVG(totalScore)`,
+      avgDigestive: sql<number>`AVG(digestiveScore)`,
+      avgAppetite: sql<number>`AVG(appetiteScore)`,
+      avgGut: sql<number>`AVG(gutScore)`,
+    }).from(quizSubmissions).where(where),
+
+    db.select({
+      alertTier: quizSubmissions.alertTier,
+      count: sql<number>`COUNT(*)`,
+    }).from(quizSubmissions).where(where).groupBy(quizSubmissions.alertTier),
+
+    db.select({
+      avgScore: sql<number>`AVG(totalScore)`,
+    }).from(quizSubmissions).where(where),
+
+    db.select({
+      scoreBand: quizSubmissions.scoreBand,
+      count: sql<number>`COUNT(*)`,
+    }).from(quizSubmissions).where(where).groupBy(quizSubmissions.scoreBand),
+  ]);
+
+  return { totals: totals[0], tierCounts, bandCounts };
+}
+
+export async function getAdPerformance(dateFrom?: Date, dateTo?: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions = [];
+  if (dateFrom) conditions.push(gte(quizSubmissions.submissionDate, dateFrom));
+  if (dateTo) conditions.push(lte(quizSubmissions.submissionDate, dateTo));
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  return db.select({
+    adName: quizSubmissions.adName,
+    total: sql<number>`COUNT(*)`,
+    redCount: sql<number>`SUM(CASE WHEN alertTier = 'Red' THEN 1 ELSE 0 END)`,
+    yellowCount: sql<number>`SUM(CASE WHEN alertTier = 'Yellow' THEN 1 ELSE 0 END)`,
+    greenCount: sql<number>`SUM(CASE WHEN alertTier = 'Green' THEN 1 ELSE 0 END)`,
+    avgScore: sql<number>`AVG(totalScore)`,
+    firstSeen: sql<Date>`MIN(submissionDate)`,
+    lastSeen: sql<Date>`MAX(submissionDate)`,
+  }).from(quizSubmissions)
+    .where(where)
+    .groupBy(quizSubmissions.adName)
+    .orderBy(desc(sql`COUNT(*)`));
+}
+
+// ── Sales Log ─────────────────────────────────────────────────────────────────
+
+export async function saveSale(data: InsertSalesLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(salesLog).values(data);
+  return result;
+}
+
+export async function getSales(opts: { page?: number; pageSize?: number } = {}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { page = 1, pageSize = 25 } = opts;
+  const offset = (page - 1) * pageSize;
+  const [rows, countResult] = await Promise.all([
+    db.select().from(salesLog).orderBy(desc(salesLog.orderDate)).limit(pageSize).offset(offset),
+    db.select({ count: sql<number>`COUNT(*)` }).from(salesLog),
+  ]);
+  return { rows, total: Number(countResult[0]?.count ?? 0) };
+}
+
+export async function deleteSale(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(salesLog).where(eq(salesLog.id, id));
 }
