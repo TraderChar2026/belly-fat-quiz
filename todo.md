@@ -61,3 +61,5 @@
 - [x] Build dashboard: ad performance table section
 - [x] Build dashboard: individual submissions table (searchable/filterable)
 - [x] Build dashboard: manual sales entry form
+- [x] Fix alertTier and scoreBand not being saved to database on submission
+- [x] Fix dashboard alert tier and score band columns showing "—" instead of correct values
