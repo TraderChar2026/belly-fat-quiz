@@ -160,14 +160,10 @@ export async function getSubmissionsSummary(dateFrom?: Date, dateTo?: Date) {
   if (dateTo) conditions.push(lte(quizSubmissions.submissionDate, dateTo));
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [totals, tierCounts, avgScores, bandCounts] = await Promise.all([
+  const [totals, tierCounts, bandCounts, bandAvgScores] = await Promise.all([
     db.select({
       total: sql<number>`COUNT(*)`,
       uniqueEmails: sql<number>`COUNT(DISTINCT email)`,
-      avgScore: sql<number>`AVG(totalScore)`,
-      avgDigestive: sql<number>`AVG(digestiveScore)`,
-      avgAppetite: sql<number>`AVG(appetiteScore)`,
-      avgGut: sql<number>`AVG(gutScore)`,
     }).from(quizSubmissions).where(where),
 
     db.select({
@@ -176,16 +172,20 @@ export async function getSubmissionsSummary(dateFrom?: Date, dateTo?: Date) {
     }).from(quizSubmissions).where(where).groupBy(quizSubmissions.alertTier),
 
     db.select({
-      avgScore: sql<number>`AVG(totalScore)`,
-    }).from(quizSubmissions).where(where),
-
-    db.select({
       scoreBand: quizSubmissions.scoreBand,
       count: sql<number>`COUNT(*)`,
     }).from(quizSubmissions).where(where).groupBy(quizSubmissions.scoreBand),
+
+    // Per-band average scores
+    db.select({
+      scoreBand: quizSubmissions.scoreBand,
+      avgScore: sql<number>`ROUND(AVG(totalScore), 1)`,
+      minScore: sql<number>`MIN(totalScore)`,
+      maxScore: sql<number>`MAX(totalScore)`,
+    }).from(quizSubmissions).where(where).groupBy(quizSubmissions.scoreBand),
   ]);
 
-  return { totals: totals[0], tierCounts, bandCounts };
+  return { totals: totals[0], tierCounts, bandCounts, bandAvgScores };
 }
 
 export async function getAdPerformance(dateFrom?: Date, dateTo?: Date) {

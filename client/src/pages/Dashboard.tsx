@@ -83,68 +83,61 @@ function SummaryCards() {
 
   const totals = data?.totals;
   const tierCounts = data?.tierCounts ?? [];
+  const bandAvgScores = data?.bandAvgScores ?? [];
 
   const getCount = (tier: string) =>
     Number(tierCounts.find((t) => t.alertTier === tier)?.count ?? 0);
 
-  const cards = [
-    {
-      label: "Total Submissions",
-      value: isLoading ? "—" : (totals?.total ?? 0),
-      icon: Users,
-      color: "text-[#4a7c59]",
-      bg: "bg-[#f4f8f4]",
-    },
-    {
-      label: "Unique Leads",
-      value: isLoading ? "—" : (totals?.uniqueEmails ?? 0),
-      icon: TrendingUp,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-    },
-    {
-      label: "Red Alert",
-      value: isLoading ? "—" : getCount("Red"),
-      icon: AlertTriangle,
-      color: "text-red-600",
-      bg: "bg-red-50",
-    },
-    {
-      label: "Yellow Alert",
-      value: isLoading ? "—" : getCount("Yellow"),
-      icon: AlertTriangle,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-    },
-    {
-      label: "Green Alert",
-      value: isLoading ? "—" : getCount("Green"),
-      icon: Leaf,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
-    },
-    {
-      label: "Avg Score",
-      value: isLoading ? "—" : (totals?.avgScore != null ? Number(totals.avgScore).toFixed(1) : "—"),
-      icon: TrendingUp,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
-    },
+  const getBandAvg = (band: string) => {
+    const row = bandAvgScores.find((b) => b.scoreBand === band);
+    return row ? Number(row.avgScore).toFixed(1) : "—";
+  };
+
+  const countCards = [
+    { label: "Total Submissions", value: isLoading ? "—" : (totals?.total ?? 0), icon: Users, color: "text-[#4a7c59]", bg: "bg-[#f4f8f4]" },
+    { label: "Unique Leads", value: isLoading ? "—" : (totals?.uniqueEmails ?? 0), icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Red Alert", value: isLoading ? "—" : getCount("Red"), icon: AlertTriangle, color: "text-red-600", bg: "bg-red-50" },
+    { label: "Yellow Alert", value: isLoading ? "—" : getCount("Yellow"), icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50" },
+    { label: "Green Alert", value: isLoading ? "—" : getCount("Green"), icon: Leaf, color: "text-emerald-600", bg: "bg-emerald-50" },
+  ];
+
+  const avgCards = [
+    { label: "Avg Score — Red (Upper)", value: isLoading ? "—" : getBandAvg("Upper_Red"), color: "text-red-700", bg: "bg-red-50" },
+    { label: "Avg Score — Red (Lower)", value: isLoading ? "—" : getBandAvg("Lower_Red"), color: "text-red-500", bg: "bg-red-50" },
+    { label: "Avg Score — Yellow", value: isLoading ? "—" : getBandAvg("Yellow"), color: "text-amber-600", bg: "bg-amber-50" },
+    { label: "Avg Score — Green", value: isLoading ? "—" : getBandAvg("Green"), color: "text-emerald-600", bg: "bg-emerald-50" },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
-      {cards.map((c) => (
-        <Card key={c.label} className="border border-border/60">
-          <CardContent className="p-4">
-            <div className={`w-9 h-9 rounded-lg ${c.bg} flex items-center justify-center mb-3`}>
-              <c.icon className={`w-4 h-4 ${c.color}`} />
-            </div>
-            <p className="text-2xl font-bold text-foreground">{String(c.value)}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{c.label}</p>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="space-y-3 mb-6">
+      {/* Count cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+        {countCards.map((c) => (
+          <Card key={c.label} className="border border-border/60">
+            <CardContent className="p-4">
+              <div className={`w-9 h-9 rounded-lg ${c.bg} flex items-center justify-center mb-3`}>
+                <c.icon className={`w-4 h-4 ${c.color}`} />
+              </div>
+              <p className="text-2xl font-bold text-foreground">{String(c.value)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{c.label}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      {/* Per-band average score cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {avgCards.map((c) => (
+          <Card key={c.label} className="border border-border/60">
+            <CardContent className="p-4">
+              <div className={`w-9 h-9 rounded-lg ${c.bg} flex items-center justify-center mb-3`}>
+                <TrendingUp className={`w-4 h-4 ${c.color}`} />
+              </div>
+              <p className="text-2xl font-bold text-foreground">{String(c.value)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{c.label}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
