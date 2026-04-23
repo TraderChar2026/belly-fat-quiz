@@ -63,3 +63,5 @@
 - [x] Build dashboard: manual sales entry form
 - [x] Fix alertTier and scoreBand not being saved to database on submission
 - [x] Fix dashboard alert tier and score band columns showing "—" instead of correct values
+- [x] Fix dashboard Submissions tab showing blank/nothing when clicked
+- [x] Fix two display errors appearing on the dashboard page

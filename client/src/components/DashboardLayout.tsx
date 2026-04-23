@@ -29,8 +29,8 @@ import { Button } from "./ui/button";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
-  { icon: ClipboardList, label: "Submissions", path: "/dashboard" },
-  { icon: DollarSign, label: "Sales Log", path: "/dashboard" },
+  { icon: ClipboardList, label: "Submissions", path: "/dashboard/submissions" },
+  { icon: DollarSign, label: "Sales Log", path: "/dashboard/sales" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
