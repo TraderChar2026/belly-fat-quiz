@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -31,7 +43,7 @@ import {
 import { toast } from "sonner";
 import {
   Search, ChevronLeft, ChevronRight, Plus,
-  RefreshCw, Eye,
+  RefreshCw, Eye, Trash2,
 } from "lucide-react";
 
 function alertBadge(tier?: string | null) {
@@ -243,7 +255,10 @@ export default function DashboardSubmissions() {
   const [searchInput, setSearchInput] = useState("");
   const [alertTier, setAlertTier] = useState<string>("");
   const [scoreBand, setScoreBand] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const pageSize = 20;
+
+  const utils = trpc.useUtils();
 
   const { data, isLoading, refetch } = trpc.dashboard.submissions.useQuery({
     page,
@@ -253,14 +268,60 @@ export default function DashboardSubmissions() {
     scoreBand: scoreBand || undefined,
   });
 
+  const deleteSubmissions = trpc.dashboard.deleteSubmissions.useMutation({
+    onSuccess: (result) => {
+      toast.success(`${result.deleted} submission${result.deleted === 1 ? "" : "s"} deleted.`);
+      setSelectedIds(new Set());
+      utils.dashboard.submissions.invalidate();
+      utils.dashboard.summary.invalidate();
+      utils.dashboard.adPerformance.invalidate();
+    },
+    onError: () => toast.error("Failed to delete submissions."),
+  });
+
   const rows = data?.rows ?? [];
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  const allPageIds = rows.map((r) => r.id);
+  const allSelected = allPageIds.length > 0 && allPageIds.every((id) => selectedIds.has(id));
+  const someSelected = allPageIds.some((id) => selectedIds.has(id));
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        allPageIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        allPageIds.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  };
+
+  const toggleOne = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
     setPage(1);
+  };
+
+  const handleBulkDelete = () => {
+    const ids = Array.from(selectedIds);
+    if (!ids.length) return;
+    deleteSubmissions.mutate({ ids });
   };
 
   return (
@@ -282,6 +343,32 @@ export default function DashboardSubmissions() {
                 All Submissions <span className="text-muted-foreground font-normal text-sm ml-1">({total})</span>
               </CardTitle>
               <div className="flex flex-wrap gap-2 items-center">
+                {selectedIds.size > 0 && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="destructive" className="gap-1.5 text-xs">
+                        <Trash2 className="w-3 h-3" /> Delete Selected ({selectedIds.size})
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete {selectedIds.size} submission{selectedIds.size === 1 ? "" : "s"}?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently remove {selectedIds.size === 1 ? "this submission" : `these ${selectedIds.size} submissions`} from the database. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleBulkDelete}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
                 <LogSaleDialog />
                 <Button variant="ghost" size="sm" onClick={() => refetch()} className="gap-1.5 text-xs">
                   <RefreshCw className="w-3 h-3" /> Refresh
@@ -345,7 +432,15 @@ export default function DashboardSubmissions() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="pl-4">Name</TableHead>
+                    <TableHead className="pl-4 w-10">
+                      <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={toggleAll}
+                        aria-label="Select all on this page"
+                        className={someSelected && !allSelected ? "opacity-50" : ""}
+                      />
+                    </TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Alert</TableHead>
                     <TableHead>Score</TableHead>
@@ -358,18 +453,28 @@ export default function DashboardSubmissions() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
+                      <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
                     </TableRow>
                   ) : rows.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                      <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
                         No submissions found.
                       </TableCell>
                     </TableRow>
                   ) : (
                     rows.map((row) => (
-                      <TableRow key={row.id} className="hover:bg-muted/30">
-                        <TableCell className="pl-4 font-medium">{row.fullName}</TableCell>
+                      <TableRow
+                        key={row.id}
+                        className={`hover:bg-muted/30 ${selectedIds.has(row.id) ? "bg-muted/20" : ""}`}
+                      >
+                        <TableCell className="pl-4">
+                          <Checkbox
+                            checked={selectedIds.has(row.id)}
+                            onCheckedChange={() => toggleOne(row.id)}
+                            aria-label={`Select submission from ${row.fullName}`}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">{row.fullName}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{row.email}</TableCell>
                         <TableCell>{alertBadge(row.alertTier)}</TableCell>
                         <TableCell className="font-semibold">{row.totalScore}</TableCell>

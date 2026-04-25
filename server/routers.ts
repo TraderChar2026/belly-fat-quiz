@@ -13,6 +13,7 @@ import {
   saveSale,
   getSales,
   deleteSale,
+  deleteSubmissions,
 } from "./db";
 import { computeScores, getCrmTag } from "../shared/quizData";
 import { TRPCError } from "@trpc/server";
@@ -214,6 +215,16 @@ export const appRouter = router({
         const row = await getSubmissionById(input.id);
         if (!row) throw new TRPCError({ code: "NOT_FOUND" });
         return row;
+      }),
+
+    deleteSubmissions: protectedProcedure
+      .input(z.object({ ids: z.array(z.number().int()).min(1).max(100) }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await deleteSubmissions(input.ids);
+        return { ok: true, deleted: input.ids.length };
       }),
   }),
 

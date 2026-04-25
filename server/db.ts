@@ -1,4 +1,4 @@
-import { eq, desc, asc, sql, and, gte, lte, like, or } from "drizzle-orm";
+import { eq, desc, asc, sql, and, gte, lte, like, or, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser, users,
@@ -237,4 +237,11 @@ export async function deleteSale(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(salesLog).where(eq(salesLog.id, id));
+}
+
+export async function deleteSubmissions(ids: number[]): Promise<void> {
+  if (!ids.length) return;
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(quizSubmissions).where(inArray(quizSubmissions.id, ids));
 }

@@ -67,3 +67,4 @@
 - [x] Fix two display errors appearing on the dashboard page
 - [x] Add "Ad Name" as a visible column in the Submissions table
 - [x] Replace single "Avg Score" summary card with four separate avg score cards: Red (Upper), Red (Lower), Yellow, Green
+- [x] Add checkbox multi-select and bulk delete button to Submissions table
