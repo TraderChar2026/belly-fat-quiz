@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
 import { computeScores, getCrmTag, getAlertLevel, CATEGORY_META, QUESTIONS } from "../shared/quizData";
 import { saveQuizSubmission, checkIsRepeatSubmission } from "./db";
+import { notifyOwner } from "./_core/notification";
 
-const execAsync = promisify(exec);
 const ghlRouter = Router();
 
 // GoHighLevel location ID for Gateway Solutions / charwinnen.com
 const GHL_LOCATION_ID = "Md5Bp8ZfS4SI5pEFdV7e";
+// GHL_API_KEY is a v1 private integration token — use the v1 REST base
+const GHL_BASE = "https://rest.gohighlevel.com/v1";
 
 /**
  * Maps each quiz question ID to its corresponding GHL custom field ID.
@@ -56,20 +56,24 @@ interface GhlSubmitBody {
   pageUrl?: string;
 }
 
-/** Run an MCP tool call and return the parsed JSON result, or null on failure. */
-async function mcpCall(toolName: string, inputPayload: Record<string, unknown>): Promise<unknown> {
-  const inputJson = JSON.stringify(inputPayload).replace(/'/g, "'\\''");
-  const { stdout, stderr } = await execAsync(
-    `manus-mcp-cli tool call ${toolName} --server prod-ghl-mcp --input '${inputJson}'`,
-    { timeout: 30000 }
-  );
-  if (stderr) console.warn(`[GHL/${toolName}] stderr:`, stderr.slice(0, 200));
-  const jsonMatch = stdout.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    console.warn(`[GHL/${toolName}] No JSON in output:`, stdout.slice(0, 200));
-    return null;
-  }
-  return JSON.parse(jsonMatch[0]);
+/** Helper: make a GHL v1 REST API call using the injected GHL_API_KEY */
+async function ghlFetch(
+  method: string,
+  path: string,
+  body?: unknown
+): Promise<{ ok: boolean; status: number; data: unknown }> {
+  const apiKey = process.env.GHL_API_KEY || "";
+  const res = await fetch(`${GHL_BASE}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  let data: unknown;
+  try { data = await res.json(); } catch { data = null; }
+  return { ok: res.ok, status: res.status, data };
 }
 
 /** Build the HTML table email body matching the preferred two-column format */
@@ -86,11 +90,12 @@ function buildHtmlEmail(params: {
   highestCat: { label: string; score: number };
   lowestCat: { label: string; score: number };
   submissionDate: string;
+  utmSource?: string;
 }): string {
   const {
     fullName, email, phone, answers,
     totalScore, digestiveScore, appetiteScore, gutScore,
-    alertLabel, highestCat, lowestCat, submissionDate,
+    alertLabel, highestCat, lowestCat, submissionDate, utmSource,
   } = params;
 
   const rowStyle = `padding:8px 12px;border-bottom:1px solid #e0e0e0;`;
@@ -105,7 +110,6 @@ function buildHtmlEmail(params: {
     const answer = answers.find((a) => a.questionId === q.id);
     let answerText = "(no answer)";
     if (answer) {
-      // Prefer optionIndex lookup; fall back to points match
       if (answer.optionIndex !== undefined && q.options[answer.optionIndex]) {
         answerText = q.options[answer.optionIndex]!.text;
       } else {
@@ -132,6 +136,7 @@ function buildHtmlEmail(params: {
     ${row("Alert Level", alertLabel)}
     ${row("Highest Score Category", `${highestCat.label} — ${highestCat.score}`)}
     ${row("Lowest Score Category", `${lowestCat.label} — ${lowestCat.score}`)}
+    ${utmSource ? row("Ad / UTM Source", utmSource) : ""}
     ${row("Submission Date", submissionDate)}
   </table>
 </div>`;
@@ -182,41 +187,40 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
         })
         .filter((cf) => cf.field_value !== "");
 
-      const upsertPayload: Record<string, unknown> = {
-        body_firstName: firstName,
-        body_email: email,
-        body_locationId: GHL_LOCATION_ID,
-        body_source: "belly_fat_quiz",
-        body_customFields: customFields,
+      const upsertBody: Record<string, unknown> = {
+        firstName,
+        email,
+        locationId: GHL_LOCATION_ID,
+        source: "belly_fat_quiz",
+        customFields,
       };
-      if (lastName) upsertPayload.body_lastName = lastName;
-      if (phone) upsertPayload.body_phone = phone;
+      if (lastName) upsertBody.lastName = lastName;
+      if (phone) upsertBody.phone = phone;
 
-      const upsertResult = await mcpCall("contacts_upsert-contact", upsertPayload) as Record<string, unknown> | null;
-      ghlContactId =
-        (upsertResult as any)?.data?.contact?.id ??
-        (upsertResult as any)?.contact?.id ??
-        (upsertResult as any)?.id ??
-        null;
-
-      console.log("[GHL] Upserted contact ID:", ghlContactId);
+      // v1 API: POST /contacts/ creates or updates (upsert by email)
+      const upsertResult = await ghlFetch("POST", "/contacts/", upsertBody);
+      if (upsertResult.ok) {
+        const d = upsertResult.data as any;
+        ghlContactId = d?.contact?.id ?? d?.id ?? null;
+        console.log("[GHL] Upserted contact ID:", ghlContactId);
+      } else {
+        console.warn("[GHL] Upsert failed:", upsertResult.status, JSON.stringify(upsertResult.data).slice(0, 200));
+      }
 
       // ── Step 2: Add alert tag via dedicated endpoint ─────────────────────────
       // This is what fires the "Gut Health Trial Workflow" automation in GHL.
       if (ghlContactId) {
-        await mcpCall("contacts_add-tags", {
-          path_contactId: ghlContactId,
-          body_tags: [crmTag],
-        });
-        console.log(`[GHL] Added tag "${crmTag}" to contact ${ghlContactId}`);
+        const tagResult = await ghlFetch("POST", `/contacts/${ghlContactId}/tags/`, { tags: [crmTag] });
+        if (tagResult.ok) {
+          console.log(`[GHL] Added tag "${crmTag}" to contact ${ghlContactId}`);
+        } else {
+          console.warn("[GHL] Tag add failed:", tagResult.status, JSON.stringify(tagResult.data).slice(0, 200));
+        }
 
         // ── Step 3: Submit to GHL Forms API so entry appears in Quiz Submissions ─
-        // POST to the Forms v2 submit endpoint using form ID e5R9PsrieIyZg7lqVcU5
         try {
           const GHL_FORM_ID = "e5R9PsrieIyZg7lqVcU5";
-          const GHL_API_KEY = process.env.GHL_API_KEY || "";
 
-          // Build form field payload: standard fields + all question custom fields
           const formFields: Record<string, string> = {
             full_name: fullName,
             first_name: firstName,
@@ -225,7 +229,6 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
           if (lastName) formFields.last_name = lastName;
           if (phone) formFields.phone = phone;
 
-          // Map each answer to its custom field ID
           for (const a of answers) {
             const fieldId = QUESTION_TO_CUSTOM_FIELD[a.questionId];
             if (!fieldId) continue;
@@ -240,75 +243,77 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
             if (answerText) formFields[fieldId] = answerText;
           }
 
-          const formRes = await fetch(
-            `https://services.leadconnectorhq.com/forms/submit`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${GHL_API_KEY}`,
-                "Version": "2021-07-28",
-              },
-              body: JSON.stringify({
-                formId: GHL_FORM_ID,
-                locationId: GHL_LOCATION_ID,
-                contactId: ghlContactId,
-                fieldData: formFields,
-              }),
-            }
-          );
+          const formResult = await ghlFetch("POST", "/forms/submit", {
+            formId: GHL_FORM_ID,
+            locationId: GHL_LOCATION_ID,
+            contactId: ghlContactId,
+            fieldData: formFields,
+          });
 
-          if (formRes.ok) {
+          if (formResult.ok) {
             console.log("[GHL] Form submission recorded in Quiz Submissions");
           } else {
-            const errText = await formRes.text().catch(() => "");
-            console.warn("[GHL] Form submission failed:", formRes.status, errText.slice(0, 200));
+            console.warn("[GHL] Form submission failed:", formResult.status, JSON.stringify(formResult.data).slice(0, 200));
           }
         } catch (formErr) {
           console.warn("[GHL] Form submission error (non-fatal):", formErr);
         }
 
-        // ── Step 4: Send HTML notification email via GHL ─────────────────────
-        // GHL's conversations_send-a-new-message supports body_html, which renders
-        // a proper two-column table in the owner's email — matching the preferred format.
-        const catScores = [
-          { label: CATEGORY_META.digestive.label, score: digestiveScore },
-          { label: CATEGORY_META.appetite.label, score: appetiteScore },
-          { label: CATEGORY_META.gut.label, score: gutScore },
-        ];
-        const highestCat = catScores.reduce((a, b) => (a.score >= b.score ? a : b));
-        const lowestCat = catScores.reduce((a, b) => (a.score <= b.score ? a : b));
+        // ── Step 4: Send HTML notification email via GHL Conversations API ───────
+        try {
+          const catScores = [
+            { label: CATEGORY_META.digestive.label, score: digestiveScore },
+            { label: CATEGORY_META.appetite.label, score: appetiteScore },
+            { label: CATEGORY_META.gut.label, score: gutScore },
+          ];
+          const highestCat = catScores.reduce((a, b) => (a.score >= b.score ? a : b));
+          const lowestCat = catScores.reduce((a, b) => (a.score <= b.score ? a : b));
 
-        const submissionDate = new Date().toLocaleString("en-US", {
-          timeZone: "America/Chicago",
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        });
+          const submissionDate = new Date().toLocaleString("en-US", {
+            timeZone: "America/Chicago",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          });
 
-        const htmlBody = buildHtmlEmail({
-          fullName, email, phone, answers,
-          totalScore, digestiveScore, appetiteScore, gutScore,
-          alertLabel, highestCat, lowestCat, submissionDate,
-        });
+          const htmlBody = buildHtmlEmail({
+            fullName, email, phone, answers,
+            totalScore, digestiveScore, appetiteScore, gutScore,
+            alertLabel, highestCat, lowestCat, submissionDate, utmSource,
+          });
 
-        await mcpCall("conversations_send-a-new-message", {
-          body_type: "Email",
-          body_contactId: ghlContactId,
-          body_emailTo: "cjwinnen@comcast.net",
-          body_subject: `${fullName} Quiz Submitted`,
-          body_html: htmlBody,
-        });
-        console.log("[GHL] Sent HTML notification email to owner");
+          // Step 4: Send owner notification via Manus built-in notification service
+          // (GHL v1 API does not support sending outbound emails via REST)
+          const notifContent = [
+            `Name: ${fullName}`,
+            `Email: ${email}`,
+            phone ? `Phone: ${phone}` : null,
+            `Alert Level: ${alertLabel}`,
+            `Score: ${totalScore}/51`,
+            `Digestive: ${digestiveScore} | Appetite: ${appetiteScore} | Gut: ${gutScore}`,
+            `Highest: ${highestCat.label} (${highestCat.score}) | Lowest: ${lowestCat.label} (${lowestCat.score})`,
+            utmSource ? `UTM Source: ${utmSource}` : null,
+            `Date: ${submissionDate}`,
+          ].filter(Boolean).join("\n");
+
+          try {
+            await notifyOwner({ title: `${fullName} Quiz Submitted`, content: notifContent });
+            console.log("[GHL] Sent owner notification");
+          } catch (notifErr) {
+            console.warn("[GHL] Owner notification failed (non-fatal):", notifErr);
+          }
+        } catch (emailErr) {
+          console.warn("[GHL] Email send error (non-fatal):", emailErr);
+        }
       } else {
         console.warn("[GHL] Could not add tag or send email — no contact ID returned from upsert");
       }
-    } catch (mcpError) {
-      // GHL failure is non-fatal — we still save the submission and send fallback notification
-      console.error("[GHL] MCP call failed:", mcpError);
+    } catch (ghlError) {
+      // GHL failure is non-fatal — we still save the submission
+      console.error("[GHL] API call failed:", ghlError);
     }
 
     // ── Compute category insights ─────────────────────────────────────────────
@@ -354,7 +359,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       phone: phone ?? null,
       answers: JSON.stringify(answers),
       totalScore,
-      alertTier: alertLevel.charAt(0).toUpperCase() + alertLevel.slice(1), // "Red"|"Yellow"|"Green"
+      alertTier: alertLevel.charAt(0).toUpperCase() + alertLevel.slice(1),
       scoreBand,
       digestiveScore,
       appetiteScore,
@@ -367,7 +372,6 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       awesomecrmContactId: ghlContactId ?? undefined,
       crmTag,
       ghlContactId,
-      // Individual question answers
       q1Digestion: getAnswerText(1),
       q2Heartburn: getAnswerText(2),
       q3WeightChanges: getAnswerText(3),
@@ -385,7 +389,6 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       q15Antacids: getAnswerText(15),
       q16PainPills: getAnswerText(16),
       q17Antibiotics: getAnswerText(17),
-      // Attribution
       sessionId,
       timezone,
       adName: normalizedAdName,

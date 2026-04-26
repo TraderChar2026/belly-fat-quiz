@@ -478,10 +478,15 @@ function SubmissionsTable() {
               <TableRow>
                 <TableHead className="pl-4">Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
                 <TableHead>Alert</TableHead>
                 <TableHead>Score</TableHead>
                 <TableHead>Band</TableHead>
                 <TableHead>Ad / Source</TableHead>
+                <TableHead>UTM Source</TableHead>
+                <TableHead>UTM Medium</TableHead>
+                <TableHead>UTM Campaign</TableHead>
+                <TableHead>Referrer</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead className="text-right pr-4">Actions</TableHead>
               </TableRow>
@@ -489,11 +494,11 @@ function SubmissionsTable() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
+                  <TableCell colSpan={13} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
                 </TableRow>
               ) : rows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                  <TableCell colSpan={13} className="text-center py-10 text-muted-foreground">
                     No submissions found.
                   </TableCell>
                 </TableRow>
@@ -502,12 +507,17 @@ function SubmissionsTable() {
                   <TableRow key={row.id} className="hover:bg-muted/30">
                     <TableCell className="pl-4 font-medium">{row.fullName}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{row.email}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{row.phone ?? "—"}</TableCell>
                     <TableCell>{alertBadge(row.alertTier)}</TableCell>
                     <TableCell className="font-semibold">{row.totalScore}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{scoreBandLabel(row.scoreBand)}</TableCell>
                     <TableCell className="text-sm max-w-[140px] truncate text-muted-foreground">
                       {row.adName ?? "Direct"}
                     </TableCell>
+                    <TableCell className="text-sm max-w-[120px] truncate text-muted-foreground">{row.utmSource ?? "—"}</TableCell>
+                    <TableCell className="text-sm max-w-[120px] truncate text-muted-foreground">{row.utmMedium ?? "—"}</TableCell>
+                    <TableCell className="text-sm max-w-[140px] truncate text-muted-foreground">{row.utmCampaign ?? "—"}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{row.referrerPlatform ?? "—"}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{fmtDate(row.submissionDate)}</TableCell>
                     <TableCell className="text-right pr-4">
                       <div className="flex gap-1 justify-end">

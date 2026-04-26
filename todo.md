@@ -75,3 +75,7 @@
 - [x] Build Funnel Analytics section on dashboard showing drop-off rates per step
 - [x] Add duplicate Order Now CTA button immediately below the Wistia video on Yellow Alert VSL page
 - [x] Add duplicate Order Now CTA button immediately below the Wistia video on Red Alert VSL page
+- [x] Add Phone column to Submissions table in dashboard
+- [x] Add attribution/tracking columns to Submissions table (UTM Source, UTM Medium, UTM Campaign, Referrer Platform, fbclid)
+- [x] Investigate and fix why GHL upsert failed for Theresa's live submission
+- [x] CRITICAL: Replace manus-mcp-cli GHL calls with direct REST API fetch calls so GHL integration works in deployed production environment
