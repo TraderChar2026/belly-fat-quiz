@@ -79,3 +79,6 @@
 - [x] Add attribution/tracking columns to Submissions table (UTM Source, UTM Medium, UTM Campaign, Referrer Platform, fbclid)
 - [x] Investigate and fix why GHL upsert failed for Theresa's live submission
 - [x] CRITICAL: Replace manus-mcp-cli GHL calls with direct REST API fetch calls so GHL integration works in deployed production environment
+- [x] Fix owner notification email not being sent on quiz submission (notifyOwner call failing silently)
+- [x] Add individual question answers (Q1-Q17) as expandable rows or columns in the Submissions table on the dashboard
+- [x] Verify GHL contact upsert and answer mapping works correctly in deployed production

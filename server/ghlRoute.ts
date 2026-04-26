@@ -1,7 +1,37 @@
 import { Router } from "express";
 import { computeScores, getCrmTag, getAlertLevel, CATEGORY_META, QUESTIONS } from "../shared/quizData";
 import { saveQuizSubmission, checkIsRepeatSubmission } from "./db";
-import { notifyOwner } from "./_core/notification";
+import { ENV } from "./_core/env";
+
+/** Send owner notification directly via Manus notification service (avoids TRPCError in Express context) */
+async function sendOwnerNotification(title: string, content: string): Promise<void> {
+  try {
+    if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
+      console.warn("[Notification] Missing forge API config — skipping owner notification");
+      return;
+    }
+    const normalizedBase = ENV.forgeApiUrl.endsWith("/") ? ENV.forgeApiUrl : `${ENV.forgeApiUrl}/`;
+    const endpoint = new URL("webdevtoken.v1.WebDevService/SendNotification", normalizedBase).toString();
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        authorization: `Bearer ${ENV.forgeApiKey}`,
+        "content-type": "application/json",
+        "connect-protocol-version": "1",
+      },
+      body: JSON.stringify({ title, content }),
+    });
+    if (res.ok) {
+      console.log("[Notification] Owner notification sent successfully");
+    } else {
+      const detail = await res.text().catch(() => "");
+      console.warn(`[Notification] Failed (${res.status}): ${detail.slice(0, 200)}`);
+    }
+  } catch (err) {
+    console.warn("[Notification] Error sending owner notification:", err);
+  }
+}
 
 const ghlRouter = Router();
 
@@ -198,6 +228,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       if (phone) upsertBody.phone = phone;
 
       // v1 API: POST /contacts/ creates or updates (upsert by email)
+      // Note: customFields in the POST body are ignored by GHL v1 — must PUT separately
       const upsertResult = await ghlFetch("POST", "/contacts/", upsertBody);
       if (upsertResult.ok) {
         const d = upsertResult.data as any;
@@ -205,6 +236,16 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
         console.log("[GHL] Upserted contact ID:", ghlContactId);
       } else {
         console.warn("[GHL] Upsert failed:", upsertResult.status, JSON.stringify(upsertResult.data).slice(0, 200));
+      }
+
+      // ── Step 1b: PUT custom fields separately (GHL v1 ignores customFields on POST) ─
+      if (ghlContactId && customFields.length > 0) {
+        const putResult = await ghlFetch("PUT", `/contacts/${ghlContactId}`, { customField: customFields });
+        if (putResult.ok) {
+          console.log(`[GHL] Mapped ${customFields.length} custom fields to contact ${ghlContactId}`);
+        } else {
+          console.warn("[GHL] Custom field mapping failed:", putResult.status, JSON.stringify(putResult.data).slice(0, 200));
+        }
       }
 
       // ── Step 2: Add alert tag via dedicated endpoint ─────────────────────────
@@ -287,6 +328,20 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
 
           // Step 4: Send owner notification via Manus built-in notification service
           // (GHL v1 API does not support sending outbound emails via REST)
+          // Build Q&A lines for the notification
+          const qaLines = QUESTIONS.map((q) => {
+            const a = answers.find((ans) => ans.questionId === q.id);
+            let answerText = "(no answer)";
+            if (a) {
+              if (a.optionIndex !== undefined && q.options[a.optionIndex]) {
+                answerText = q.options[a.optionIndex]!.text;
+              } else {
+                answerText = q.options.find((o) => o.points === a.points)?.text ?? answerText;
+              }
+            }
+            return `Q${q.id}: ${q.text}\n   Answer: ${answerText}`;
+          });
+
           const notifContent = [
             `Name: ${fullName}`,
             `Email: ${email}`,
@@ -297,10 +352,13 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
             `Highest: ${highestCat.label} (${highestCat.score}) | Lowest: ${lowestCat.label} (${lowestCat.score})`,
             utmSource ? `UTM Source: ${utmSource}` : null,
             `Date: ${submissionDate}`,
-          ].filter(Boolean).join("\n");
+            ``,
+            `--- Quiz Answers ---`,
+            ...qaLines,
+          ].filter((l) => l !== null).join("\n");
 
           try {
-            await notifyOwner({ title: `${fullName} Quiz Submitted`, content: notifContent });
+            await sendOwnerNotification(`${fullName} Quiz Submitted`, notifContent);
             console.log("[GHL] Sent owner notification");
           } catch (notifErr) {
             console.warn("[GHL] Owner notification failed (non-fatal):", notifErr);
