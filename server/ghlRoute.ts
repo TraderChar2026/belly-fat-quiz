@@ -322,8 +322,8 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
           });
 
           // Step 4: Send owner notification via Manus built-in notification service
-          // Format matches the agreed AwesomeCRM two-column table email format
-          const qaLines = QUESTIONS.map((q) => {
+          // Build HTML so each field and Q&A renders on its own line in the email
+          const qaRows = QUESTIONS.map((q) => {
             const a = answers.find((ans) => ans.questionId === q.id);
             let answerText = "(no answer)";
             if (a) {
@@ -333,40 +333,33 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
                 answerText = q.options.find((o) => o.points === a.points)?.text ?? answerText;
               }
             }
-            return `${q.text}\nAnswer: ${answerText}`;
-          });
+            return `<tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#555;width:55%"><b>${q.text}</b></td><td style="padding:4px 0;vertical-align:top">${answerText}</td></tr>`;
+          }).join("");
 
           const highestMaxScore = highestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : highestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore;
           const lowestMaxScore = lowestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : lowestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore;
 
-          const notifLines: string[] = [
-            `You have received a quiz submission. Please review the quiz details below.`,
-            ``,
-            `Full Name: ${fullName}`,
-            `Phone: ${phone ?? "(not provided)"}`,
-            `Email: ${email}`,
-            ``,
-            `--- Quiz Answers ---`,
-            ``,
-            ...qaLines.flatMap((line) => [line, ``]),
-            `--- Scores ---`,
-            ``,
-            `Overall Score: ${totalScore} / 51`,
-            `${CATEGORY_META.digestive.label} -- Max score ${CATEGORY_META.digestive.maxScore}: ${digestiveScore}`,
-            `${CATEGORY_META.appetite.label} -- Max score ${CATEGORY_META.appetite.maxScore}: ${appetiteScore}`,
-            `${CATEGORY_META.gut.label} -- Max score ${CATEGORY_META.gut.maxScore}: ${gutScore}`,
-            ``,
-            `Highest Score: ${highestCat.score}`,
-            `Lowest Score: ${lowestCat.score}`,
-            `Highest Score Category: ${highestCat.label} -- Max score ${highestMaxScore}`,
-            `Lowest Score Category: ${lowestCat.label} -- Max score ${lowestMaxScore}`,
-            ``,
-            `Timezone: ${timezone ?? "Unknown"}`,
-            `Submission Date: ${submissionDate}`,
-            pageUrl ? `URL: ${pageUrl}` : null,
-          ].filter((l) => l !== null) as string[];
-
-          const notifContent = notifLines.join("\n\n");
+          const notifContent = `
+<p>You have received a quiz submission. Please review the details below.</p>
+<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;width:100%">
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Full Name</b></td><td style="padding:4px 0">${fullName}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Phone</b></td><td style="padding:4px 0">${phone ?? "(not provided)"}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Email</b></td><td style="padding:4px 0">${email}</td></tr>
+  <tr><td colspan="2" style="padding:12px 0 4px"><b>— Quiz Answers —</b></td></tr>
+  ${qaRows}
+  <tr><td colspan="2" style="padding:12px 0 4px"><b>— Scores —</b></td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Overall Score</b></td><td style="padding:4px 0">${totalScore} / 51</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>${CATEGORY_META.digestive.label} (max ${CATEGORY_META.digestive.maxScore})</b></td><td style="padding:4px 0">${digestiveScore}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>${CATEGORY_META.appetite.label} (max ${CATEGORY_META.appetite.maxScore})</b></td><td style="padding:4px 0">${appetiteScore}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>${CATEGORY_META.gut.label} (max ${CATEGORY_META.gut.maxScore})</b></td><td style="padding:4px 0">${gutScore}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Highest Score</b></td><td style="padding:4px 0">${highestCat.score}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Lowest Score</b></td><td style="padding:4px 0">${lowestCat.score}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Highest Score Category</b></td><td style="padding:4px 0">${highestCat.label} (max ${highestMaxScore})</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Lowest Score Category</b></td><td style="padding:4px 0">${lowestCat.label} (max ${lowestMaxScore})</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Timezone</b></td><td style="padding:4px 0">${timezone ?? "Unknown"}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;color:#555"><b>Submission Date</b></td><td style="padding:4px 0">${submissionDate}</td></tr>
+  ${pageUrl ? `<tr><td style="padding:4px 12px 4px 0;color:#555"><b>URL</b></td><td style="padding:4px 0">${pageUrl}</td></tr>` : ""}
+</table>`;
 
           try {
             await sendOwnerNotification(`Quiz Submitted: ${fullName}`, notifContent);
