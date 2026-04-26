@@ -56,7 +56,7 @@
 - [x] Pass attribution data through quiz submission to server and store in database
 - [x] Server-side funnel.track tRPC procedure ready (page_view, quiz_start, quiz_complete, order_click)
 - [x] Wire frontend event dispatch to funnel.track for page_view, quiz_start, quiz_complete
-- [ ] Add order_click event to VSL pages buy buttons (post-launch)
+- [x] Add order_click event to VSL pages buy buttons (post-launch)
 - [x] Build dashboard: submissions summary section
 - [x] Build dashboard: ad performance table section
 - [x] Build dashboard: individual submissions table (searchable/filterable)
@@ -68,3 +68,8 @@
 - [x] Add "Ad Name" as a visible column in the Submissions table
 - [x] Replace single "Avg Score" summary card with four separate avg score cards: Red (Upper), Red (Lower), Yellow, Green
 - [x] Add checkbox multi-select and bulk delete button to Submissions table
+- [x] Pass session ID, alert tier, ad name, UTM params in VSL redirect URL query string
+- [x] Add vsl_view, order_click, and Wistia 25/50/75/100 milestone events to Yellow Alert VSL page
+- [x] Add vsl_view, order_click, and Wistia 25/50/75/100 milestone events to Red Alert VSL page
+- [x] Add funnel.stats tRPC query returning step-by-step conversion counts
+- [x] Build Funnel Analytics section on dashboard showing drop-off rates per step

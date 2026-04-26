@@ -149,6 +149,37 @@ export async function getFunnelEventsBySession(sessionId: string) {
     .orderBy(asc(funnelEvents.eventTimestamp));
 }
 
+export async function getFunnelStats() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Count distinct sessions per event type
+  const rows = await db
+    .select({
+      eventType: funnelEvents.eventType,
+      sessions: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})`,
+    })
+    .from(funnelEvents)
+    .groupBy(funnelEvents.eventType);
+
+  const map: Record<string, number> = {};
+  for (const r of rows) {
+    map[r.eventType] = Number(r.sessions);
+  }
+
+  return {
+    page_view: map["page_view"] ?? 0,
+    quiz_start: map["quiz_start"] ?? 0,
+    quiz_complete: map["quiz_complete"] ?? 0,
+    vsl_view: map["vsl_view"] ?? 0,
+    vsl_25: map["vsl_25"] ?? 0,
+    vsl_50: map["vsl_50"] ?? 0,
+    vsl_75: map["vsl_75"] ?? 0,
+    vsl_100: map["vsl_100"] ?? 0,
+    order_click: map["order_click"] ?? 0,
+  };
+}
+
 // ── Dashboard Aggregates ──────────────────────────────────────────────────────
 
 export async function getSubmissionsSummary(dateFrom?: Date, dateTo?: Date) {

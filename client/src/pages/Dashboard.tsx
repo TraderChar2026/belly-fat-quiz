@@ -677,6 +677,79 @@ function SalesLogTable() {
   );
 }
 
+// ── Funnel Analytics Section ─────────────────────────────────────────────────
+
+function FunnelSection() {
+  const { data, isLoading, refetch } = trpc.dashboard.funnelStats.useQuery();
+
+  const steps = [
+    { key: "page_view",    label: "Page Views",       color: "bg-blue-500" },
+    { key: "quiz_start",   label: "Quiz Started",     color: "bg-indigo-500" },
+    { key: "quiz_complete",label: "Quiz Completed",   color: "bg-violet-500" },
+    { key: "vsl_view",     label: "VSL Viewed",       color: "bg-amber-500" },
+    { key: "vsl_25",       label: "Video 25%",        color: "bg-orange-400" },
+    { key: "vsl_50",       label: "Video 50%",        color: "bg-orange-500" },
+    { key: "vsl_75",       label: "Video 75%",        color: "bg-orange-600" },
+    { key: "vsl_100",      label: "Video 100%",       color: "bg-red-500" },
+    { key: "order_click",  label: "Order Clicked",    color: "bg-emerald-600" },
+  ] as const;
+
+  const getValue = (key: string) =>
+    isLoading ? null : (data?.[key as keyof typeof data] ?? 0) as number;
+
+  const topValue = getValue("page_view") ?? 1;
+
+  return (
+    <Card className="mb-6">
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardTitle className="text-base font-semibold">Funnel Analytics</CardTitle>
+        <Button variant="ghost" size="sm" onClick={() => refetch()} className="gap-1.5 text-xs">
+          <RefreshCw className="w-3 h-3" /> Refresh
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {steps.map((step, i) => {
+            const val = getValue(step.key);
+            const prev = i > 0 ? (getValue(steps[i - 1].key) ?? 0) : null;
+            const pctOfTop = topValue > 0 && val !== null ? Math.round((val / topValue) * 100) : 0;
+            const dropPct = prev !== null && prev > 0 && val !== null
+              ? Math.round(((prev - val) / prev) * 100)
+              : null;
+
+            return (
+              <div key={step.key}>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-foreground w-36">{step.label}</span>
+                    {dropPct !== null && dropPct > 0 && (
+                      <span className="text-xs text-muted-foreground">↓ {dropPct}% drop</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-semibold text-foreground">
+                    {val === null ? "—" : val.toLocaleString()}
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-border overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ${step.color}`}
+                    style={{ width: `${pctOfTop}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {!isLoading && (data?.page_view ?? 0) === 0 && (
+          <p className="text-sm text-muted-foreground text-center mt-4">
+            No funnel data yet. Events will appear here once visitors start taking the quiz.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 // ── Main Dashboard Page ───────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -694,6 +767,7 @@ export default function Dashboard() {
 
         <SummaryCards />
         <AdPerformanceTable />
+        <FunnelSection />
         <SubmissionsTable />
         <SalesLogTable />
       </div>

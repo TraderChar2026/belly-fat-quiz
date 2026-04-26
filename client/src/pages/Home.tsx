@@ -310,7 +310,7 @@ function ContactForm({
   );
 }
 
-function ResultsPage({ result, answers }: { result: ResultData; answers: Answer[] }) {
+function ResultsPage({ result, answers, attribution }: { result: ResultData; answers: Answer[]; attribution: import("@/hooks/useAttribution").AttributionData }) {
   const alertLevel = getAlertLevel(result.totalScore);
 
   // ── Red Alert sub-group: Lower (23–30) vs Upper (31–54) ───────────────────
@@ -322,11 +322,24 @@ function ResultsPage({ result, answers }: { result: ResultData; answers: Answer[
       : null;
 
   // ── Auto-redirect countdown for yellow/red alert ───────────────────────────
+  const buildVslUrl = (base: string) => {
+    const p = new URLSearchParams();
+    if (attribution.sessionId) p.set("sid", attribution.sessionId);
+    p.set("tier", alertLevel);
+    if (redAlertSubGroup) p.set("band", redAlertSubGroup);
+    if (attribution.adNameRaw) p.set("ad_name", attribution.adNameRaw);
+    if (attribution.utmSource) p.set("utm_source", attribution.utmSource);
+    if (attribution.utmMedium) p.set("utm_medium", attribution.utmMedium);
+    if (attribution.utmCampaign) p.set("utm_campaign", attribution.utmCampaign);
+    if (attribution.utmId) p.set("utm_id", attribution.utmId);
+    if (attribution.fbclid) p.set("fbclid", attribution.fbclid);
+    return `${base}?${p.toString()}`;
+  };
   const redirectUrl =
     alertLevel === "yellow"
-      ? "/yellow-alert-preview.html"
+      ? buildVslUrl("/yellow-alert-preview.html")
       : alertLevel === "red"
-      ? "/red-alert-preview.html"
+      ? buildVslUrl("/red-alert-preview.html")
       : null;
 
   const [countdown, setCountdown] = useState(redirectUrl ? 7 : 0);
@@ -674,7 +687,7 @@ export default function Home() {
         )}
 
         {stage === "results" && result && (
-          <ResultsPage result={result} answers={answers} />
+          <ResultsPage result={result} answers={answers} attribution={attribution} />
         )}
       </main>
 

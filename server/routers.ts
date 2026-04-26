@@ -10,6 +10,7 @@ import {
   getSubmissionById,
   getSubmissionsSummary,
   getAdPerformance,
+  getFunnelStats,
   saveSale,
   getSales,
   deleteSale,
@@ -225,6 +226,13 @@ export const appRouter = router({
         }
         await deleteSubmissions(input.ids);
         return { ok: true, deleted: input.ids.length };
+      }),
+    funnelStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getFunnelStats();
       }),
   }),
 

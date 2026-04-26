@@ -608,7 +608,7 @@
           </div>
 
           <!-- CTA -->
-          <a href="https://cart.lifevantage.com/US/shoppingcart/share/792b7ca9-b39b-445b-9cfe-00128d01555f" target="_blank" class="cta-primary">
+          <a href="https://cart.lifevantage.com/US/shoppingcart/share/792b7ca9-b39b-445b-9cfe-00128d01555f" target="_blank" class="cta-primary" id="order-cta">
             👉 &nbsp; Click Here to Order Now — Yes, I'm Ready to Reclaim My Body
           </a>
           <p class="guarantee-note">✅ <strong>100% Money-Back Guarantee</strong> &nbsp;·&nbsp; No risk. No fear. Just results.</p>
@@ -625,5 +625,65 @@
     </div>
   </footer>
 
+<script>
+(function() {
+  // Parse attribution from URL query string
+  var params = new URLSearchParams(window.location.search);
+  var sid = params.get('sid') || '';
+  var band = params.get('band') || '';
+  var adName = params.get('ad_name') || '';
+  var utmSource = params.get('utm_source') || '';
+  var utmCampaign = params.get('utm_campaign') || '';
+
+  // Post event to funnel.track tRPC endpoint
+  function trackEvent(eventType) {
+    if (!sid) return;
+    fetch('/api/trpc/funnel.track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        json: {
+          eventType: eventType,
+          sessionId: sid,
+          alertTier: 'Red',
+          scoreBand: band === 'upper' ? 'Upper_Red' : 'Lower_Red',
+          vslVersion: 'red',
+          adName: adName || undefined,
+          utmSource: utmSource || undefined,
+          utmCampaign: utmCampaign || undefined
+        }
+      })
+    }).catch(function() {});
+  }
+
+  // Fire vsl_view immediately
+  trackEvent('vsl_view');
+
+  // Order click
+  var ctaBtn = document.getElementById('order-cta');
+  if (ctaBtn) {
+    ctaBtn.addEventListener('click', function() {
+      trackEvent('order_click');
+    });
+  }
+
+  // Wistia video milestones via _wq API
+  var milestonesFired = {};
+  window._wq = window._wq || [];
+  window._wq.push({
+    id: '9384761b7n',
+    onReady: function(video) {
+      video.bind('percentwatchedchanged', function(pct) {
+        [25, 50, 75, 100].forEach(function(m) {
+          if (pct * 100 >= m && !milestonesFired[m]) {
+            milestonesFired[m] = true;
+            trackEvent('vsl_' + m);
+          }
+        });
+      });
+    }
+  });
+})();
+</script>
 </body>
 </html>
