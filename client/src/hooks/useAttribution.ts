@@ -11,6 +11,7 @@ export interface AttributionData {
   utmMedium?: string;
   utmCampaign?: string;
   utmId?: string;
+  utmContent?: string;
   utmTerm?: string;
   fbclid?: string;
   fbEventId?: string;
@@ -61,6 +62,7 @@ export function useAttribution(): AttributionData {
     const utmMedium = params.get("utm_medium") ?? undefined;
     const utmCampaign = params.get("utm_campaign") ?? undefined;
     const utmId = params.get("utm_id") ?? undefined;
+    const utmContent = params.get("utm_content") ?? undefined;
     const utmTerm = params.get("utm_term") ?? undefined;
     const fbclid = params.get("fbclid") ?? undefined;
     const fbEventId = params.get("fb_event_id") ?? undefined;
@@ -77,6 +79,7 @@ export function useAttribution(): AttributionData {
       utmMedium,
       utmCampaign,
       utmId,
+      utmContent,
       utmTerm,
       fbclid,
       fbEventId,

@@ -70,6 +70,7 @@ export const quizSubmissions = mysqlTable("quiz_submissions", {
   utmMedium: varchar("utmMedium", { length: 255 }),
   utmCampaign: varchar("utmCampaign", { length: 255 }),
   utmId: varchar("utmId", { length: 255 }),
+  utmContent: varchar("utmContent", { length: 512 }),
   utmTerm: varchar("utmTerm", { length: 255 }),
   fbclid: varchar("fbclid", { length: 512 }),
   fbEventId: varchar("fbEventId", { length: 255 }),

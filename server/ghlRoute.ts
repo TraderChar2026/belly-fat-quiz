@@ -80,6 +80,7 @@ interface GhlSubmitBody {
   utmMedium?: string;
   utmCampaign?: string;
   utmId?: string;
+  utmContent?: string;
   utmTerm?: string;
   fbclid?: string;
   fbEventId?: string;
@@ -178,7 +179,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
     const {
       fullName, email, phone, answers,
       sessionId, timezone, adName, adNameRaw, referrerUrl, referrerPlatform,
-      utmSource, utmMedium, utmCampaign, utmId, utmTerm, fbclid, fbEventId, pageUrl,
+      utmSource, utmMedium, utmCampaign, utmId, utmContent, utmTerm, fbclid, fbEventId, pageUrl,
     } = body;
 
     if (!fullName || !email || !Array.isArray(answers) || answers.length !== 17) {
@@ -320,15 +321,8 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
             hour12: true,
           });
 
-          const htmlBody = buildHtmlEmail({
-            fullName, email, phone, answers,
-            totalScore, digestiveScore, appetiteScore, gutScore,
-            alertLabel, highestCat, lowestCat, submissionDate, utmSource,
-          });
-
           // Step 4: Send owner notification via Manus built-in notification service
-          // (GHL v1 API does not support sending outbound emails via REST)
-          // Build Q&A lines for the notification
+          // Format matches the agreed AwesomeCRM two-column table email format
           const qaLines = QUESTIONS.map((q) => {
             const a = answers.find((ans) => ans.questionId === q.id);
             let answerText = "(no answer)";
@@ -339,26 +333,35 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
                 answerText = q.options.find((o) => o.points === a.points)?.text ?? answerText;
               }
             }
-            return `Q${q.id}: ${q.text}\n   Answer: ${answerText}`;
+            return `${q.text}: ${answerText}`;
           });
 
-          const notifContent = [
-            `Name: ${fullName}`,
-            `Email: ${email}`,
-            phone ? `Phone: ${phone}` : null,
-            `Alert Level: ${alertLabel}`,
-            `Score: ${totalScore}/51`,
-            `Digestive: ${digestiveScore} | Appetite: ${appetiteScore} | Gut: ${gutScore}`,
-            `Highest: ${highestCat.label} (${highestCat.score}) | Lowest: ${lowestCat.label} (${lowestCat.score})`,
-            utmSource ? `UTM Source: ${utmSource}` : null,
-            `Date: ${submissionDate}`,
+          const notifLines: string[] = [
+            `You have received a quiz submission. Please review the quiz details below.`,
             ``,
-            `--- Quiz Answers ---`,
+            `Full Name: ${fullName}`,
+            `Phone: ${phone ?? "(not provided)"}`,
+            `Email: ${email}`,
+            ``,
             ...qaLines,
-          ].filter((l) => l !== null).join("\n");
+            ``,
+            `Overall Only: ${totalScore}`,
+            `${CATEGORY_META.digestive.label} -- Max score ${CATEGORY_META.digestive.maxScore}: ${digestiveScore}`,
+            `${CATEGORY_META.appetite.label} -- Max score ${CATEGORY_META.appetite.maxScore}: ${appetiteScore}`,
+            `${CATEGORY_META.gut.label} -- Max score ${CATEGORY_META.gut.maxScore}: ${gutScore}`,
+            `Highest Score: ${highestCat.score}`,
+            `Lowest Score: ${lowestCat.score}`,
+            `Highest Score Category: ${highestCat.label} -- Max score ${highestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : highestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore}`,
+            `Lowest Score Category: ${lowestCat.label} -- Max score ${lowestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : lowestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore}`,
+            `Timezone: ${timezone ?? "Unknown"}`,
+            `Submission Date: ${submissionDate}`,
+            pageUrl ? `URL: ${pageUrl}` : null,
+          ].filter((l) => l !== null) as string[];
+
+          const notifContent = notifLines.join("\n");
 
           try {
-            await sendOwnerNotification(`${fullName} Quiz Submitted`, notifContent);
+            await sendOwnerNotification(`Quiz Submitted: ${fullName}`, notifContent);
             console.log("[GHL] Sent owner notification");
           } catch (notifErr) {
             console.warn("[GHL] Owner notification failed (non-fatal):", notifErr);
@@ -457,6 +460,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       utmMedium,
       utmCampaign,
       utmId,
+      utmContent,
       utmTerm,
       fbclid,
       fbEventId,

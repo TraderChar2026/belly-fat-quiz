@@ -470,6 +470,7 @@ export default function DashboardSubmissions() {
                     <TableHead className="min-w-[160px]">UTM Medium</TableHead>
                     <TableHead className="min-w-[200px]">Campaign</TableHead>
                     <TableHead className="min-w-[120px]">utm_id</TableHead>
+                    <TableHead className="min-w-[200px]">utm_content</TableHead>
                     <TableHead className="min-w-[120px]">utm_term</TableHead>
                     <TableHead className="min-w-[200px]">URL (documentURL)</TableHead>
                     <TableHead className="min-w-[160px]">fbEventId</TableHead>
@@ -535,6 +536,7 @@ export default function DashboardSubmissions() {
                         <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.utmMedium ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[200px] whitespace-normal">{row.utmCampaign ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[120px]">{row.utmId ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[200px] whitespace-normal">{row.utmContent ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[120px]">{row.utmTerm ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[200px] max-w-[260px] truncate">{row.pageUrl ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.fbEventId ?? "—"}</TableCell>

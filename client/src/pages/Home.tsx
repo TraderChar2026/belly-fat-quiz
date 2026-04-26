@@ -587,6 +587,7 @@ export default function Home() {
           utmMedium: attribution.utmMedium,
           utmCampaign: attribution.utmCampaign,
           utmId: attribution.utmId,
+          utmContent: attribution.utmContent,
           utmTerm: attribution.utmTerm,
           fbclid: attribution.fbclid,
           fbEventId: attribution.fbEventId,

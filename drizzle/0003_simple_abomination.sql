@@ -1,0 +1,1 @@
+ALTER TABLE `quiz_submissions` ADD `utmContent` varchar(512);
