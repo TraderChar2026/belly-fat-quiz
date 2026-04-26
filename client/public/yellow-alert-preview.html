@@ -518,6 +518,12 @@
       <div class="video-wrapper">
         <wistia-player media-id="g4s4s1m6ta" aspect="1.7777777777777777"></wistia-player>
       </div>
+      <div style="text-align:center; margin-top:28px;">
+        <a href="https://cart.lifevantage.com/US/shoppingcart/share/792b7ca9-b39b-445b-9cfe-00128d01555f" target="_blank" class="cta-primary" id="order-cta-video">
+          👉 &nbsp; Click Here to Order Now — Yes, I'm Ready to Reclaim My Body
+        </a>
+        <p style="margin-top:12px; font-size:13px; color:#5a7a5a;">✅ <strong>100% Money-Back Guarantee</strong> &nbsp;·&nbsp; No risk. No fear. Just results.</p>
+      </div>
     </div>
   </section>
 
@@ -699,13 +705,15 @@
   // Fire vsl_view immediately
   trackEvent('vsl_view');
 
-  // Order click
-  var ctaBtn = document.getElementById('order-cta');
-  if (ctaBtn) {
-    ctaBtn.addEventListener('click', function() {
-      trackEvent('order_click');
-    });
-  }
+  // Order click — wire all CTA buttons on the page
+  ['order-cta', 'order-cta-video'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', function() {
+        trackEvent('order_click');
+      });
+    }
+  });
 
   // Wistia video milestones via _wq API
   var milestonesFired = {};

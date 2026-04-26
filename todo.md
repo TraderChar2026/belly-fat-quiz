@@ -73,3 +73,5 @@
 - [x] Add vsl_view, order_click, and Wistia 25/50/75/100 milestone events to Red Alert VSL page
 - [x] Add funnel.stats tRPC query returning step-by-step conversion counts
 - [x] Build Funnel Analytics section on dashboard showing drop-off rates per step
+- [x] Add duplicate Order Now CTA button immediately below the Wistia video on Yellow Alert VSL page
+- [x] Add duplicate Order Now CTA button immediately below the Wistia video on Red Alert VSL page
