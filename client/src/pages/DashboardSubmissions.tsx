@@ -448,17 +448,34 @@ export default function DashboardSubmissions() {
                     <TableHead>Band</TableHead>
                     <TableHead>Ad / Source</TableHead>
                     <TableHead>Date</TableHead>
+                    <TableHead className="min-w-[180px]">Q1 Digestion</TableHead>
+                    <TableHead className="min-w-[180px]">Q2 Heartburn</TableHead>
+                    <TableHead className="min-w-[180px]">Q3 Weight Changes</TableHead>
+                    <TableHead className="min-w-[180px]">Q4 Energy</TableHead>
+                    <TableHead className="min-w-[180px]">Q5 After Meals</TableHead>
+                    <TableHead className="min-w-[180px]">Q6 Eating Control</TableHead>
+                    <TableHead className="min-w-[180px]">Q7 Lose Weight</TableHead>
+                    <TableHead className="min-w-[180px]">Q8 Breakfast</TableHead>
+                    <TableHead className="min-w-[180px]">Q9 Sleep</TableHead>
+                    <TableHead className="min-w-[180px]">Q10 Brain Fog</TableHead>
+                    <TableHead className="min-w-[180px]">Q11 Mood Swings</TableHead>
+                    <TableHead className="min-w-[180px]">Q12 Diet</TableHead>
+                    <TableHead className="min-w-[180px]">Q13 Fermented Foods</TableHead>
+                    <TableHead className="min-w-[180px]">Q14 Prebiotic Foods</TableHead>
+                    <TableHead className="min-w-[180px]">Q15 Antacids</TableHead>
+                    <TableHead className="min-w-[180px]">Q16 Pain Pills</TableHead>
+                    <TableHead className="min-w-[180px] pr-4">Q17 Antibiotics</TableHead>
                     <TableHead className="text-right pr-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
+                      <TableCell colSpan={27} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
                     </TableRow>
                   ) : rows.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-10 text-muted-foreground">
+                      <TableCell colSpan={27} className="text-center py-10 text-muted-foreground">
                         No submissions found.
                       </TableCell>
                     </TableRow>
@@ -485,6 +502,23 @@ export default function DashboardSubmissions() {
                           {row.adName ?? "Direct"}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">{fmtDate(row.submissionDate)}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q1Digestion ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q2Heartburn ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q3WeightChanges ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q4Energy ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q5AfterMeals ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q6EatingControl ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q7LoseWeight ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q8Breakfast ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q9Sleep ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q10BrainFog ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q11MoodSwings ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q12Diet ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q13FermentedFoods ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q14PrebioticFoods ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q15Antacids ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q16PainPills ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[180px] pr-4 whitespace-normal">{row.q17Antibiotics ?? "—"}</TableCell>
                         <TableCell className="text-right pr-4">
                           <div className="flex gap-1 justify-end">
                             <Dialog>

@@ -84,3 +84,4 @@
 - [x] Verify GHL contact upsert and answer mapping works correctly in deployed production
 - [x] Add Phone column to Submissions table (show — when blank)
 - [x] Manually push Ros's submission to AwesomeCRM with correct tag and custom field answers
+- [x] Add all 17 quiz question answer columns to Submissions table with horizontal scrollbar for side-by-side comparison
