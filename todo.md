@@ -90,3 +90,4 @@
 - [x] Add analytics tRPC queries: submissions over time, alert tier breakdown, ad performance chart, question answer distributions, funnel conversion rates
 - [x] Build Analytics dashboard page with charts: submissions timeline, alert tier pie/donut, ad performance bar chart, funnel drop-off, top question answer distributions
 - [x] Add Analytics nav link to sidebar in DashboardLayout
+- [x] Replace shortcut Q&A column headers (Q1 Digestion, etc.) with full question text in Submissions table

@@ -112,23 +112,23 @@ function SubmissionDetail({ id }: { id: number }) {
   ];
 
   const qFields: [string, string | null | undefined][] = [
-    ["Q1 Digestion", data.q1Digestion],
-    ["Q2 Heartburn", data.q2Heartburn],
-    ["Q3 Weight Changes", data.q3WeightChanges],
-    ["Q4 Energy", data.q4Energy],
-    ["Q5 After Meals", data.q5AfterMeals],
-    ["Q6 Eating Control", data.q6EatingControl],
-    ["Q7 Lose Weight", data.q7LoseWeight],
-    ["Q8 Breakfast", data.q8Breakfast],
-    ["Q9 Sleep", data.q9Sleep],
-    ["Q10 Brain Fog", data.q10BrainFog],
-    ["Q11 Mood Swings", data.q11MoodSwings],
-    ["Q12 Diet", data.q12Diet],
-    ["Q13 Fermented Foods", data.q13FermentedFoods],
-    ["Q14 Prebiotic Foods", data.q14PrebioticFoods],
-    ["Q15 Antacids", data.q15Antacids],
-    ["Q16 Pain Pills", data.q16PainPills],
-    ["Q17 Antibiotics", data.q17Antibiotics],
+    ["How would you describe your digestion?", data.q1Digestion],
+    ["Do you have heartburn after meals?", data.q2Heartburn],
+    ["How do you experience unexplained weight changes?", data.q3WeightChanges],
+    ["How do you feel after meals?", data.q4Energy],
+    ["How would you rate your energy levels throughout the day?", data.q5AfterMeals],
+    ["How well do you control your eating?", data.q6EatingControl],
+    ["How difficult is it for you to lose weight?", data.q7LoseWeight],
+    ["What do you typically eat for breakfast?", data.q8Breakfast],
+    ["Do you have problems sleeping?", data.q9Sleep],
+    ["Do you often experience brain fog?", data.q10BrainFog],
+    ["Do you experience mood swings?", data.q11MoodSwings],
+    ["How would you describe your typical diet?", data.q12Diet],
+    ["How often do you eat fermented foods? (Greek yogurt, kimchi, sauerkraut)", data.q13FermentedFoods],
+    ["How often do you eat prebiotic foods? (asparagus, onion, garlic, or bananas)", data.q14PrebioticFoods],
+    ["Do you take antacids or acid blockers like Prilosec or omeprazole?", data.q15Antacids],
+    ["Do you take pain pills like aspirin, Advil, Tylenol, or ibuprofen?", data.q16PainPills],
+    ["Recent antibiotic use?", data.q17Antibiotics],
   ];
 
   return (
@@ -448,23 +448,23 @@ export default function DashboardSubmissions() {
                     <TableHead>Band</TableHead>
                     <TableHead>Ad / Source</TableHead>
                     <TableHead>Date</TableHead>
-                    <TableHead className="min-w-[180px]">Q1 Digestion</TableHead>
-                    <TableHead className="min-w-[180px]">Q2 Heartburn</TableHead>
-                    <TableHead className="min-w-[180px]">Q3 Weight Changes</TableHead>
-                    <TableHead className="min-w-[180px]">Q4 Energy</TableHead>
-                    <TableHead className="min-w-[180px]">Q5 After Meals</TableHead>
-                    <TableHead className="min-w-[180px]">Q6 Eating Control</TableHead>
-                    <TableHead className="min-w-[180px]">Q7 Lose Weight</TableHead>
-                    <TableHead className="min-w-[180px]">Q8 Breakfast</TableHead>
-                    <TableHead className="min-w-[180px]">Q9 Sleep</TableHead>
-                    <TableHead className="min-w-[180px]">Q10 Brain Fog</TableHead>
-                    <TableHead className="min-w-[180px]">Q11 Mood Swings</TableHead>
-                    <TableHead className="min-w-[180px]">Q12 Diet</TableHead>
-                    <TableHead className="min-w-[180px]">Q13 Fermented Foods</TableHead>
-                    <TableHead className="min-w-[180px]">Q14 Prebiotic Foods</TableHead>
-                    <TableHead className="min-w-[180px]">Q15 Antacids</TableHead>
-                    <TableHead className="min-w-[180px]">Q16 Pain Pills</TableHead>
-                    <TableHead className="min-w-[180px] pr-4">Q17 Antibiotics</TableHead>
+                    <TableHead className="min-w-[260px]">How would you describe your digestion?</TableHead>
+                    <TableHead className="min-w-[260px]">Do you have heartburn after meals?</TableHead>
+                    <TableHead className="min-w-[260px]">How do you experience unexplained weight changes?</TableHead>
+                    <TableHead className="min-w-[260px]">How do you feel after meals?</TableHead>
+                    <TableHead className="min-w-[300px]">How would you rate your energy levels throughout the day?</TableHead>
+                    <TableHead className="min-w-[260px]">How well do you control your eating?</TableHead>
+                    <TableHead className="min-w-[260px]">How difficult is it for you to lose weight?</TableHead>
+                    <TableHead className="min-w-[260px]">What do you typically eat for breakfast?</TableHead>
+                    <TableHead className="min-w-[220px]">Do you have problems sleeping?</TableHead>
+                    <TableHead className="min-w-[260px]">Do you often experience brain fog?</TableHead>
+                    <TableHead className="min-w-[260px]">Do you experience mood swings?</TableHead>
+                    <TableHead className="min-w-[260px]">How would you describe your typical diet?</TableHead>
+                    <TableHead className="min-w-[320px]">How often do you eat fermented foods? (Greek yogurt, kimchi, sauerkraut)</TableHead>
+                    <TableHead className="min-w-[340px]">How often do you eat prebiotic foods? (asparagus, onion, garlic, or bananas)</TableHead>
+                    <TableHead className="min-w-[320px]">Do you take antacids or acid blockers like Prilosec or omeprazole?</TableHead>
+                    <TableHead className="min-w-[320px]">Do you take pain pills like aspirin, Advil, Tylenol, or ibuprofen?</TableHead>
+                    <TableHead className="min-w-[220px] pr-4">Recent antibiotic use?</TableHead>
                     <TableHead className="min-w-[200px]">Ad Name</TableHead>
                     <TableHead className="min-w-[160px]">UTM Source</TableHead>
                     <TableHead className="min-w-[160px]">UTM Medium</TableHead>
