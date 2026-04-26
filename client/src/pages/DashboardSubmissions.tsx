@@ -465,17 +465,28 @@ export default function DashboardSubmissions() {
                     <TableHead className="min-w-[180px]">Q15 Antacids</TableHead>
                     <TableHead className="min-w-[180px]">Q16 Pain Pills</TableHead>
                     <TableHead className="min-w-[180px] pr-4">Q17 Antibiotics</TableHead>
+                    <TableHead className="min-w-[200px]">Ad Name</TableHead>
+                    <TableHead className="min-w-[160px]">UTM Source</TableHead>
+                    <TableHead className="min-w-[160px]">UTM Medium</TableHead>
+                    <TableHead className="min-w-[200px]">Campaign</TableHead>
+                    <TableHead className="min-w-[120px]">utm_id</TableHead>
+                    <TableHead className="min-w-[120px]">utm_term</TableHead>
+                    <TableHead className="min-w-[200px]">URL (documentURL)</TableHead>
+                    <TableHead className="min-w-[160px]">fbEventId</TableHead>
+                    <TableHead className="min-w-[200px]">fbclid</TableHead>
+                    <TableHead className="min-w-[160px]">Referrer Platform</TableHead>
+                    <TableHead className="min-w-[260px] pr-4">Referrer URL</TableHead>
                     <TableHead className="text-right pr-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={27} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
+                      <TableCell colSpan={39} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
                     </TableRow>
                   ) : rows.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={27} className="text-center py-10 text-muted-foreground">
+                      <TableCell colSpan={39} className="text-center py-10 text-muted-foreground">
                         No submissions found.
                       </TableCell>
                     </TableRow>
@@ -519,6 +530,17 @@ export default function DashboardSubmissions() {
                         <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q15Antacids ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q16PainPills ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[180px] pr-4 whitespace-normal">{row.q17Antibiotics ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[200px] whitespace-normal">{row.adName ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.utmSource ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.utmMedium ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[200px] whitespace-normal">{row.utmCampaign ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[120px]">{row.utmId ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[120px]">{row.utmTerm ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[200px] max-w-[260px] truncate">{row.pageUrl ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.fbEventId ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[200px] max-w-[260px] truncate">{row.fbclid ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.referrerPlatform ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[260px] pr-4 max-w-[320px] truncate">{row.referrerUrl ?? "—"}</TableCell>
                         <TableCell className="text-right pr-4">
                           <div className="flex gap-1 justify-end">
                             <Dialog>

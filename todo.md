@@ -85,3 +85,5 @@
 - [x] Add Phone column to Submissions table (show — when blank)
 - [x] Manually push Ros's submission to AwesomeCRM with correct tag and custom field answers
 - [x] Add all 17 quiz question answer columns to Submissions table with horizontal scrollbar for side-by-side comparison
+- [x] Add tracking columns to Submissions table: UTM Medium, URL, Campaign, documentURL, fbEventId, medium, mediumId, UTM Source, utm_id, utm_term, fbclid
+- [x] Add Ad Name column to the tracking section of the Submissions table (after the Q&A columns, alongside UTM fields)
