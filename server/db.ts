@@ -276,3 +276,82 @@ export async function deleteSubmissions(ids: number[]): Promise<void> {
   if (!db) throw new Error("Database not available");
   await db.delete(quizSubmissions).where(inArray(quizSubmissions.id, ids));
 }
+
+// ── Analytics ─────────────────────────────────────────────────────────────────
+
+/** Submissions grouped by day for a timeline chart */
+export async function getSubmissionsOverTime(days = 30) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const rows = await db.select({
+    day: sql<string>`DATE(submissionDate)`,
+    total: sql<number>`COUNT(*)`,
+    red: sql<number>`SUM(CASE WHEN alertTier = 'Red' THEN 1 ELSE 0 END)`,
+    yellow: sql<number>`SUM(CASE WHEN alertTier = 'Yellow' THEN 1 ELSE 0 END)`,
+    green: sql<number>`SUM(CASE WHEN alertTier = 'Green' THEN 1 ELSE 0 END)`,
+  }).from(quizSubmissions)
+    .where(gte(quizSubmissions.submissionDate, since))
+    .groupBy(sql`DATE(submissionDate)`)
+    .orderBy(asc(sql`DATE(submissionDate)`));
+  return rows;
+}
+
+/** Answer frequency for each question */
+export async function getQuestionAnswerDistributions() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const questions = [
+    { key: "q1Digestion", col: quizSubmissions.q1Digestion, label: "Q1 Digestion" },
+    { key: "q2Heartburn", col: quizSubmissions.q2Heartburn, label: "Q2 Heartburn" },
+    { key: "q3WeightChanges", col: quizSubmissions.q3WeightChanges, label: "Q3 Weight Changes" },
+    { key: "q4Energy", col: quizSubmissions.q4Energy, label: "Q4 Energy" },
+    { key: "q5AfterMeals", col: quizSubmissions.q5AfterMeals, label: "Q5 After Meals" },
+    { key: "q6EatingControl", col: quizSubmissions.q6EatingControl, label: "Q6 Eating Control" },
+    { key: "q7LoseWeight", col: quizSubmissions.q7LoseWeight, label: "Q7 Lose Weight" },
+    { key: "q8Breakfast", col: quizSubmissions.q8Breakfast, label: "Q8 Breakfast" },
+    { key: "q9Sleep", col: quizSubmissions.q9Sleep, label: "Q9 Sleep" },
+    { key: "q10BrainFog", col: quizSubmissions.q10BrainFog, label: "Q10 Brain Fog" },
+    { key: "q11MoodSwings", col: quizSubmissions.q11MoodSwings, label: "Q11 Mood Swings" },
+    { key: "q12Diet", col: quizSubmissions.q12Diet, label: "Q12 Diet" },
+    { key: "q13FermentedFoods", col: quizSubmissions.q13FermentedFoods, label: "Q13 Fermented Foods" },
+    { key: "q14PrebioticFoods", col: quizSubmissions.q14PrebioticFoods, label: "Q14 Prebiotic Foods" },
+    { key: "q15Antacids", col: quizSubmissions.q15Antacids, label: "Q15 Antacids" },
+    { key: "q16PainPills", col: quizSubmissions.q16PainPills, label: "Q16 Pain Pills" },
+    { key: "q17Antibiotics", col: quizSubmissions.q17Antibiotics, label: "Q17 Antibiotics" },
+  ] as const;
+
+  const results: { key: string; label: string; answers: { answer: string; count: number }[] }[] = [];
+  for (const q of questions) {
+    const rows = await db.select({
+      answer: q.col,
+      count: sql<number>`COUNT(*)`,
+    }).from(quizSubmissions)
+      .where(sql`${q.col} IS NOT NULL`)
+      .groupBy(q.col)
+      .orderBy(desc(sql`COUNT(*)`));
+    results.push({ key: q.key, label: q.label, answers: rows.map(r => ({ answer: r.answer ?? "", count: Number(r.count) })) });
+  }
+  return results;
+}
+
+/** Top traffic sources */
+export async function getTrafficSources() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [platformRows, utmSourceRows, utmMediumRows] = await Promise.all([
+    db.select({
+      platform: quizSubmissions.referrerPlatform,
+      count: sql<number>`COUNT(*)`,
+    }).from(quizSubmissions).groupBy(quizSubmissions.referrerPlatform).orderBy(desc(sql`COUNT(*)`)),
+    db.select({
+      source: quizSubmissions.utmSource,
+      count: sql<number>`COUNT(*)`,
+    }).from(quizSubmissions).where(sql`utmSource IS NOT NULL`).groupBy(quizSubmissions.utmSource).orderBy(desc(sql`COUNT(*)`)),
+    db.select({
+      medium: quizSubmissions.utmMedium,
+      count: sql<number>`COUNT(*)`,
+    }).from(quizSubmissions).where(sql`utmMedium IS NOT NULL`).groupBy(quizSubmissions.utmMedium).orderBy(desc(sql`COUNT(*)`)),
+  ]);
+  return { platformRows, utmSourceRows, utmMediumRows };
+}

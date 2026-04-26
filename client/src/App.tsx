@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import DashboardSubmissions from "./pages/DashboardSubmissions";
 import DashboardSales from "./pages/DashboardSales";
+import DashboardAnalytics from "./pages/DashboardAnalytics";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/dashboard/submissions"} component={DashboardSubmissions} />
       <Route path={"/dashboard/sales"} component={DashboardSales} />
+      <Route path={"/dashboard/analytics"} component={DashboardAnalytics} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

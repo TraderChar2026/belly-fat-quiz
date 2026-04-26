@@ -87,3 +87,6 @@
 - [x] Add all 17 quiz question answer columns to Submissions table with horizontal scrollbar for side-by-side comparison
 - [x] Add tracking columns to Submissions table: UTM Medium, URL, Campaign, documentURL, fbEventId, medium, mediumId, UTM Source, utm_id, utm_term, fbclid
 - [x] Add Ad Name column to the tracking section of the Submissions table (after the Q&A columns, alongside UTM fields)
+- [x] Add analytics tRPC queries: submissions over time, alert tier breakdown, ad performance chart, question answer distributions, funnel conversion rates
+- [x] Build Analytics dashboard page with charts: submissions timeline, alert tier pie/donut, ad performance bar chart, funnel drop-off, top question answer distributions
+- [x] Add Analytics nav link to sidebar in DashboardLayout

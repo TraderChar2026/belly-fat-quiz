@@ -15,6 +15,9 @@ import {
   getSales,
   deleteSale,
   deleteSubmissions,
+  getSubmissionsOverTime,
+  getQuestionAnswerDistributions,
+  getTrafficSources,
 } from "./db";
 import { computeScores, getCrmTag } from "../shared/quizData";
 import { TRPCError } from "@trpc/server";
@@ -233,6 +236,32 @@ export const appRouter = router({
           throw new TRPCError({ code: "FORBIDDEN" });
         }
         return getFunnelStats();
+      }),
+  }),
+
+  // ── Analytics (owner-only) ───────────────────────────────────────────────────
+  analytics: router({
+    submissionsOverTime: protectedProcedure
+      .input(z.object({ days: z.number().int().min(7).max(365).default(30) }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getSubmissionsOverTime(input?.days ?? 30);
+      }),
+    questionDistributions: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getQuestionAnswerDistributions();
+      }),
+    trafficSources: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getTrafficSources();
       }),
   }),
 
