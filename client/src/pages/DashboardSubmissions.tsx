@@ -442,6 +442,7 @@ export default function DashboardSubmissions() {
                     </TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
                     <TableHead>Alert</TableHead>
                     <TableHead>Score</TableHead>
                     <TableHead>Band</TableHead>
@@ -453,11 +454,11 @@ export default function DashboardSubmissions() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
+                      <TableCell colSpan={10} className="text-center py-10 text-muted-foreground">Loading...</TableCell>
                     </TableRow>
                   ) : rows.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
+                      <TableCell colSpan={10} className="text-center py-10 text-muted-foreground">
                         No submissions found.
                       </TableCell>
                     </TableRow>
@@ -476,6 +477,7 @@ export default function DashboardSubmissions() {
                         </TableCell>
                         <TableCell className="font-medium">{row.fullName}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{row.email}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{row.phone ?? "—"}</TableCell>
                         <TableCell>{alertBadge(row.alertTier)}</TableCell>
                         <TableCell className="font-semibold">{row.totalScore}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{scoreBandLabel(row.scoreBand)}</TableCell>

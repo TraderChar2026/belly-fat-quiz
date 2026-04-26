@@ -82,3 +82,5 @@
 - [x] Fix owner notification email not being sent on quiz submission (notifyOwner call failing silently)
 - [x] Add individual question answers (Q1-Q17) as expandable rows or columns in the Submissions table on the dashboard
 - [x] Verify GHL contact upsert and answer mapping works correctly in deployed production
+- [x] Add Phone column to Submissions table (show — when blank)
+- [x] Manually push Ros's submission to AwesomeCRM with correct tag and custom field answers
