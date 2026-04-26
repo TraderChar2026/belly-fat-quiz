@@ -333,8 +333,11 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
                 answerText = q.options.find((o) => o.points === a.points)?.text ?? answerText;
               }
             }
-            return `${q.text}: ${answerText}`;
+            return `${q.text}\nAnswer: ${answerText}`;
           });
+
+          const highestMaxScore = highestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : highestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore;
+          const lowestMaxScore = lowestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : lowestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore;
 
           const notifLines: string[] = [
             `You have received a quiz submission. Please review the quiz details below.`,
@@ -343,22 +346,27 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
             `Phone: ${phone ?? "(not provided)"}`,
             `Email: ${email}`,
             ``,
-            ...qaLines,
+            `--- Quiz Answers ---`,
             ``,
-            `Overall Only: ${totalScore}`,
+            ...qaLines.flatMap((line) => [line, ``]),
+            `--- Scores ---`,
+            ``,
+            `Overall Score: ${totalScore} / 51`,
             `${CATEGORY_META.digestive.label} -- Max score ${CATEGORY_META.digestive.maxScore}: ${digestiveScore}`,
             `${CATEGORY_META.appetite.label} -- Max score ${CATEGORY_META.appetite.maxScore}: ${appetiteScore}`,
             `${CATEGORY_META.gut.label} -- Max score ${CATEGORY_META.gut.maxScore}: ${gutScore}`,
+            ``,
             `Highest Score: ${highestCat.score}`,
             `Lowest Score: ${lowestCat.score}`,
-            `Highest Score Category: ${highestCat.label} -- Max score ${highestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : highestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore}`,
-            `Lowest Score Category: ${lowestCat.label} -- Max score ${lowestCat.label === CATEGORY_META.digestive.label ? CATEGORY_META.digestive.maxScore : lowestCat.label === CATEGORY_META.appetite.label ? CATEGORY_META.appetite.maxScore : CATEGORY_META.gut.maxScore}`,
+            `Highest Score Category: ${highestCat.label} -- Max score ${highestMaxScore}`,
+            `Lowest Score Category: ${lowestCat.label} -- Max score ${lowestMaxScore}`,
+            ``,
             `Timezone: ${timezone ?? "Unknown"}`,
             `Submission Date: ${submissionDate}`,
             pageUrl ? `URL: ${pageUrl}` : null,
           ].filter((l) => l !== null) as string[];
 
-          const notifContent = notifLines.join("\n");
+          const notifContent = notifLines.join("\n\n");
 
           try {
             await sendOwnerNotification(`Quiz Submitted: ${fullName}`, notifContent);
