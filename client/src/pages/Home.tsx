@@ -60,7 +60,7 @@ function LandingHeader({ onStart }: { onStart: () => void }) {
         {/* Copy block */}
         <div className="max-w-xl mx-auto text-left mb-10 space-y-4 text-base md:text-lg text-foreground/80">
           <p className="text-center font-semibold text-foreground/70 mb-2">Let's End The Weight Loss Struggle.</p>
-          <p>You're not at fault.<br />It's not willpower.<br />It's not your hormones.<br />It's not your age.</p>
+          <p>You're not at fault.<br />It's not willpower.<br />It's not your age.</p>
           <p>Take this quiz to...</p>
           <ul className="list-none space-y-2">
             <li>✓ Discover the real reason you're struggling to lose weight after 40</li>
