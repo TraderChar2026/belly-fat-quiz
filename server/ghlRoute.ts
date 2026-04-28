@@ -249,9 +249,28 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
         }
       }
 
-      // ── Step 2: Add alert tag via dedicated endpoint ─────────────────────────
-      // This is what fires the "Gut Health Trial Workflow" automation in GHL.
+      // ── Step 2: Remove then re-add alert tag so automation fires for existing contacts ─
+      // GHL automations only trigger when a tag is ADDED. If the contact already has
+      // the tag (e.g. repeat quiz taker), adding it again does nothing. Removing first
+      // ensures the add always fires the automation.
       if (ghlContactId) {
+        // Remove all three possible alert tags first (in case they have a different tier from before)
+        const allAlertTags = ["red alert", "yellow alert", "green alert"];
+        try {
+          const removeResult = await ghlFetch("DELETE", `/contacts/${ghlContactId}/tags/`, { tags: allAlertTags });
+          if (removeResult.ok) {
+            console.log(`[GHL] Removed existing alert tags from contact ${ghlContactId}`);
+          } else {
+            // Non-fatal — tag may not exist yet, proceed to add
+            console.log(`[GHL] Tag removal returned ${removeResult.status} (may not have had tags yet)`);
+          }
+        } catch (removeErr) {
+          console.warn("[GHL] Tag removal error (non-fatal):", removeErr);
+        }
+
+        // Short delay to ensure GHL processes the removal before the add
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const tagResult = await ghlFetch("POST", `/contacts/${ghlContactId}/tags/`, { tags: [crmTag] });
         if (tagResult.ok) {
           console.log(`[GHL] Added tag "${crmTag}" to contact ${ghlContactId}`);
