@@ -38,7 +38,7 @@ function LandingHeader({ onStart }: { onStart: () => void }) {
       </div>
 
       {/* Headline section */}
-      <div className="max-w-3xl mx-auto px-4 pt-10 pb-6 text-center">
+      <div className="max-w-3xl mx-auto px-4 pt-4 pb-6 text-center">
         <p className="text-lg md:text-xl text-foreground/80 mb-3 italic">
           It's Not Your Fault... It's Not Willpower...
         </p>
