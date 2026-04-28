@@ -51,10 +51,10 @@ function LandingHeader({ onStart }: { onStart: () => void }) {
         </h1>
 
         <p className="text-xl md:text-2xl font-semibold text-foreground/85 leading-snug mb-2">
-          Discover Why You Can't Lose The Fat No Matter What You Try
+          Discover How You Can Boost GLP-1 Levels to Unlock Fat Loss WITHOUT Medications or Shots
         </p>
         <p className="text-xl md:text-2xl font-semibold text-foreground/85 leading-snug mb-10">
-          And How To Finally Lose Up To 25 Pounds In 12 Weeks
+          And Get a Custom Plan for Boosting GLP-1 Naturally and Finally Lose Up to 25 lbs in 12 Weeks
         </p>
 
         {/* Copy block */}
