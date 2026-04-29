@@ -50,11 +50,8 @@ function LandingHeader({ onStart }: { onStart: () => void }) {
           Take The Free Stubborn<br />Belly Fat Quiz
         </h1>
 
-        <p className="text-lg md:text-xl font-semibold text-foreground/85 leading-snug mb-2 max-w-2xl mx-auto">
-          Discover How You Can Boost GLP-1 Levels to Unlock Fat Loss WITHOUT Medications or Shots
-        </p>
         <p className="text-lg md:text-xl font-semibold text-foreground/85 leading-snug mb-4 max-w-2xl mx-auto">
-          And Get a Custom Plan for Boosting GLP-1 Naturally and Finally Lose Up to 25 lbs in 12 Weeks
+          And Get a Custom Plan for Boosting GLP-1 Naturally and Finally Lose Up to 25 lbs in 12 Weeks WITHOUT Meds or Shots
         </p>
 
         {/* Copy block */}
