@@ -613,14 +613,19 @@ export default function Home() {
             utmCampaign: attribution.utmCampaign,
           });
         }
-        setResult({
-          totalScore: data.totalScore,
-          digestiveScore: data.digestiveScore,
-          appetiteScore: data.appetiteScore,
-          gutScore: data.gutScore,
-          crmTag: data.crmTag,
-        });
-        setStage("results");
+        // ── Skip results page — redirect directly to tier VSL ────────────────
+        const tier = data.crmTag?.includes("red") ? "red" : data.crmTag?.includes("yellow") ? "yellow" : "green";
+        const vslBase = tier === "red" ? "/red-alert-preview.html" : "/yellow-alert-preview.html";
+        const p = new URLSearchParams();
+        if (attribution.sessionId) p.set("sid", attribution.sessionId);
+        p.set("tier", tier);
+        if (attribution.adNameRaw) p.set("ad_name", attribution.adNameRaw);
+        if (attribution.utmSource) p.set("utm_source", attribution.utmSource);
+        if (attribution.utmMedium) p.set("utm_medium", attribution.utmMedium);
+        if (attribution.utmCampaign) p.set("utm_campaign", attribution.utmCampaign);
+        if (attribution.utmId) p.set("utm_id", attribution.utmId);
+        if (attribution.fbclid) p.set("fbclid", attribution.fbclid);
+        window.location.href = `${vslBase}?${p.toString()}`;
       } catch {
         toast.error("Something went wrong. Please try again.");
       } finally {
