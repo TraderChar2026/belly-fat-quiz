@@ -2,6 +2,7 @@ import { Router } from "express";
 import { computeScores, getCrmTag, getAlertLevel, CATEGORY_META, QUESTIONS } from "../shared/quizData";
 import { saveQuizSubmission, checkIsRepeatSubmission } from "./db";
 import { ENV } from "./_core/env";
+import { sendResultsEmail } from "./resendEmail";
 
 /** Send owner notification directly via Manus notification service (avoids TRPCError in Express context) */
 async function sendOwnerNotification(title: string, content: string): Promise<void> {
@@ -486,6 +487,24 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       fbEventId,
       pageUrl,
     });
+
+    // ── Send personalised results email to quiz taker via Resend ────────────
+    const nameParts2 = fullName.trim().split(/\s+/);
+    const firstName2 = nameParts2[0] ?? fullName;
+    try {
+      await sendResultsEmail({
+        firstName: firstName2,
+        email,
+        totalScore,
+        maxScore: 51,
+        digestiveScore,
+        appetiteScore,
+        gutScore,
+        alertLevel,
+      });
+    } catch (emailErr) {
+      console.warn("[Resend] Results email failed (non-fatal):", emailErr);
+    }
 
     return res.json({
       success: true,
