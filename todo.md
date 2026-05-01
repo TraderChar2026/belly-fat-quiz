@@ -94,3 +94,5 @@
 - [x] Audit DB schema for missing tracking fields: timezone, highestScoreCategory, lowestScoreCategory, highestScore, lowestScore, full pageUrl — added utmContent column
 - [x] Fix notification email to match agreed format: Full Name, Phone, Email, 17 Q&A rows, scores, categories, timezone, submission date, full URL
 - [x] Fix notification email formatting: each field and each Q&A must be on its own line (currently renders as run-on paragraph with no line breaks)
+- [ ] Fix max score on Red Alert VSL page: change 45 → 51
+- [ ] Diagnose and fix Resend results email not being received by quiz takers

@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_ADDRESS = "char@quiz.charwinnen.com";
+const FROM_ADDRESS = "char@resend.charwinnen.com";
 const FROM_NAME = "Char Winnen Ed.D.";
 
 const RED_VSL_URL = "https://quiz.charwinnen.com/red-alert-preview.html";
