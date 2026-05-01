@@ -99,10 +99,10 @@ function SubmissionDetail({ id }: { id: number }) {
     ["Alert Tier", data.alertTier],
     ["Score Band", scoreBandLabel(data.scoreBand)],
     ["Submitted", fmtDateTime(data.submissionDate)],
-    ["Ad / Source", data.adName ?? "Direct / Unknown"],
+    ["Ad Name", data.utmMedium ?? data.adName ?? "Direct / Unknown"],
+    ["Ad Source", data.utmSource],
     ["UTM Campaign", data.utmCampaign],
-    ["UTM Source", data.utmSource],
-    ["UTM Medium", data.utmMedium],
+    ["UTM Content", data.utmContent],
     ["Referrer", data.referrerUrl],
     ["Platform", data.referrerPlatform],
     ["fbclid", data.fbclid],
@@ -465,8 +465,8 @@ export default function DashboardSubmissions() {
                     <TableHead className="min-w-[320px]">Do you take antacids or acid blockers like Prilosec or omeprazole?</TableHead>
                     <TableHead className="min-w-[320px]">Do you take pain pills like aspirin, Advil, Tylenol, or ibuprofen?</TableHead>
                     <TableHead className="min-w-[220px] pr-4">Recent antibiotic use?</TableHead>
-                    <TableHead className="min-w-[200px]">Ad Name</TableHead>
-                    <TableHead className="min-w-[160px]">UTM Source</TableHead>
+                    <TableHead className="min-w-[200px]">Ad Name (utm_medium)</TableHead>
+                    <TableHead className="min-w-[160px]">Ad Source (utm_source)</TableHead>
                     <TableHead className="min-w-[160px]">UTM Medium</TableHead>
                     <TableHead className="min-w-[200px]">Campaign</TableHead>
                     <TableHead className="min-w-[120px]">utm_id</TableHead>
@@ -511,7 +511,7 @@ export default function DashboardSubmissions() {
                         <TableCell className="font-semibold">{row.totalScore}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{scoreBandLabel(row.scoreBand)}</TableCell>
                         <TableCell className="text-sm max-w-[140px] truncate text-muted-foreground">
-                          {row.adName ?? "Direct"}
+                          {row.utmMedium ?? row.adName ?? "—"}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">{fmtDate(row.submissionDate)}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q1Digestion ?? "—"}</TableCell>
@@ -531,7 +531,7 @@ export default function DashboardSubmissions() {
                         <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q15Antacids ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[180px] whitespace-normal">{row.q16PainPills ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[180px] pr-4 whitespace-normal">{row.q17Antibiotics ?? "—"}</TableCell>
-                        <TableCell className="text-xs text-muted-foreground min-w-[200px] whitespace-normal">{row.adName ?? "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground min-w-[200px] whitespace-normal">{row.utmMedium ?? row.adName ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.utmSource ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[160px]">{row.utmMedium ?? "—"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground min-w-[200px] whitespace-normal">{row.utmCampaign ?? "—"}</TableCell>

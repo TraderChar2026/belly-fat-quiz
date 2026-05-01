@@ -96,3 +96,4 @@
 - [x] Fix notification email formatting: each field and each Q&A must be on its own line (currently renders as run-on paragraph with no line breaks)
 - [ ] Fix max score on Red Alert VSL page: change 45 → 51
 - [ ] Diagnose and fix Resend results email not being received by quiz takers
+- [x] Fix dashboard Ad Source column: display utm_medium (ad name) and utm_source (ad source) correctly

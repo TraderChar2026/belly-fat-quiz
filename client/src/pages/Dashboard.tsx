@@ -223,10 +223,10 @@ function SubmissionDetail({ id }: { id: number }) {
     ["Alert Tier", data.alertTier],
     ["Score Band", scoreBandLabel(data.scoreBand)],
     ["Submitted", fmtDateTime(data.submissionDate)],
-    ["Ad / Source", data.adName ?? "Direct / Unknown"],
+    ["Ad Name", data.utmMedium ?? data.adName ?? "Direct / Unknown"],
+    ["Ad Source", data.utmSource],
     ["UTM Campaign", data.utmCampaign],
-    ["UTM Source", data.utmSource],
-    ["UTM Medium", data.utmMedium],
+    ["UTM Content", data.utmContent],
     ["Referrer", data.referrerUrl],
     ["Platform", data.referrerPlatform],
     ["fbclid", data.fbclid],
@@ -482,8 +482,8 @@ function SubmissionsTable() {
                 <TableHead>Alert</TableHead>
                 <TableHead>Score</TableHead>
                 <TableHead>Band</TableHead>
-                <TableHead>Ad / Source</TableHead>
-                <TableHead>UTM Source</TableHead>
+                <TableHead>Ad Name</TableHead>
+                <TableHead>Ad Source</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead className="text-right pr-4">Actions</TableHead>
               </TableRow>
@@ -509,7 +509,7 @@ function SubmissionsTable() {
                     <TableCell className="font-semibold">{row.totalScore}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{scoreBandLabel(row.scoreBand)}</TableCell>
                     <TableCell className="text-sm max-w-[140px] truncate text-muted-foreground">
-                      {row.adName ?? "Direct"}
+                      {row.utmMedium ?? row.adName ?? "—"}
                     </TableCell>
                     <TableCell className="text-sm max-w-[120px] truncate text-muted-foreground">{row.utmSource ?? "—"}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{fmtDate(row.submissionDate)}</TableCell>
