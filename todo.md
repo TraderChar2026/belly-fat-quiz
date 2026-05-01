@@ -98,3 +98,4 @@
 - [ ] Diagnose and fix Resend results email not being received by quiz takers
 - [x] Fix dashboard Ad Source column: display utm_medium (ad name) and utm_source (ad source) correctly
 - [x] Add GHL activity log (contact note) to quiz submission flow so each contact gets a "Quiz submitted" note with UTM/tracking data in their AwesomeCRM timeline
+- [x] Fix GHL note userId bug: was incorrectly using contactId as userId — now uses correct GHL owner user ID (VWV6V1WEgkzAom5STnKb) so notes actually appear in AwesomeCRM Activity tab

@@ -38,6 +38,8 @@ const ghlRouter = Router();
 
 // GoHighLevel location ID for Gateway Solutions / charwinnen.com
 const GHL_LOCATION_ID = "Md5Bp8ZfS4SI5pEFdV7e";
+// GHL user ID for the account owner (Char Winnen) — required for the notes API userId field
+const GHL_OWNER_USER_ID = "VWV6V1WEgkzAom5STnKb";
 // GHL_API_KEY is a v1 private integration token — use the v1 REST base
 const GHL_BASE = "https://rest.gohighlevel.com/v1";
 
@@ -300,7 +302,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
           const noteBody = noteLines.join("\n");
           const noteResult = await ghlFetch("POST", `/contacts/${ghlContactId}/notes/`, {
             body: noteBody,
-            userId: ghlContactId,
+            userId: GHL_OWNER_USER_ID,
           });
           if (noteResult.ok) {
             console.log(`[GHL] Activity note added to contact ${ghlContactId}`);
