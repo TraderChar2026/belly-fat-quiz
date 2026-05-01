@@ -97,3 +97,4 @@
 - [ ] Fix max score on Red Alert VSL page: change 45 → 51
 - [ ] Diagnose and fix Resend results email not being received by quiz takers
 - [x] Fix dashboard Ad Source column: display utm_medium (ad name) and utm_source (ad source) correctly
+- [x] Add GHL activity log (contact note) to quiz submission flow so each contact gets a "Quiz submitted" note with UTM/tracking data in their AwesomeCRM timeline

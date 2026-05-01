@@ -279,6 +279,38 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
           console.warn("[GHL] Tag add failed:", tagResult.status, JSON.stringify(tagResult.data).slice(0, 200));
         }
 
+        // ── Step 2b: Add activity note with UTM/tracking data to contact timeline ──
+        try {
+          const noteLines = [
+            `Quiz Submitted — Stubborn Belly Fat Quiz`,
+            ``,
+            `Score: ${totalScore} / 51  |  Alert: ${alertLevel.charAt(0).toUpperCase() + alertLevel.slice(1)} Alert`,
+            ``,
+            `--- Ad / Tracking Data ---`,
+            `Ad Name (utm_medium): ${utmMedium ?? "—"}`,
+            `Ad Source (utm_source): ${utmSource ?? "—"}`,
+            `Campaign (utm_campaign): ${utmCampaign ?? "—"}`,
+            `UTM Content: ${utmContent ?? "—"}`,
+            `UTM ID: ${utmId ?? "—"}`,
+            `UTM Term: ${utmTerm ?? "—"}`,
+            `fbclid: ${fbclid ?? "—"}`,
+            `Referrer: ${referrerUrl ?? "—"}`,
+            `Page URL: ${pageUrl ?? "—"}`,
+          ];
+          const noteBody = noteLines.join("\n");
+          const noteResult = await ghlFetch("POST", `/contacts/${ghlContactId}/notes/`, {
+            body: noteBody,
+            userId: ghlContactId,
+          });
+          if (noteResult.ok) {
+            console.log(`[GHL] Activity note added to contact ${ghlContactId}`);
+          } else {
+            console.warn("[GHL] Note creation failed:", noteResult.status, JSON.stringify(noteResult.data).slice(0, 200));
+          }
+        } catch (noteErr) {
+          console.warn("[GHL] Note creation error (non-fatal):", noteErr);
+        }
+
         // ── Step 3: Submit to GHL Forms API so entry appears in Quiz Submissions ─
         try {
           const GHL_FORM_ID = "e5R9PsrieIyZg7lqVcU5";
