@@ -99,3 +99,5 @@
 - [x] Fix dashboard Ad Source column: display utm_medium (ad name) and utm_source (ad source) correctly
 - [x] Add GHL activity log (contact note) to quiz submission flow so each contact gets a "Quiz submitted" note with UTM/tracking data in their AwesomeCRM timeline
 - [x] Fix GHL note userId bug: was incorrectly using contactId as userId — now uses correct GHL owner user ID (VWV6V1WEgkzAom5STnKb) so notes actually appear in AwesomeCRM Activity tab
+- [x] Add GHL "order clicked" tag automatically when someone clicks Order Now on a VSL page (server-side, triggered by order_click funnel event)
+- [x] Add "Order Clickers" section to dashboard showing name, email, phone, alert tier, ad name, and click time for follow-up

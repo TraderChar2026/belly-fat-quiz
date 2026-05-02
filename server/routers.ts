@@ -18,6 +18,7 @@ import {
   getSubmissionsOverTime,
   getQuestionAnswerDistributions,
   getTrafficSources,
+  getOrderClickers,
 } from "./db";
 import { computeScores, getCrmTag } from "../shared/quizData";
 import { TRPCError } from "@trpc/server";
@@ -162,6 +163,45 @@ export const appRouter = router({
           utmSource: input.utmSource,
           utmCampaign: input.utmCampaign,
         });
+
+        // ── GHL tag: add "order clicked" when someone clicks Order Now ────────
+        if (input.eventType === "order_click" && input.sessionId) {
+          try {
+            // Look up the GHL contact ID from the quiz submission for this session
+            const { getDb } = await import("./db");
+            const { eq } = await import("drizzle-orm");
+            const { quizSubmissions } = await import("../drizzle/schema");
+            const db = await getDb();
+            if (db) {
+              const rows = await db.select({
+                ghlContactId: quizSubmissions.ghlContactId,
+                awesomecrmContactId: quizSubmissions.awesomecrmContactId,
+              }).from(quizSubmissions)
+                .where(eq(quizSubmissions.sessionId, input.sessionId))
+                .limit(1);
+              const contactId = rows[0]?.awesomecrmContactId || rows[0]?.ghlContactId;
+              if (contactId) {
+                const apiKey = process.env.GHL_API_KEY || "";
+                const tagRes = await fetch(`https://rest.gohighlevel.com/v1/contacts/${contactId}/tags/`, {
+                  method: "POST",
+                  headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+                  body: JSON.stringify({ tags: ["order clicked"] }),
+                });
+                if (tagRes.ok) {
+                  console.log(`[GHL] Added "order clicked" tag to contact ${contactId}`);
+                } else {
+                  const detail = await tagRes.text().catch(() => "");
+                  console.warn(`[GHL] Failed to add "order clicked" tag (${tagRes.status}): ${detail.slice(0, 200)}`);
+                }
+              } else {
+                console.warn(`[GHL] order_click: no GHL contact found for session ${input.sessionId}`);
+              }
+            }
+          } catch (tagErr) {
+            console.warn("[GHL] order_click tag error (non-fatal):", tagErr);
+          }
+        }
+
         return { ok: true };
       }),
   }),
@@ -236,6 +276,14 @@ export const appRouter = router({
           throw new TRPCError({ code: "FORBIDDEN" });
         }
         return getFunnelStats();
+      }),
+
+    orderClickers: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getOrderClickers();
       }),
   }),
 

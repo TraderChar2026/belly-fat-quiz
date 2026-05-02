@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardSubmissions from "./pages/DashboardSubmissions";
 import DashboardSales from "./pages/DashboardSales";
 import DashboardAnalytics from "./pages/DashboardAnalytics";
+import DashboardOrderClickers from "./pages/DashboardOrderClickers";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/dashboard/submissions"} component={DashboardSubmissions} />
       <Route path={"/dashboard/sales"} component={DashboardSales} />
+      <Route path={"/dashboard/order-clickers"} component={DashboardOrderClickers} />
       <Route path={"/dashboard/analytics"} component={DashboardAnalytics} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

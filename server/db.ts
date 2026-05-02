@@ -335,6 +335,34 @@ export async function getQuestionAnswerDistributions() {
   return results;
 }
 
+/** Order clickers: funnel_events of type order_click joined to quiz_submissions via sessionId */
+export async function getOrderClickers(limit = 200) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const rows = await db
+    .select({
+      eventId: funnelEvents.id,
+      clickedAt: funnelEvents.eventTimestamp,
+      sessionId: funnelEvents.sessionId,
+      adName: funnelEvents.adName,
+      utmSource: funnelEvents.utmSource,
+      utmCampaign: funnelEvents.utmCampaign,
+      alertTier: funnelEvents.alertTier,
+      scoreBand: funnelEvents.scoreBand,
+      fullName: quizSubmissions.fullName,
+      email: quizSubmissions.email,
+      phone: quizSubmissions.phone,
+      totalScore: quizSubmissions.totalScore,
+      ghlContactId: quizSubmissions.ghlContactId,
+    })
+    .from(funnelEvents)
+    .leftJoin(quizSubmissions, eq(funnelEvents.sessionId, quizSubmissions.sessionId))
+    .where(eq(funnelEvents.eventType, "order_click"))
+    .orderBy(desc(funnelEvents.eventTimestamp))
+    .limit(limit);
+  return rows;
+}
+
 /** Top traffic sources */
 export async function getTrafficSources() {
   const db = await getDb();
