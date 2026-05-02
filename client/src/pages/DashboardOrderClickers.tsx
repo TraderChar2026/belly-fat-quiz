@@ -81,6 +81,7 @@ export default function DashboardOrderClickers() {
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Name</th>
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Email</th>
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Phone</th>
+                    <th className="text-left px-4 py-3 font-medium text-muted-foreground">Country</th>
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Alert Tier</th>
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Score</th>
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Ad Name</th>
@@ -118,6 +119,9 @@ export default function DashboardOrderClickers() {
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground" title={(row as any).countryName ?? ""}>
+                        {(row as any).countryName ?? (row as any).country ?? "—"}
                       </td>
                       <td className="px-4 py-3">
                         {row.alertTier ? (

@@ -354,6 +354,8 @@ export async function getOrderClickers(limit = 200) {
       phone: quizSubmissions.phone,
       totalScore: quizSubmissions.totalScore,
       ghlContactId: quizSubmissions.ghlContactId,
+      country: quizSubmissions.country,
+      countryName: quizSubmissions.countryName,
     })
     .from(funnelEvents)
     .leftJoin(quizSubmissions, eq(funnelEvents.sessionId, quizSubmissions.sessionId))

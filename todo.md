@@ -107,3 +107,4 @@
 - [x] Backfill country for existing submissions using timezone-to-country fallback
 - [x] Show country column in dashboard submissions table
 - [x] Sync country to GHL contact field on submission
+- [x] Add country column to Order Clickers dashboard table
