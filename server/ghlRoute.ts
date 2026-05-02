@@ -176,6 +176,44 @@ function buildHtmlEmail(params: {
 </div>`;
 }
 
+/** Resolve ISO 3166-1 alpha-2 country code and name from an IP address.
+ * Uses ipapi.co (1000 free requests/day). Falls back gracefully on error.
+ */
+async function getCountryFromIp(ip: string): Promise<{ country: string; countryName: string } | null> {
+  if (!ip || ip === "::1" || ip === "127.0.0.1" || ip.startsWith("192.168.") || ip.startsWith("10.")) {
+    return null; // skip loopback / private IPs (dev environment)
+  }
+  try {
+    const res = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, {
+      headers: { "User-Agent": "belly-fat-quiz/1.0" },
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!res.ok) return null;
+    const data = await res.json() as { country_code?: string; country_name?: string; error?: boolean };
+    if (data.error || !data.country_code) return null;
+    return { country: data.country_code, countryName: data.country_name ?? data.country_code };
+  } catch {
+    return null;
+  }
+}
+
+/** Fallback: derive country from IANA timezone string for the 5 target markets. */
+function getCountryFromTimezone(tz?: string | null): { country: string; countryName: string } | null {
+  if (!tz) return null;
+  const usZones = ["New_York","Chicago","Denver","Los_Angeles","Phoenix","Anchorage","Honolulu","Indiana","Detroit","Boise","Menominee","Adak","Nome","Sitka","Yakutat"];
+  if (tz.startsWith("America/") && usZones.some(z => tz.includes(z)))
+    return { country: "US", countryName: "United States" };
+  const caZones = ["Toronto","Vancouver","Winnipeg","Edmonton","Halifax","St_Johns","Regina","Whitehorse","Yellowknife","Iqaluit","Moncton","Glace_Bay","Goose_Bay","Swift_Current","Creston","Dawson","Dawson_Creek","Fort_Nelson","Nipigon","Pangnirtung","Rainy_River","Rankin_Inlet","Resolute","Thunder_Bay"];
+  if (tz.startsWith("America/") && caZones.some(z => tz.includes(z)))
+    return { country: "CA", countryName: "Canada" };
+  if (tz.startsWith("Australia/")) return { country: "AU", countryName: "Australia" };
+  if (tz.startsWith("Pacific/Auckland") || tz.startsWith("Pacific/Chatham"))
+    return { country: "NZ", countryName: "New Zealand" };
+  if (["Europe/London","Europe/Belfast","Europe/Jersey","Europe/Guernsey","Europe/Isle_of_Man"].includes(tz))
+    return { country: "GB", countryName: "United Kingdom" };
+  return null;
+}
+
 ghlRouter.post("/api/ghl-submit", async (req, res) => {
   try {
     const body = req.body as GhlSubmitBody;
@@ -184,6 +222,14 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       sessionId, timezone, adName, adNameRaw, referrerUrl, referrerPlatform,
       utmSource, utmMedium, utmCampaign, utmId, utmContent, utmTerm, fbclid, fbEventId, pageUrl,
     } = body;
+
+    // ── Detect country from IP (with timezone fallback) ───────────────────────
+    const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "";
+    let countryInfo = await getCountryFromIp(clientIp);
+    if (!countryInfo) countryInfo = getCountryFromTimezone(timezone);
+    const country = countryInfo?.country ?? null;
+    const countryName = countryInfo?.countryName ?? null;
+    console.log(`[GHL] Country: ${countryName ?? "unknown"} (${country ?? "?"}) from IP ${clientIp || "(none)"}`);
 
     if (!fullName || !email || !Array.isArray(answers) || answers.length !== 17) {
       return res.status(400).json({ error: "Invalid payload" });
@@ -230,6 +276,7 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       };
       if (lastName) upsertBody.lastName = lastName;
       if (phone) upsertBody.phone = phone;
+      if (country) upsertBody.country = country; // ISO 3166-1 alpha-2, e.g. "US", "CA", "AU"
 
       // v1 API: POST /contacts/ creates or updates (upsert by email)
       // Note: customFields in the POST body are ignored by GHL v1 — must PUT separately
@@ -242,13 +289,18 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
         console.warn("[GHL] Upsert failed:", upsertResult.status, JSON.stringify(upsertResult.data).slice(0, 200));
       }
 
-      // ── Step 1b: PUT custom fields separately (GHL v1 ignores customFields on POST) ─
-      if (ghlContactId && customFields.length > 0) {
-        const putResult = await ghlFetch("PUT", `/contacts/${ghlContactId}`, { customField: customFields });
-        if (putResult.ok) {
-          console.log(`[GHL] Mapped ${customFields.length} custom fields to contact ${ghlContactId}`);
-        } else {
-          console.warn("[GHL] Custom field mapping failed:", putResult.status, JSON.stringify(putResult.data).slice(0, 200));
+      // ── Step 1b: PUT custom fields + country separately (GHL v1 ignores customFields on POST) ─
+      if (ghlContactId) {
+        const putPayload: Record<string, unknown> = {};
+        if (customFields.length > 0) putPayload.customField = customFields;
+        if (country) putPayload.country = country;
+        if (Object.keys(putPayload).length > 0) {
+          const putResult = await ghlFetch("PUT", `/contacts/${ghlContactId}`, putPayload);
+          if (putResult.ok) {
+            console.log(`[GHL] Updated ${customFields.length} custom fields + country (${country}) on contact ${ghlContactId}`);
+          } else {
+            console.warn("[GHL] PUT contact failed:", putResult.status, JSON.stringify(putResult.data).slice(0, 200));
+          }
         }
       }
 
@@ -507,6 +559,8 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       q17Antibiotics: getAnswerText(17),
       sessionId,
       timezone,
+      country: country ?? undefined,
+      countryName: countryName ?? undefined,
       adName: normalizedAdName,
       adNameRaw: adNameRaw ?? adName,
       referrerUrl,

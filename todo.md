@@ -102,3 +102,8 @@
 - [x] Add GHL "order clicked" tag automatically when someone clicks Order Now on a VSL page (server-side, triggered by order_click funnel event)
 - [x] Add "Order Clickers" section to dashboard showing name, email, phone, alert tier, ad name, and click time for follow-up
 - [x] Fix Wistia video milestone tracking on both VSL pages (vsl_25/50/75/100 not firing because _wq API is incompatible with wistia-player web component)
+- [x] Add `country` column to quiz_submissions table (VARCHAR 2, e.g. "US", "CA", "AU", "NZ", "GB")
+- [x] Add server-side IP geolocation lookup in ghlRoute.ts to detect country at submission time
+- [x] Backfill country for existing submissions using timezone-to-country fallback
+- [x] Show country column in dashboard submissions table
+- [x] Sync country to GHL contact field on submission

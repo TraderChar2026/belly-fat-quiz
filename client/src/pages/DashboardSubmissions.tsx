@@ -106,6 +106,7 @@ function SubmissionDetail({ id }: { id: number }) {
     ["Referrer", data.referrerUrl],
     ["Platform", data.referrerPlatform],
     ["fbclid", data.fbclid],
+    ["Country", (data as any).countryName ?? (data as any).country],
     ["Timezone", data.timezone],
     ["Repeat Submission", data.isRepeatSubmission ? "Yes" : "No"],
     ["GHL Contact ID", data.awesomecrmContactId],
@@ -443,6 +444,7 @@ export default function DashboardSubmissions() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Phone</TableHead>
+                    <TableHead>Country</TableHead>
                     <TableHead>Alert</TableHead>
                     <TableHead>Score</TableHead>
                     <TableHead>Band</TableHead>
@@ -507,6 +509,9 @@ export default function DashboardSubmissions() {
                         <TableCell className="font-medium">{row.fullName}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{row.email}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{row.phone ?? "—"}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground" title={(row as any).countryName ?? ""}>
+                          {(row as any).countryName ?? (row as any).country ?? "—"}
+                        </TableCell>
                         <TableCell>{alertBadge(row.alertTier)}</TableCell>
                         <TableCell className="font-semibold">{row.totalScore}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{scoreBandLabel(row.scoreBand)}</TableCell>

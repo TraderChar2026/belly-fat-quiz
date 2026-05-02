@@ -29,6 +29,13 @@
       "when": 1777212263152,
       "tag": "0003_simple_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1777725253444,
+      "tag": "0004_lumpy_kid_colt",
+      "breakpoints": true
     }
   ]
 }

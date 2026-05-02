@@ -30,6 +30,8 @@ export const quizSubmissions = mysqlTable("quiz_submissions", {
   email: varchar("email", { length: 320 }).notNull(),
   phone: varchar("phone", { length: 64 }),
   timezone: varchar("timezone", { length: 64 }),
+  country: varchar("country", { length: 2 }),                   // ISO 3166-1 alpha-2: "US" | "CA" | "AU" | "NZ" | "GB" etc.
+  countryName: varchar("countryName", { length: 64 }),          // Full name: "United States" | "Canada" etc.
 
   // ── Scores ─────────────────────────────────────────────────────────────────
   totalScore: int("totalScore").notNull(),
