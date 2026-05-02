@@ -101,3 +101,4 @@
 - [x] Fix GHL note userId bug: was incorrectly using contactId as userId — now uses correct GHL owner user ID (VWV6V1WEgkzAom5STnKb) so notes actually appear in AwesomeCRM Activity tab
 - [x] Add GHL "order clicked" tag automatically when someone clicks Order Now on a VSL page (server-side, triggered by order_click funnel event)
 - [x] Add "Order Clickers" section to dashboard showing name, email, phone, alert tier, ad name, and click time for follow-up
+- [x] Fix Wistia video milestone tracking on both VSL pages (vsl_25/50/75/100 not firing because _wq API is incompatible with wistia-player web component)

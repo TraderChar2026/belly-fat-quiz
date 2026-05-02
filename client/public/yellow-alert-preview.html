@@ -716,22 +716,31 @@
     }
   });
 
-  // Wistia video milestones via _wq API
+  // Wistia video milestones via Aurora wistia-player web component API
   var milestonesFired = {};
-  window._wq = window._wq || [];
-  window._wq.push({
-    id: 'g4s4s1m6ta',
-    onReady: function(video) {
-      video.bind('percentwatchedchanged', function(pct) {
-        [25, 50, 75, 100].forEach(function(m) {
-          if (pct * 100 >= m && !milestonesFired[m]) {
-            milestonesFired[m] = true;
-            trackEvent('vsl_' + m);
-          }
-        });
-      });
+  function attachWistiaTracking() {
+    var player = document.querySelector('wistia-player[media-id="g4s4s1m6ta"]');
+    if (!player) {
+      // Player element not yet in DOM — retry after a short delay
+      setTimeout(attachWistiaTracking, 500);
+      return;
     }
-  });
+    player.addEventListener('percent-watched-change', function(event) {
+      var pct = (event.detail && event.detail.percent != null) ? event.detail.percent : 0;
+      [25, 50, 75, 100].forEach(function(m) {
+        if (pct * 100 >= m && !milestonesFired[m]) {
+          milestonesFired[m] = true;
+          trackEvent('vsl_' + m);
+        }
+      });
+    });
+  }
+  // Wait for the custom element to be registered, then attach
+  if (typeof customElements !== 'undefined' && customElements.whenDefined) {
+    customElements.whenDefined('wistia-player').then(attachWistiaTracking);
+  } else {
+    setTimeout(attachWistiaTracking, 1500);
+  }
 })();
 </script>
 </body>
