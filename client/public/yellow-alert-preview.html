@@ -609,8 +609,9 @@
   <!-- Offer -->
   <section class="offer-section">
     <div class="container">
-      <h2>Your Yellow Alert Solution</h2>
-      <p class="offer-sub">Start losing weight this month by flipping your GLP-1 hormone switch back on and restoring your gut health before this becomes a serious problem.</p>
+      <h2>The Yellow Alert Solution</h2>
+      <h3 style="text-align:center;font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:600;color:#2d4a2d;margin:0 0 14px;">The GLP-1 Gut Restoration Protocol</h3>
+      <p class="offer-sub" style="text-align:center;max-width:680px;margin:0 auto 28px;">If your gut is broken, no diet will work. This is the science-backed system that fixes the root cause so your body can finally let go of the weight.</p>
 
       <div class="offer-box">
         <div class="offer-box-header">
@@ -622,16 +623,16 @@
           <!-- Stats -->
           <div class="offer-stats-row">
             <div class="offer-stat-box">
-              <div class="offer-stat-number">245%</div>
-              <div class="offer-stat-label">Increase in GLP-1 Hormone Levels</div>
-            </div>
-            <div class="offer-stat-box">
               <div class="offer-stat-number">25 lbs</div>
               <div class="offer-stat-label">Average Weight Loss in 12 Weeks</div>
             </div>
             <div class="offer-stat-box">
               <div class="offer-stat-number">27%</div>
               <div class="offer-stat-label">Belly Fat Reduction in 12 Weeks</div>
+            </div>
+            <div class="offer-stat-box">
+              <div class="offer-stat-number">240%</div>
+              <div class="offer-stat-label">Increase in GLP-1 Hormone Levels</div>
             </div>
           </div>
 
@@ -733,10 +734,16 @@ function applyCountryOffer(countryCode) {
   });
 }
 
-fetch('/api/country')
-  .then(function(r) { return r.json(); })
-  .then(function(data) { applyCountryOffer(data.country || 'US'); })
-  .catch(function() { applyCountryOffer('US'); });
+// Allow ?country=XX override for preview/testing
+var urlCountry = new URLSearchParams(window.location.search).get('country');
+if (urlCountry && COUNTRY_OFFERS[urlCountry.toUpperCase()]) {
+  applyCountryOffer(urlCountry.toUpperCase());
+} else {
+  fetch('/api/country')
+    .then(function(r) { return r.json(); })
+    .then(function(data) { applyCountryOffer(data.country || 'US'); })
+    .catch(function() { applyCountryOffer('US'); });
+}
 </script>
 
 <script>

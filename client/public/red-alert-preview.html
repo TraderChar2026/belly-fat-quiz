@@ -695,10 +695,16 @@ function applyCountryOffer(countryCode) {
 }
 
 // Detect country and apply offer on page load
-fetch('/api/country')
-  .then(function(r) { return r.json(); })
-  .then(function(data) { applyCountryOffer(data.country || 'US'); })
-  .catch(function() { applyCountryOffer('US'); });
+// Allow ?country=XX override for preview/testing
+var urlCountry = new URLSearchParams(window.location.search).get('country');
+if (urlCountry && COUNTRY_OFFERS[urlCountry.toUpperCase()]) {
+  applyCountryOffer(urlCountry.toUpperCase());
+} else {
+  fetch('/api/country')
+    .then(function(r) { return r.json(); })
+    .then(function(data) { applyCountryOffer(data.country || 'US'); })
+    .catch(function() { applyCountryOffer('US'); });
+}
 </script>
 
 <script>
