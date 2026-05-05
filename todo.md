@@ -108,3 +108,6 @@
 - [x] Show country column in dashboard submissions table
 - [x] Sync country to GHL contact field on submission
 - [x] Add country column to Order Clickers dashboard table
+- [x] Add /api/country endpoint for client-side IP detection on VSL pages (switched to ip-api.com, 45 req/min, no daily cap)
+- [x] Add country-specific product offer swapping to Red Alert VSL page (stack name, product descriptions, cart links for US/CA/AU/NZ/UK)
+- [x] Add country-specific product offer swapping to Yellow Alert VSL page (same 5-country logic)

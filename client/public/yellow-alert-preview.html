@@ -637,9 +637,9 @@
 
           <!-- What You Get -->
           <div style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#4a7c59;margin-bottom:10px;">✅ &nbsp; What You Get</div>
-          <ul class="offer-items">
-            <li><span class="check">✓</span><div><strong>Healthy Edge Stack</strong> — Two powerhouse products working together: <em>Protandim® Nrf2 Synergizer®</em> (reduces oxidative stress and calms inflammation at the cellular level) + <em>P84 (PhytoPower 84)</em> (a complete microbiome system with 84 ingredients — probiotics, prebiotics, postbiotics, digestive enzymes, and superfood blends — that activates 14 key gut peptides to regulate, repair, and restore your gut balance).</div></li>
-            <li><span class="check">✓</span><div><strong>MindBody GLP-1 System</strong> — Helps your body naturally produce more of its own GLP-1 hormone, without injections or side effects. Start losing weight in as little as one month.</div></li>
+          <ul class="offer-items" id="offer-items">
+            <li><span class="check">✓</span><div><strong id="product1-name">Healthy Edge Stack</strong> — <span id="product1-desc">Two powerhouse products working together: <em>Protandim® Nrf2 Synergizer®</em> (reduces oxidative stress and calms inflammation at the cellular level) + <em>P84 (PhytoPower 84)</em> (a complete microbiome system with 84 ingredients — probiotics, prebiotics, postbiotics, digestive enzymes, and superfood blends — that activates 14 key gut peptides to regulate, repair, and restore your gut balance).</span></div></li>
+            <li><span class="check">✓</span><div><strong id="product2-name">MindBody GLP-1 System</strong> — <span id="product2-desc">Helps your body naturally produce more of its own GLP-1 hormone, without injections or side effects. Start losing weight in as little as one month.</span></div></li>
             <li><span class="check">✓</span><div><strong>Step-by-Step Protocol</strong> — Char's exact roadmap for using the system to get maximum results, including what to take, when, and how to accelerate your progress.</div></li>
           </ul>
 
@@ -676,6 +676,68 @@
       <p style="margin-top:8px;">*These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, cure, or prevent any disease. Individual results may vary.</p>
     </div>
   </footer>
+
+<script>
+// ── Country-specific offer content ──────────────────────────────────────────
+var COUNTRY_OFFERS = {
+  US: {
+    product1Name: 'Healthy Edge Stack',
+    product1Desc: 'Two powerhouse products working together: <em>Protandim\u00ae Nrf2 Synergizer\u00ae</em> (reduces oxidative stress and calms inflammation at the cellular level) + <em>P84 (PhytoPower 84)</em> (a complete microbiome system with 84 ingredients \u2014 probiotics, prebiotics, postbiotics, digestive enzymes, and superfood blends \u2014 that activates 14 key gut peptides to regulate, repair, and restore your gut balance).',
+    product2Name: 'MindBody GLP-1 System',
+    product2Desc: 'Helps your body naturally produce more of its own GLP-1 hormone, without injections or side effects. Start losing weight in as little as one month.',
+    cartUrl: 'https://cart.lifevantage.com/US/shoppingcart/share/792b7ca9-b39b-445b-9cfe-00128d01555f'
+  },
+  CA: {
+    product1Name: 'MB System + Protandim Nrf2 Synergizer Stack',
+    product1Desc: 'Protandim Nrf2 Synergizer \u2014 reduces oxidative stress and calms inflammation at the cell level + MB System that helps your body naturally produce more of your own GLP-1 hormone \u2014 without injections, side effects, or muscle loss. Start losing weight in as little as one month.',
+    product2Name: 'Probio',
+    product2Desc: 'Provides 6 strains of beneficial bacteria that promotes a healthy balance in your microbiome that you need to help you lose stubborn belly fat.',
+    cartUrl: 'https://cart.lifevantage.com/CA/shoppingcart/share/7814d937-c2aa-4212-b746-e7bfdc175e53'
+  },
+  AU: {
+    product1Name: 'Healthy Balance Stack',
+    product1Desc: 'Protandim Nrf2 Synergizer \u2014 reduces oxidative stress and calms inflammation at the cell level + MB System that helps your body naturally produce more of your own GLP-1 hormone \u2014 without injections, side effects, or muscle loss. Start losing weight in as little as one month.',
+    product2Name: 'Probio',
+    product2Desc: 'Provides 6 strains of beneficial bacteria that promotes a healthy balance in your microbiome that you need to help you lose stubborn belly fat.',
+    cartUrl: 'https://cart.lifevantage.com/AU/shoppingcart/share/77181ebf-c3d4-4e21-9790-45f06238ae8e'
+  },
+  NZ: {
+    product1Name: 'Healthy Balance Stack',
+    product1Desc: 'Protandim Nrf2 Synergizer \u2014 reduces oxidative stress and calms inflammation at the cell level + MB System that helps your body naturally produce more of your own GLP-1 hormone \u2014 without injections, side effects, or muscle loss. Start losing weight in as little as one month.',
+    product2Name: 'Probio',
+    product2Desc: 'Provides 6 strains of beneficial bacteria that promotes a healthy balance in your microbiome that you need to help you lose stubborn belly fat.',
+    cartUrl: 'https://cart.lifevantage.com/NZ/shoppingcart/share/d5187e9c-d884-490e-bcf4-c537afd73979'
+  },
+  GB: {
+    product1Name: 'Healthy Weight Stack',
+    product1Desc: 'Protandim Nrf2 Synergizer \u2014 reduces oxidative stress and calms inflammation at the cell level + MB System that helps your body naturally produce more of your own GLP-1 hormone \u2014 without injections, side effects, or muscle loss. Start losing weight in as little as one month.',
+    product2Name: 'Probio',
+    product2Desc: 'Provides 6 strains of beneficial bacteria that promotes a healthy balance in your microbiome that you need to help you lose stubborn belly fat.',
+    cartUrl: 'https://cart.lifevantage.com/UK/shoppingcart/share/ceae3322-9dff-477c-becb-e1ff1d626166'
+  }
+};
+
+function applyCountryOffer(countryCode) {
+  var offer = COUNTRY_OFFERS[countryCode] || COUNTRY_OFFERS['US'];
+  var p1Name = document.getElementById('product1-name');
+  var p1Desc = document.getElementById('product1-desc');
+  var p2Name = document.getElementById('product2-name');
+  var p2Desc = document.getElementById('product2-desc');
+  if (p1Name) p1Name.textContent = offer.product1Name;
+  if (p1Desc) p1Desc.innerHTML = offer.product1Desc;
+  if (p2Name) p2Name.textContent = offer.product2Name;
+  if (p2Desc) p2Desc.innerHTML = offer.product2Desc;
+  ['order-cta', 'order-cta-video'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (btn) btn.href = offer.cartUrl;
+  });
+}
+
+fetch('/api/country')
+  .then(function(r) { return r.json(); })
+  .then(function(data) { applyCountryOffer(data.country || 'US'); })
+  .catch(function() { applyCountryOffer('US'); });
+</script>
 
 <script>
 (function() {

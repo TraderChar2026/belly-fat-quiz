@@ -177,21 +177,21 @@ function buildHtmlEmail(params: {
 }
 
 /** Resolve ISO 3166-1 alpha-2 country code and name from an IP address.
- * Uses ipapi.co (1000 free requests/day). Falls back gracefully on error.
+ * Uses ip-api.com (45 req/min free, no daily cap). Falls back gracefully on error.
  */
 async function getCountryFromIp(ip: string): Promise<{ country: string; countryName: string } | null> {
   if (!ip || ip === "::1" || ip === "127.0.0.1" || ip.startsWith("192.168.") || ip.startsWith("10.")) {
     return null; // skip loopback / private IPs (dev environment)
   }
   try {
-    const res = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, {
+    const res = await fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,countryCode,country`, {
       headers: { "User-Agent": "belly-fat-quiz/1.0" },
       signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return null;
-    const data = await res.json() as { country_code?: string; country_name?: string; error?: boolean };
-    if (data.error || !data.country_code) return null;
-    return { country: data.country_code, countryName: data.country_name ?? data.country_code };
+    const data = await res.json() as { status?: string; countryCode?: string; country?: string };
+    if (data.status !== "success" || !data.countryCode) return null;
+    return { country: data.countryCode, countryName: data.country ?? data.countryCode };
   } catch {
     return null;
   }
@@ -607,6 +607,17 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
     console.error("[GHL Submit] Error:", err);
     return res.status(500).json({ error: "Submission failed" });
   }
+});
+
+// ── Country detection endpoint for VSL pages ────────────────────────────────
+ghlRouter.get("/api/country", async (req, res) => {
+  const forwarded = req.headers["x-forwarded-for"];
+  const rawIp = Array.isArray(forwarded) ? forwarded[0] : (forwarded ?? req.socket.remoteAddress ?? "");
+  const clientIp = rawIp.split(",")[0].trim();
+
+  let countryInfo = await getCountryFromIp(clientIp);
+  const country = countryInfo?.country ?? "US";
+  return res.json({ country });
 });
 
 export { ghlRouter };
