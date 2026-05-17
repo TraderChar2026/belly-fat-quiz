@@ -1,0 +1,129 @@
+{
+  "query": "\nSELECT \n  fe.sessionId,\n  COALESCE(fe.adName, qs.adName) as adName,\n  COALESCE(fe.alertTier, qs.alertTier) as alertTier,\n  qs.fullName,\n  qs.email\nFROM funnel_events fe\nLEFT JOIN quiz_submissions qs ON fe.sessionId = qs.sessionId\nWHERE fe.eventType = 'order_click'\nORDER BY fe.eventTimestamp DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute \nSELECT \n  fe.sessionId,\n  COALESCE(fe.adName, qs.adName) as adName,\n  COALESCE(fe.alertTier, qs.alertTier) as alertTier,\n  qs.fullName,\n  qs.email\nFROM funnel_events fe\nLEFT JOIN quiz_submissions qs ON fe.sessionId = qs.sessionId\nWHERE fe.eventType = 'order_click'\nORDER BY fe.eventTimestamp DESC;\n",
+  "rows": [
+    {
+      "sessionId": "1778977522721-bsfhxt1d",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Michele Chapman",
+      "email": "michele.chapman9@gmail.com"
+    },
+    {
+      "sessionId": "1778797032947-li3rfyt6",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Kay Hopkins",
+      "email": "suenaf4@gmail.com"
+    },
+    {
+      "sessionId": "1778658969194-usxr3tae",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Pauline Southern",
+      "email": "pasouth@btinternet.com"
+    },
+    {
+      "sessionId": "1778578770720-cporggad",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Diana",
+      "email": "ronaldburcherr@gmail.com"
+    },
+    {
+      "sessionId": "1778570966985-gmr4lxs7",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Gemma Manson",
+      "email": "cmereaina@gmail.com"
+    },
+    {
+      "sessionId": "1777945575956-njedk5cu",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "BRENDA",
+      "email": "1brendajensen1@gmail.com"
+    },
+    {
+      "sessionId": "1777926995549-139ut6lh",
+      "adName": "NULL",
+      "alertTier": "Red",
+      "fullName": "NULL",
+      "email": "NULL"
+    },
+    {
+      "sessionId": "1777921947428-2e8eqqd1",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Terese Calkins",
+      "email": "calkster2@icloud.com"
+    },
+    {
+      "sessionId": "1777893641903-cp9tcu5n",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Judi Boxall",
+      "email": "judiboxall@aol.com"
+    },
+    {
+      "sessionId": "1777893641903-cp9tcu5n",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Judi Boxall",
+      "email": "judiboxall@aol.com"
+    },
+    {
+      "sessionId": "1777834012013-v2vz3nwa",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Yvonne Farquhar",
+      "email": "teala@execulink.com"
+    },
+    {
+      "sessionId": "1777741294525-gnyx5ncn",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Catrina",
+      "email": "Catrina5360@virginmedia.com"
+    },
+    {
+      "sessionId": "1777668594205-fiy8smlb",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Anna Franklin",
+      "email": "annaizzy18@gmail.com"
+    },
+    {
+      "sessionId": "1777530770502-qsv2d5ys",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Shona Mc Gregor",
+      "email": "shonajeanmcgregor@gmail.com"
+    },
+    {
+      "sessionId": "1777502281749-yp1njz2i",
+      "adName": "NULL",
+      "alertTier": "Red",
+      "fullName": "NULL",
+      "email": "NULL"
+    },
+    {
+      "sessionId": "1777306306729-2nn0lh8v",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Julie",
+      "email": "mejulie55@aol.com"
+    },
+    {
+      "sessionId": "1777170725305-96wexxgc",
+      "adName": "Direct / Unknown",
+      "alertTier": "Red",
+      "fullName": "Theresa",
+      "email": "rh.owen@sympatico.ca"
+    }
+  ],
+  "messages": [],
+  "stdout": "sessionId\tadName\talertTier\tfullName\temail\n1778977522721-bsfhxt1d\tDirect / Unknown\tRed\tMichele Chapman\tmichele.chapman9@gmail.com\n1778797032947-li3rfyt6\tDirect / Unknown\tRed\tKay Hopkins\tsuenaf4@gmail.com\n1778658969194-usxr3tae\tDirect / Unknown\tRed\tPauline Southern\tpasouth@btinternet.com\n1778578770720-cporggad\tDirect / Unknown\tRed\tDiana\tronaldburcherr@gmail.com\n1778570966985-gmr4lxs7\tDirect / Unknown\tRed\tGemma Manson\tcmereaina@gmail.com\n1777945575956-njedk5cu\tDirect / Unknown\tRed\tBRENDA\t1brendajensen1@gmail.com\n1777926995549-139ut6lh\tNULL\tRed\tNULL\tNULL\n1777921947428-2e8eqqd1\tDirect / Unknown\tRed\tTerese Calkins\tcalkster2@icloud.com\n1777893641903-cp9tcu5n\tDirect / Unknown\tRed\tJudi Boxall\tjudiboxall@aol.com\n1777893641903-cp9tcu5n\tDirect / Unknown\tRed\tJudi Boxall\tjudiboxall@aol.com\n1777834012013-v2vz3nwa\tDirect / Unknown\tRed\tYvonne Farquhar\tteala@execulink.com\n1777741294525-gnyx5ncn\tDirect / Unknown\tRed\tCatrina\tCatrina5360@virginmedia.com\n1777668594205-fiy8smlb\tDirect / Unknown\tRed\tAnna Franklin\tannaizzy18@gmail.com\n1777530770502-qsv2d5ys\tDirect / Unknown\tRed\tShona Mc Gregor\tshonajeanmcgregor@gmail.com\n1777502281749-yp1njz2i\tNULL\tRed\tNULL\tNULL\n1777306306729-2nn0lh8v\tDirect / Unknown\tRed\tJulie\tmejulie55@aol.com\n1777170725305-96wexxgc\tDirect / Unknown\tRed\tTheresa\trh.owen@sympatico.ca\n",
+  "stderr": "",
+  "execution_time_ms": 309
+}

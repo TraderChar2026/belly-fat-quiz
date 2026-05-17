@@ -1,0 +1,130 @@
+{
+  "query": "\nSELECT \n  sessionId,\n  fullName,\n  adName,\n  utmSource,\n  utmMedium,\n  utmCampaign,\n  utmContent,\n  referrerPlatform,\n  fbclid,\n  pageUrl\nFROM quiz_submissions\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute \nSELECT \n  sessionId,\n  fullName,\n  adName,\n  utmSource,\n  utmMedium,\n  utmCampaign,\n  utmContent,\n  referrerPlatform,\n  fbclid,\n  pageUrl\nFROM quiz_submissions\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "rows": [
+    {
+      "sessionId": "1779012807379-x90ax913",
+      "fullName": "Debra Trauntner",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "My Closet 5/15/26",
+      "utmCampaign": "My Closet 5/15/26",
+      "utmContent": "My Closet  5/15/25",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZA8xNzM4NDc2NDI2NzAzNzAAAR7Nc9QDeDCslhAShm5G0nBHUNZtc8IqryTxMf1IJBOyLxg4aWMX6i65l5gvgg_aem_cuuBTeTrzzBtzLdULfCk-Q",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=My+Closet+5%2F15%2F26&utm_campaign=My+Closet+5%2F15%2F26&utm_content=My+Closet++5%2F15%2F25&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZA8xNzM4NDc2NDI2NzAzNzAAAR7Nc9QDeDCslhAShm5G0nBHUNZtc8IqryTxMf1IJBOyLxg4aWMX6i65l5gvgg_aem_cuuBTeTrzzBtzLdULfCk-Q&utm_id=120246662292220503&utm_term=120246662292300503"
+    },
+    {
+      "sessionId": "1778977522721-bsfhxt1d",
+      "fullName": "Michele Chapman",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "My Closet 5/15/26",
+      "utmCampaign": "My Closet 5/15/26",
+      "utmContent": "My Closet  5/15/25",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR6SOefTNtwOz9lVsvjuQUQxtrdBGT5JjvrMkd7_zssuNbzr8s_O38MdTd6O8A_aem_bzdDwamVk7Jxlmscs6OGoQ",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=My+Closet+5%2F15%2F26&utm_campaign=My+Closet+5%2F15%2F26&utm_content=My+Closet++5%2F15%2F25&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR6SOefTNtwOz9lVsvjuQUQxtrdBGT5JjvrMkd7_zssuNbzr8s_O38MdTd6O8A_aem_bzdDwamVk7Jxlmscs6OGoQ&utm_id=120246662292220503&utm_term=120246662292300503"
+    },
+    {
+      "sessionId": "1778797032947-li3rfyt6",
+      "fullName": "Kay Hopkins",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "Closet Full Of Clothes 14/25/26",
+      "utmCampaign": "Closet Full Of Clothes 14/25/2026",
+      "utmContent": "Closet Full of Clothes 4/25/26",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7Z27PfRmUPe-tBPRyhngOy2TuKD6kLzfXc55qhL8m7deFjA8DBYzK49G5vfw_aem_YWdncwCNILlcMTDxZGpyrSKIDwVG",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Closet+Full+Of+Clothes+14%2F25%2F26&utm_campaign=Closet+Full+Of+Clothes+14%2F25%2F2026&utm_content=Closet+Full+of+Clothes+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7Z27PfRmUPe-tBPRyhngOy2TuKD6kLzfXc55qhL8m7deFjA8DBYzK49G5vfw_aem_YWdncwCNILlcMTDxZGpyrSKIDwVG&brid=YWdncwGNILlcMTDxZGpyrSKIDwVG&utm_id=120245400723090503&utm_term=120245400723070503"
+    },
+    {
+      "sessionId": "1778682432426-72mwucsj",
+      "fullName": "Beth Bowen",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "Hopeless 4/25/26",
+      "utmCampaign": "Hopeless 4/25/26",
+      "utmContent": "Hopeless 4/25/26",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAaszf4MGcCdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5Kxaz6x1dduDJlpCQwQMzuF5xhvaPh7WOOPzb5VEOeo9b8K7rISzylCEdAxg_aem_uD25OCdK2NjhQL3NG-cKSw",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Hopeless+4%2F25%2F26&utm_campaign=Hopeless+4%2F25%2F26&utm_content=Hopeless+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf4MGcCdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5Kxaz6x1dduDJlpCQwQMzuF5xhvaPh7WOOPzb5VEOeo9b8K7rISzylCEdAxg_aem_uD25OCdK2NjhQL3NG-cKSw&utm_id=120245402212990503&utm_term=120245402213010503"
+    },
+    {
+      "sessionId": "1778658969194-usxr3tae",
+      "fullName": "Pauline Southern",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "Hopeless 4/25/26",
+      "utmCampaign": "Hopeless 4/25/26",
+      "utmContent": "Hopeless 4/25/26",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAaszf4NDUhdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5eER1BbDYhdSU6kyc_Q-4kyU5OuSJAbBOsX7NYqBGP434b9kEx5Jf-SVbnmw_aem_O9SdFfPSpkXLDKLm7hQy_w",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Hopeless+4%2F25%2F26&utm_campaign=Hopeless+4%2F25%2F26&utm_content=Hopeless+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf4NDUhdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5eER1BbDYhdSU6kyc_Q-4kyU5OuSJAbBOsX7NYqBGP434b9kEx5Jf-SVbnmw_aem_O9SdFfPSpkXLDKLm7hQy_w&utm_id=120245402212990503&utm_term=120245402213010503"
+    },
+    {
+      "sessionId": "1778653816183-8anyb55j",
+      "fullName": "Margaret",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "Closet Full Of Clothes 14/25/26",
+      "utmCampaign": "Closet Full Of Clothes 14/25/2026",
+      "utmContent": "Closet Full of Clothes 4/25/26",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5BaICdZZI-HnwQVwmHDcBSjjkUcGiomo0LW0xFedsRYMhNl_zECalzo-k7HQ_aem_w78VWl9I3DGIcXV97XrBPQ",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Closet+Full+Of+Clothes+14%2F25%2F26&utm_campaign=Closet+Full+Of+Clothes+14%2F25%2F2026&utm_content=Closet+Full+of+Clothes+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5BaICdZZI-HnwQVwmHDcBSjjkUcGiomo0LW0xFedsRYMhNl_zECalzo-k7HQ_aem_w78VWl9I3DGIcXV97XrBPQ&utm_id=120245400723090503&utm_term=120245400723070503"
+    },
+    {
+      "sessionId": "1778594748913-84s32e6q",
+      "fullName": "Dannie Cade",
+      "adName": "Direct / Unknown",
+      "utmSource": "NULL",
+      "utmMedium": "NULL",
+      "utmCampaign": "NULL",
+      "utmContent": "NULL",
+      "referrerPlatform": "Direct",
+      "fbclid": "NULL",
+      "pageUrl": "https://quiz.charwinnen.com/"
+    },
+    {
+      "sessionId": "1778612694838-7ahrnxkd",
+      "fullName": "Sue Raines",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "Stopped 4/30/2026",
+      "utmCampaign": "Stopped 4/30/2026",
+      "utmContent": "Stopped 4/30/2026",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAaszf4ueJSdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR4xMQpfvG_mIXllr9ge_RW4Hz_7B-LpLLiOLFIRbEDcanaR_K0byVfAlzTCmA_aem_sHRyn7z0DqHeXxUz9U2frw",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Stopped+4%2F30%2F2026&utm_campaign=Stopped+4%2F30%2F2026&utm_content=Stopped+4%2F30%2F2026&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf4ueJSdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR4xMQpfvG_mIXllr9ge_RW4Hz_7B-LpLLiOLFIRbEDcanaR_K0byVfAlzTCmA_aem_sHRyn7z0DqHeXxUz9U2frw&brid=YWdncwGwdHKfvPQOod5fFTP1TZ-v&utm_id=120245740613940503&utm_term=120245740613950503"
+    },
+    {
+      "sessionId": "1778611433190-16h3jnf0",
+      "fullName": "Alison Egan",
+      "adName": "Direct / Unknown",
+      "utmSource": "NULL",
+      "utmMedium": "NULL",
+      "utmCampaign": "NULL",
+      "utmContent": "NULL",
+      "referrerPlatform": "Facebook",
+      "fbclid": "IwY2xjawRwVDhleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR42qSkt522fOkQRwwfo9D_jdn1xpa974-JSKBvvT7QZCF8BPGBK-u4sKpKUmg_aem_uWYF_BTK0-EfLh8w1kRx3g",
+      "pageUrl": "https://quiz.charwinnen.com/?fbclid=IwY2xjawRwVDhleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR42qSkt522fOkQRwwfo9D_jdn1xpa974-JSKBvvT7QZCF8BPGBK-u4sKpKUmg_aem_uWYF_BTK0-EfLh8w1kRx3g"
+    },
+    {
+      "sessionId": "1778578770720-cporggad",
+      "fullName": "Diana",
+      "adName": "Direct / Unknown",
+      "utmSource": "FB Pd sentence ad",
+      "utmMedium": "Closet Full Of Clothes 14/25/26",
+      "utmCampaign": "Closet Full Of Clothes 14/25/2026",
+      "utmContent": "Closet Full of Clothes 4/25/26",
+      "referrerPlatform": "Referral",
+      "fbclid": "IwZXh0bgNhZW0BMABhZGlkAasyjlRyIHdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7-4IauqyyHCx4KzjxLP7VQr3VWJg4We6riogVo429zc4GucG0uTBywHfFavA_aem_EfPA86FpgRKGFPlOcyJpOQ",
+      "pageUrl": "https://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Closet+Full+Of+Clothes+14%2F25%2F26&utm_campaign=Closet+Full+Of+Clothes+14%2F25%2F2026&utm_content=Closet+Full+of+Clothes+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAasyjlRyIHdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7-4IauqyyHCx4KzjxLP7VQr3VWJg4We6riogVo429zc4GucG0uTBywHfFavA_aem_EfPA86FpgRKGFPlOcyJpOQ&utm_id=120245400723090503&utm_term=120245400723070503"
+    }
+  ],
+  "messages": [],
+  "stdout": "sessionId\tfullName\tadName\tutmSource\tutmMedium\tutmCampaign\tutmContent\treferrerPlatform\tfbclid\tpageUrl\n1779012807379-x90ax913\tDebra Trauntner\tDirect / Unknown\tFB Pd sentence ad\tMy Closet 5/15/26\tMy Closet 5/15/26\tMy Closet  5/15/25\tReferral\tIwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZA8xNzM4NDc2NDI2NzAzNzAAAR7Nc9QDeDCslhAShm5G0nBHUNZtc8IqryTxMf1IJBOyLxg4aWMX6i65l5gvgg_aem_cuuBTeTrzzBtzLdULfCk-Q\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=My+Closet+5%2F15%2F26&utm_campaign=My+Closet+5%2F15%2F26&utm_content=My+Closet++5%2F15%2F25&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZA8xNzM4NDc2NDI2NzAzNzAAAR7Nc9QDeDCslhAShm5G0nBHUNZtc8IqryTxMf1IJBOyLxg4aWMX6i65l5gvgg_aem_cuuBTeTrzzBtzLdULfCk-Q&utm_id=120246662292220503&utm_term=120246662292300503\n1778977522721-bsfhxt1d\tMichele Chapman\tDirect / Unknown\tFB Pd sentence ad\tMy Closet 5/15/26\tMy Closet 5/15/26\tMy Closet  5/15/25\tReferral\tIwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR6SOefTNtwOz9lVsvjuQUQxtrdBGT5JjvrMkd7_zssuNbzr8s_O38MdTd6O8A_aem_bzdDwamVk7Jxlmscs6OGoQ\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=My+Closet+5%2F15%2F26&utm_campaign=My+Closet+5%2F15%2F26&utm_content=My+Closet++5%2F15%2F25&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszs_S2THdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR6SOefTNtwOz9lVsvjuQUQxtrdBGT5JjvrMkd7_zssuNbzr8s_O38MdTd6O8A_aem_bzdDwamVk7Jxlmscs6OGoQ&utm_id=120246662292220503&utm_term=120246662292300503\n1778797032947-li3rfyt6\tKay Hopkins\tDirect / Unknown\tFB Pd sentence ad\tCloset Full Of Clothes 14/25/26\tCloset Full Of Clothes 14/25/2026\tCloset Full of Clothes 4/25/26\tReferral\tIwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7Z27PfRmUPe-tBPRyhngOy2TuKD6kLzfXc55qhL8m7deFjA8DBYzK49G5vfw_aem_YWdncwCNILlcMTDxZGpyrSKIDwVG\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Closet+Full+Of+Clothes+14%2F25%2F26&utm_campaign=Closet+Full+Of+Clothes+14%2F25%2F2026&utm_content=Closet+Full+of+Clothes+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7Z27PfRmUPe-tBPRyhngOy2TuKD6kLzfXc55qhL8m7deFjA8DBYzK49G5vfw_aem_YWdncwCNILlcMTDxZGpyrSKIDwVG&brid=YWdncwGNILlcMTDxZGpyrSKIDwVG&utm_id=120245400723090503&utm_term=120245400723070503\n1778682432426-72mwucsj\tBeth Bowen\tDirect / Unknown\tFB Pd sentence ad\tHopeless 4/25/26\tHopeless 4/25/26\tHopeless 4/25/26\tReferral\tIwZXh0bgNhZW0BMABhZGlkAaszf4MGcCdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5Kxaz6x1dduDJlpCQwQMzuF5xhvaPh7WOOPzb5VEOeo9b8K7rISzylCEdAxg_aem_uD25OCdK2NjhQL3NG-cKSw\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Hopeless+4%2F25%2F26&utm_campaign=Hopeless+4%2F25%2F26&utm_content=Hopeless+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf4MGcCdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5Kxaz6x1dduDJlpCQwQMzuF5xhvaPh7WOOPzb5VEOeo9b8K7rISzylCEdAxg_aem_uD25OCdK2NjhQL3NG-cKSw&utm_id=120245402212990503&utm_term=120245402213010503\n1778658969194-usxr3tae\tPauline Southern\tDirect / Unknown\tFB Pd sentence ad\tHopeless 4/25/26\tHopeless 4/25/26\tHopeless 4/25/26\tReferral\tIwZXh0bgNhZW0BMABhZGlkAaszf4NDUhdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5eER1BbDYhdSU6kyc_Q-4kyU5OuSJAbBOsX7NYqBGP434b9kEx5Jf-SVbnmw_aem_O9SdFfPSpkXLDKLm7hQy_w\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Hopeless+4%2F25%2F26&utm_campaign=Hopeless+4%2F25%2F26&utm_content=Hopeless+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf4NDUhdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5eER1BbDYhdSU6kyc_Q-4kyU5OuSJAbBOsX7NYqBGP434b9kEx5Jf-SVbnmw_aem_O9SdFfPSpkXLDKLm7hQy_w&utm_id=120245402212990503&utm_term=120245402213010503\n1778653816183-8anyb55j\tMargaret\tDirect / Unknown\tFB Pd sentence ad\tCloset Full Of Clothes 14/25/26\tCloset Full Of Clothes 14/25/2026\tCloset Full of Clothes 4/25/26\tReferral\tIwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5BaICdZZI-HnwQVwmHDcBSjjkUcGiomo0LW0xFedsRYMhNl_zECalzo-k7HQ_aem_w78VWl9I3DGIcXV97XrBPQ\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Closet+Full+Of+Clothes+14%2F25%2F26&utm_campaign=Closet+Full+Of+Clothes+14%2F25%2F2026&utm_content=Closet+Full+of+Clothes+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf33SzbdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR5BaICdZZI-HnwQVwmHDcBSjjkUcGiomo0LW0xFedsRYMhNl_zECalzo-k7HQ_aem_w78VWl9I3DGIcXV97XrBPQ&utm_id=120245400723090503&utm_term=120245400723070503\n1778594748913-84s32e6q\tDannie Cade\tDirect / Unknown\tNULL\tNULL\tNULL\tNULL\tDirect\tNULL\thttps://quiz.charwinnen.com/\n1778612694838-7ahrnxkd\tSue Raines\tDirect / Unknown\tFB Pd sentence ad\tStopped 4/30/2026\tStopped 4/30/2026\tStopped 4/30/2026\tReferral\tIwZXh0bgNhZW0BMABhZGlkAaszf4ueJSdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR4xMQpfvG_mIXllr9ge_RW4Hz_7B-LpLLiOLFIRbEDcanaR_K0byVfAlzTCmA_aem_sHRyn7z0DqHeXxUz9U2frw\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Stopped+4%2F30%2F2026&utm_campaign=Stopped+4%2F30%2F2026&utm_content=Stopped+4%2F30%2F2026&fbclid=IwZXh0bgNhZW0BMABhZGlkAaszf4ueJSdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR4xMQpfvG_mIXllr9ge_RW4Hz_7B-LpLLiOLFIRbEDcanaR_K0byVfAlzTCmA_aem_sHRyn7z0DqHeXxUz9U2frw&brid=YWdncwGwdHKfvPQOod5fFTP1TZ-v&utm_id=120245740613940503&utm_term=120245740613950503\n1778611433190-16h3jnf0\tAlison Egan\tDirect / Unknown\tNULL\tNULL\tNULL\tNULL\tFacebook\tIwY2xjawRwVDhleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR42qSkt522fOkQRwwfo9D_jdn1xpa974-JSKBvvT7QZCF8BPGBK-u4sKpKUmg_aem_uWYF_BTK0-EfLh8w1kRx3g\thttps://quiz.charwinnen.com/?fbclid=IwY2xjawRwVDhleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR42qSkt522fOkQRwwfo9D_jdn1xpa974-JSKBvvT7QZCF8BPGBK-u4sKpKUmg_aem_uWYF_BTK0-EfLh8w1kRx3g\n1778578770720-cporggad\tDiana\tDirect / Unknown\tFB Pd sentence ad\tCloset Full Of Clothes 14/25/26\tCloset Full Of Clothes 14/25/2026\tCloset Full of Clothes 4/25/26\tReferral\tIwZXh0bgNhZW0BMABhZGlkAasyjlRyIHdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7-4IauqyyHCx4KzjxLP7VQr3VWJg4We6riogVo429zc4GucG0uTBywHfFavA_aem_EfPA86FpgRKGFPlOcyJpOQ\thttps://quiz.charwinnen.com/?utm_source=FB+Pd+sentence+ad&utm_medium=Closet+Full+Of+Clothes+14%2F25%2F26&utm_campaign=Closet+Full+Of+Clothes+14%2F25%2F2026&utm_content=Closet+Full+of+Clothes+4%2F25%2F26&fbclid=IwZXh0bgNhZW0BMABhZGlkAasyjlRyIHdzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7-4IauqyyHCx4KzjxLP7VQr3VWJg4We6riogVo429zc4GucG0uTBywHfFavA_aem_EfPA86FpgRKGFPlOcyJpOQ&utm_id=120245400723090503&utm_term=120245400723070503\n",
+  "stderr": "",
+  "execution_time_ms": 260
+}

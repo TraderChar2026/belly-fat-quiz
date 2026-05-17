@@ -344,7 +344,7 @@ export async function getOrderClickers(limit = 200) {
       eventId: funnelEvents.id,
       clickedAt: funnelEvents.eventTimestamp,
       sessionId: funnelEvents.sessionId,
-      adName: sql<string>`COALESCE(${funnelEvents.adName}, ${quizSubmissions.adName})`,
+      adName: sql<string>`COALESCE(${quizSubmissions.utmMedium}, ${funnelEvents.adName}, ${quizSubmissions.adName})`,
       utmSource: sql<string>`COALESCE(${funnelEvents.utmSource}, ${quizSubmissions.utmSource})`,
       utmCampaign: sql<string>`COALESCE(${funnelEvents.utmCampaign}, ${quizSubmissions.utmCampaign})`,
       alertTier: sql<string>`COALESCE(${funnelEvents.alertTier}, ${quizSubmissions.alertTier})`,
