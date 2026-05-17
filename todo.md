@@ -111,3 +111,5 @@
 - [x] Add /api/country endpoint for client-side IP detection on VSL pages (switched to ip-api.com, 45 req/min, no daily cap)
 - [x] Add country-specific product offer swapping to Red Alert VSL page (stack name, product descriptions, cart links for US/CA/AU/NZ/UK)
 - [x] Add country-specific product offer swapping to Yellow Alert VSL page (same 5-country logic)
+- [ ] Enforce contact form gate: block quiz results and VSL redirect until contact info is successfully submitted — no submission = no results, no VSL page
+- [x] Fix ad name null in Order Clickers: getOrderClickers now uses COALESCE to fall back to quiz_submissions.adName/alertTier/scoreBand/utmSource/utmCampaign when funnel event fields are null
