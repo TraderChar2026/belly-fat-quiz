@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -242,6 +243,7 @@ function TierTable({ tier }: { tier: Tier }) {
 
 export default function DashboardEmailStats() {
   return (
+    <DashboardLayout>
     <div className="p-6 space-y-6 max-w-5xl">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Email Sequence Stats</h1>
@@ -276,5 +278,6 @@ export default function DashboardEmailStats() {
         ))}
       </Tabs>
     </div>
+    </DashboardLayout>
   );
 }

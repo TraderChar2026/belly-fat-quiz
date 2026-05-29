@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -115,12 +116,14 @@ export default function DashboardFunnel() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4">
-        <div className="h-8 bg-muted rounded animate-pulse w-48" />
-        {[...Array(7)].map((_, i) => (
-          <div key={i} className="h-16 bg-muted rounded animate-pulse" />
-        ))}
-      </div>
+      <DashboardLayout>
+        <div className="p-6 space-y-4">
+          <div className="h-8 bg-muted rounded animate-pulse w-48" />
+          {[...Array(7)].map((_, i) => (
+            <div key={i} className="h-16 bg-muted rounded animate-pulse" />
+          ))}
+        </div>
+      </DashboardLayout>
     );
   }
 
@@ -134,6 +137,7 @@ export default function DashboardFunnel() {
   const totalComplete = s.red_complete + s.yellow_complete + s.green_complete;
 
   return (
+    <DashboardLayout>
     <div className="p-6 space-y-6 max-w-5xl">
       {/* Header + Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
@@ -362,5 +366,6 @@ export default function DashboardFunnel() {
         </Card>
       )}
     </div>
+    </DashboardLayout>
   );
 }
