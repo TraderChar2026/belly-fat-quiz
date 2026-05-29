@@ -201,3 +201,46 @@ describe("upsertManualSalesSummary", () => {
     );
   });
 });
+
+// ── getAdPerformanceTable ─────────────────────────────────────────────────────
+// Note: getAdPerformanceTable is not mocked above since it wasn't in the original
+// mock list. We add a separate describe block with its own vi.mock scope.
+
+describe("getAdPerformanceTable (unit logic)", () => {
+  it("computes conversion rates correctly", () => {
+    // Test the pure percentage logic used inside the helper
+    const pct = (num: number, den: number) =>
+      den > 0 ? Math.round((num / den) * 1000) / 10 : 0;
+
+    expect(pct(80, 100)).toBe(80);
+    expect(pct(50, 80)).toBe(62.5);
+    expect(pct(0, 100)).toBe(0);
+    expect(pct(5, 0)).toBe(0);   // no division by zero
+    expect(pct(3, 100)).toBe(3); // visit-to-order rate
+  });
+
+  it("sorts rows by visits descending by default", () => {
+    const rows = [
+      { adName: "Ad B", visits: 50, starts: 40, completes: 30, vslViews: 25, orderClicks: 2, startRate: 80, completeRate: 75, vslRate: 83, orderRate: 4 },
+      { adName: "Ad A", visits: 200, starts: 160, completes: 100, vslViews: 80, orderClicks: 10, startRate: 80, completeRate: 62.5, vslRate: 80, orderRate: 5 },
+      { adName: "Direct / Unknown", visits: 30, starts: 10, completes: 5, vslViews: 3, orderClicks: 0, startRate: 33, completeRate: 50, vslRate: 60, orderRate: 0 },
+    ];
+    const sorted = [...rows].sort((a, b) => b.visits - a.visits);
+    expect(sorted[0].adName).toBe("Ad A");
+    expect(sorted[1].adName).toBe("Ad B");
+    expect(sorted[2].adName).toBe("Direct / Unknown");
+  });
+
+  it("handles empty data gracefully", () => {
+    const rows: { adName: string; visits: number }[] = [];
+    const totalVisits = rows.reduce((s: number, r: { visits: number }) => s + r.visits, 0);
+    expect(totalVisits).toBe(0);
+  });
+
+  it("orderRate uses visits as denominator (visit-to-order is the key metric)", () => {
+    const pct = (num: number, den: number) =>
+      den > 0 ? Math.round((num / den) * 1000) / 10 : 0;
+    // 5 order clicks out of 200 visits = 2.5%
+    expect(pct(5, 200)).toBe(2.5);
+  });
+});

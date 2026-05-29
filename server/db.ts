@@ -629,3 +629,90 @@ export async function upsertManualSalesSummary(data: {
     });
   }
 }
+
+// ── Ad Performance Table ──────────────────────────────────────────────────────
+// Returns one row per distinct ad name with full funnel counts and conversion rates.
+// Pulls from funnelEvents only (no join to quizSubmissions needed for counts).
+export async function getAdPerformanceTable(opts?: {
+  dateFrom?: Date;
+  dateTo?: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions: ReturnType<typeof and>[] = [];
+  if (opts?.dateFrom) conditions.push(gte(funnelEvents.eventTimestamp, opts.dateFrom));
+  if (opts?.dateTo) conditions.push(lte(funnelEvents.eventTimestamp, opts.dateTo));
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  // Pull all relevant events with their ad name in one query
+  const rows = await db
+    .select({
+      adName: sql<string>`COALESCE(${funnelEvents.adName}, 'Direct / Unknown')`,
+      eventType: funnelEvents.eventType,
+      sessionId: funnelEvents.sessionId,
+    })
+    .from(funnelEvents)
+    .where(where ?? sql`1=1`);
+
+  // Aggregate in JS — group by adName, count unique sessions per event type
+  const adMap = new Map<string, {
+    sessions: Set<string>;
+    page_view: Set<string>;
+    quiz_start: Set<string>;
+    quiz_complete: Set<string>;
+    vsl_view: Set<string>;
+    order_click: Set<string>;
+  }>();
+
+  for (const row of rows) {
+    const key = row.adName || "Direct / Unknown";
+    if (!adMap.has(key)) {
+      adMap.set(key, {
+        sessions: new Set(),
+        page_view: new Set(),
+        quiz_start: new Set(),
+        quiz_complete: new Set(),
+        vsl_view: new Set(),
+        order_click: new Set(),
+      });
+    }
+    const entry = adMap.get(key)!;
+    if (row.sessionId) {
+      entry.sessions.add(row.sessionId);
+      const et = row.eventType as string;
+      if (et === "page_view") entry.page_view.add(row.sessionId);
+      else if (et === "quiz_start") entry.quiz_start.add(row.sessionId);
+      else if (et === "quiz_complete") entry.quiz_complete.add(row.sessionId);
+      else if (et === "vsl_view") entry.vsl_view.add(row.sessionId);
+      else if (et === "order_click") entry.order_click.add(row.sessionId);
+    }
+  }
+
+  const pct = (num: number, den: number) =>
+    den > 0 ? Math.round((num / den) * 1000) / 10 : 0;
+
+  const result = Array.from(adMap.entries()).map(([adName, e]) => {
+    const visits = e.page_view.size;
+    const starts = e.quiz_start.size;
+    const completes = e.quiz_complete.size;
+    const vslViews = e.vsl_view.size;
+    const orderClicks = e.order_click.size;
+    return {
+      adName,
+      visits,
+      starts,
+      completes,
+      vslViews,
+      orderClicks,
+      startRate: pct(starts, visits),
+      completeRate: pct(completes, starts),
+      vslRate: pct(vslViews, completes),
+      orderRate: pct(orderClicks, visits),   // visit-to-order is the key metric
+    };
+  });
+
+  // Sort by visits descending by default
+  result.sort((a, b) => b.visits - a.visits);
+  return result;
+}

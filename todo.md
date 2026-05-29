@@ -126,3 +126,8 @@
 - [x] Wire quiz frontend to fire updated funnel event with last_question_reached on each question advance
 - [x] Add date range filter (7d / 30d / 90d / All time) to funnel overview page
 - [x] Add ad name dropdown filter to funnel overview page
+- [x] Add getAdPerformanceTable DB helper: one row per ad name with page_view, quiz_start, quiz_complete, vsl_view, order_click counts and conversion rates
+- [x] Add dashboard.adPerformance tRPC query that calls getAdPerformanceTable with optional date range filter
+- [x] Build DashboardAdPerformance.tsx: sortable table (click any column header to sort), color-coded conversion rate cells, date range filter, "Direct / Unknown" row always present
+- [x] Wire /dashboard/analytics route to DashboardAdPerformance (replacing old DashboardAnalytics placeholder)
+- [x] Remove ad name dropdown from Funnel Overview (keep date range filter only) since Ad Performance page handles per-ad analysis

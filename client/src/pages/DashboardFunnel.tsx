@@ -103,17 +103,14 @@ function TierBadge({ tier, count, total }: { tier: string; count: number; total:
 
 export default function DashboardFunnel() {
   const [rangeDays, setRangeDays] = useState(0);
-  const [selectedAd, setSelectedAd] = useState<string>("__all__");
 
   const dateRange = useMemo(() => getDateRange(rangeDays), [rangeDays]);
-  const adFilter = selectedAd === "__all__" ? undefined : selectedAd;
 
   const { data: stats, isLoading } = trpc.dashboard.fullFunnelStats.useQuery(
-    { ...dateRange, adName: adFilter },
+    { ...dateRange },
     { refetchInterval: 60_000 }
   );
 
-  const { data: adNames } = trpc.dashboard.adNames.useQuery();
   const { data: dropoff } = trpc.dashboard.dropoffByQuestion.useQuery();
 
   if (isLoading) {
@@ -152,18 +149,6 @@ export default function DashboardFunnel() {
             <SelectContent>
               {DATE_RANGES.map(r => (
                 <SelectItem key={r.days} value={String(r.days)}>{r.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedAd} onValueChange={setSelectedAd}>
-            <SelectTrigger className="w-52">
-              <SelectValue placeholder="All ads" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">All ads</SelectItem>
-              {(adNames ?? []).map(name => (
-                <SelectItem key={name} value={name}>{name}</SelectItem>
               ))}
             </SelectContent>
           </Select>

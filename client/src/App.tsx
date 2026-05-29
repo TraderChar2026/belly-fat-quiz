@@ -12,6 +12,7 @@ import DashboardAnalytics from "./pages/DashboardAnalytics";
 import DashboardOrderClickers from "./pages/DashboardOrderClickers";
 import DashboardFunnel from "./pages/DashboardFunnel";
 import DashboardEmailStats from "./pages/DashboardEmailStats";
+import DashboardAdPerformance from "./pages/DashboardAdPerformance";
 
 function Router() {
   return (
@@ -21,7 +22,7 @@ function Router() {
       <Route path={"/dashboard/submissions"} component={DashboardSubmissions} />
       <Route path={"/dashboard/sales"} component={DashboardSales} />
       <Route path={"/dashboard/order-clickers"} component={DashboardOrderClickers} />
-      <Route path={"/dashboard/analytics"} component={DashboardAnalytics} />
+      <Route path={"/dashboard/analytics"} component={DashboardAdPerformance} />
       <Route path={"/dashboard/email-stats"} component={DashboardEmailStats} />
       <Route path={"/dashboard/vsl"} component={DashboardAnalytics} />
       <Route path={"/dashboard/questions"} component={DashboardAnalytics} />

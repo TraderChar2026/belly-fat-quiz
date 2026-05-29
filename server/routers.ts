@@ -26,6 +26,7 @@ import {
   upsertEmailSequenceStat,
   getManualSalesSummary,
   upsertManualSalesSummary,
+  getAdPerformanceTable,
 } from "./db";
 import { computeScores, getCrmTag } from "../shared/quizData";
 import { TRPCError } from "@trpc/server";
@@ -373,6 +374,18 @@ export const appRouter = router({
         }
         await upsertManualSalesSummary(input);
         return { ok: true };
+      }),
+
+    adPerformanceTable: protectedProcedure
+      .input(z.object({
+        dateFrom: z.coerce.date().optional(),
+        dateTo: z.coerce.date().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getAdPerformanceTable(input ?? {});
       }),
   }),
 
