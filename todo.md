@@ -113,3 +113,16 @@
 - [x] Add country-specific product offer swapping to Yellow Alert VSL page (same 5-country logic)
 - [ ] Enforce contact form gate: block quiz results and VSL redirect until contact info is successfully submitted — no submission = no results, no VSL page
 - [x] Fix ad name null in Order Clickers: getOrderClickers now uses COALESCE to fall back to quiz_submissions.adName/alertTier/scoreBand/utmSource/utmCampaign when funnel event fields are null
+- [x] Add `last_question_reached` int column to funnel_events table for mid-quiz drop-off tracking
+- [x] Add `email_sequence_stats` table to DB (tier, email_number, subject, sent_count, open_rate, click_rate, unsub_count, updated_at)
+- [x] Add `manual_sales` table to DB (tier, period_label, sales_count, revenue, notes, updated_at)
+- [x] Add funnel.fullStats tRPC query: page_view → quiz_start → quiz_complete → vsl_view → vsl_25 → order_click → order_placed counts with conversion rates
+- [x] Add funnel.dropoffByQuestion tRPC query: count of sessions that reached each question (1-18) but did not complete
+- [x] Add dashboard.emailStats tRPC queries: get/upsert email sequence stats rows
+- [x] Add dashboard.manualSales tRPC queries: get/upsert manual sales rows
+- [x] Build new DashboardFunnel.tsx page: step-by-step funnel with counts, conversion %, drop-off %, split by tier, filterable by ad name
+- [x] Build DashboardEmailStats.tsx page: manual entry table for 3 tiers × 7 emails (subject, sent, open %, click %, unsubs, last updated)
+- [x] Update DashboardLayout.tsx sidebar: new order = Funnel Overview → Submissions → Ad Performance → VSL Performance → Email Stats → Question Analysis → Order Clickers
+- [x] Wire quiz frontend to fire updated funnel event with last_question_reached on each question advance
+- [x] Add date range filter (7d / 30d / 90d / All time) to funnel overview page
+- [x] Add ad name dropdown filter to funnel overview page

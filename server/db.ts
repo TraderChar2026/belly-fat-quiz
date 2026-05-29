@@ -385,3 +385,247 @@ export async function getTrafficSources() {
   ]);
   return { platformRows, utmSourceRows, utmMediumRows };
 }
+
+// ── Full Funnel Stats (with optional date range and ad name filter) ────────────
+
+export async function getFullFunnelStats(opts: {
+  dateFrom?: Date;
+  dateTo?: Date;
+  adName?: string;
+} = {}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { dateFrom, dateTo, adName } = opts;
+
+  // Build conditions for funnel_events
+  const eventConditions = [];
+  if (dateFrom) eventConditions.push(gte(funnelEvents.eventTimestamp, dateFrom));
+  if (dateTo) eventConditions.push(lte(funnelEvents.eventTimestamp, dateTo));
+
+  // For ad name filter we need to join to quiz_submissions
+  // We'll do two separate queries: one for events, one for submissions
+  const subConditions = [];
+  if (dateFrom) subConditions.push(gte(quizSubmissions.submissionDate, dateFrom));
+  if (dateTo) subConditions.push(lte(quizSubmissions.submissionDate, dateTo));
+  if (adName) {
+    // filter by utmMedium (actual ad name for Facebook) or adName
+    subConditions.push(
+      or(
+        eq(quizSubmissions.utmMedium, adName),
+        eq(quizSubmissions.adName, adName)
+      )
+    );
+  }
+
+  // Get sessions that match the ad name filter (for cross-referencing events)
+  let filteredSessionIds: string[] | null = null;
+  if (adName) {
+    const sessions = await db
+      .select({ sessionId: quizSubmissions.sessionId })
+      .from(quizSubmissions)
+      .where(and(...subConditions));
+    filteredSessionIds = sessions.map(s => s.sessionId).filter(Boolean) as string[];
+    if (filteredSessionIds.length === 0) {
+      return {
+        page_view: 0, quiz_start: 0, quiz_complete: 0,
+        vsl_view: 0, vsl_25: 0, vsl_50: 0, vsl_75: 0, vsl_100: 0,
+        order_click: 0, order_placed: 0,
+        red_complete: 0, yellow_complete: 0, green_complete: 0,
+      };
+    }
+    eventConditions.push(inArray(funnelEvents.sessionId, filteredSessionIds));
+  }
+
+  const eventWhere = eventConditions.length > 0 ? and(...eventConditions) : undefined;
+  const subWhere = subConditions.length > 0 ? and(...subConditions) : undefined;
+
+  const [eventRows, tierRows] = await Promise.all([
+    db.select({
+      eventType: funnelEvents.eventType,
+      sessions: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})`,
+    })
+      .from(funnelEvents)
+      .where(eventWhere)
+      .groupBy(funnelEvents.eventType),
+
+    db.select({
+      alertTier: quizSubmissions.alertTier,
+      count: sql<number>`COUNT(*)`,
+    })
+      .from(quizSubmissions)
+      .where(subWhere)
+      .groupBy(quizSubmissions.alertTier),
+  ]);
+
+  const map: Record<string, number> = {};
+  for (const r of eventRows) map[r.eventType] = Number(r.sessions);
+
+  const tierMap: Record<string, number> = {};
+  for (const r of tierRows) tierMap[r.alertTier] = Number(r.count);
+
+  return {
+    page_view: map["page_view"] ?? 0,
+    quiz_start: map["quiz_start"] ?? 0,
+    quiz_complete: map["quiz_complete"] ?? 0,
+    vsl_view: map["vsl_view"] ?? 0,
+    vsl_25: map["vsl_25"] ?? 0,
+    vsl_50: map["vsl_50"] ?? 0,
+    vsl_75: map["vsl_75"] ?? 0,
+    vsl_100: map["vsl_100"] ?? 0,
+    order_click: map["order_click"] ?? 0,
+    order_placed: map["order_placed"] ?? 0,
+    red_complete: tierMap["Red"] ?? 0,
+    yellow_complete: tierMap["Yellow"] ?? 0,
+    green_complete: tierMap["Green"] ?? 0,
+  };
+}
+
+/** Drop-off by question: for each question 1-18, count sessions that reached it but did not complete */
+export async function getDropoffByQuestion() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get all quiz_start events that have a lastQuestionReached set
+  const rows = await db
+    .select({
+      lastQuestionReached: funnelEvents.lastQuestionReached,
+      count: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})`,
+    })
+    .from(funnelEvents)
+    .where(
+      and(
+        eq(funnelEvents.eventType, "quiz_start"),
+        sql`${funnelEvents.lastQuestionReached} IS NOT NULL`
+      )
+    )
+    .groupBy(funnelEvents.lastQuestionReached)
+    .orderBy(asc(funnelEvents.lastQuestionReached));
+
+  // Also get sessions that completed (so we can show completions per question)
+  const completedSessions = await db
+    .select({ count: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})` })
+    .from(funnelEvents)
+    .where(eq(funnelEvents.eventType, "quiz_complete"));
+
+  const completions = Number(completedSessions[0]?.count ?? 0);
+
+  return {
+    byQuestion: rows.map(r => ({
+      question: Number(r.lastQuestionReached),
+      droppedOff: Number(r.count),
+    })),
+    completions,
+  };
+}
+
+/** Get all distinct ad names for the filter dropdown */
+export async function getAdNames() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const rows = await db
+    .selectDistinct({
+      adName: sql<string>`COALESCE(NULLIF(${quizSubmissions.utmMedium}, ''), NULLIF(${quizSubmissions.adName}, ''), 'Direct / Unknown')`,
+    })
+    .from(quizSubmissions)
+    .orderBy(sql`COALESCE(NULLIF(${quizSubmissions.utmMedium}, ''), NULLIF(${quizSubmissions.adName}, ''), 'Direct / Unknown')`);
+  return rows.map(r => r.adName).filter(Boolean);
+}
+
+// ── Email Sequence Stats ──────────────────────────────────────────────────────
+
+import { emailSequenceStats, manualSalesSummary, InsertEmailSequenceStat, InsertManualSalesSummary } from "../drizzle/schema";
+
+export async function getEmailSequenceStats(tier?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const where = tier ? eq(emailSequenceStats.tier, tier) : undefined;
+  return db.select().from(emailSequenceStats)
+    .where(where)
+    .orderBy(asc(emailSequenceStats.tier), asc(emailSequenceStats.emailNumber));
+}
+
+export async function upsertEmailSequenceStat(data: {
+  tier: string;
+  emailNumber: number;
+  subject?: string;
+  sentCount?: number;
+  openRate?: number;
+  clickRate?: number;
+  unsubCount?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Check if row exists
+  const existing = await db.select({ id: emailSequenceStats.id })
+    .from(emailSequenceStats)
+    .where(and(eq(emailSequenceStats.tier, data.tier), eq(emailSequenceStats.emailNumber, data.emailNumber)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db.update(emailSequenceStats)
+      .set({
+        subject: data.subject,
+        sentCount: data.sentCount ?? null,
+        openRate: data.openRate != null ? String(data.openRate) as any : null,
+        clickRate: data.clickRate != null ? String(data.clickRate) as any : null,
+        unsubCount: data.unsubCount ?? null,
+      })
+      .where(eq(emailSequenceStats.id, existing[0].id));
+  } else {
+    await db.insert(emailSequenceStats).values({
+      tier: data.tier,
+      emailNumber: data.emailNumber,
+      subject: data.subject,
+      sentCount: data.sentCount ?? null,
+      openRate: data.openRate != null ? String(data.openRate) as any : null,
+      clickRate: data.clickRate != null ? String(data.clickRate) as any : null,
+      unsubCount: data.unsubCount ?? null,
+    });
+  }
+}
+
+// ── Manual Sales Summary ──────────────────────────────────────────────────────
+
+export async function getManualSalesSummary() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(manualSalesSummary)
+    .orderBy(desc(manualSalesSummary.updatedAt));
+}
+
+export async function upsertManualSalesSummary(data: {
+  tier: string;
+  periodLabel?: string;
+  salesCount: number;
+  revenue?: number;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db.select({ id: manualSalesSummary.id })
+    .from(manualSalesSummary)
+    .where(eq(manualSalesSummary.tier, data.tier))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db.update(manualSalesSummary)
+      .set({
+        periodLabel: data.periodLabel,
+        salesCount: data.salesCount,
+        revenue: data.revenue != null ? String(data.revenue) as any : null,
+        notes: data.notes,
+      })
+      .where(eq(manualSalesSummary.id, existing[0].id));
+  } else {
+    await db.insert(manualSalesSummary).values({
+      tier: data.tier,
+      periodLabel: data.periodLabel,
+      salesCount: data.salesCount,
+      revenue: data.revenue != null ? String(data.revenue) as any : null,
+      notes: data.notes,
+    });
+  }
+}

@@ -532,13 +532,28 @@ export default function Home() {
     []
   );
 
+  const attribution = useAttribution();
+  const trackEvent = trpc.funnel.track.useMutation();
+
   const handleNext = useCallback(() => {
+    // Update lastQuestionReached on the quiz_start event for drop-off tracking
+    if (attribution.sessionId) {
+      trackEvent.mutate({
+        eventType: "quiz_start",
+        sessionId: attribution.sessionId,
+        lastQuestionReached: questionIndex + 1, // 1-indexed current question
+        adName: attribution.adNameRaw,
+        referrerPlatform: attribution.referrerPlatform,
+        utmSource: attribution.utmSource,
+        utmCampaign: attribution.utmCampaign,
+      });
+    }
     if (questionIndex < QUESTIONS.length - 1) {
       setQuestionIndex((i) => i + 1);
     } else {
       setStage("contact");
     }
-  }, [questionIndex]);
+  }, [questionIndex, attribution, trackEvent]);
 
   const handleBack = useCallback(() => {
     if (questionIndex > 0) {
@@ -547,9 +562,6 @@ export default function Home() {
       setStage("intro");
     }
   }, [questionIndex]);
-
-  const attribution = useAttribution();
-  const trackEvent = trpc.funnel.track.useMutation();
 
   // Fire page_view on mount
   useEffect(() => {

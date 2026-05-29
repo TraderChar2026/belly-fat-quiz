@@ -11,6 +11,9 @@ import {
   getSubmissionsSummary,
   getAdPerformance,
   getFunnelStats,
+  getFullFunnelStats,
+  getDropoffByQuestion,
+  getAdNames,
   saveSale,
   getSales,
   deleteSale,
@@ -19,6 +22,10 @@ import {
   getQuestionAnswerDistributions,
   getTrafficSources,
   getOrderClickers,
+  getEmailSequenceStats,
+  upsertEmailSequenceStat,
+  getManualSalesSummary,
+  upsertManualSalesSummary,
 } from "./db";
 import { computeScores, getCrmTag } from "../shared/quizData";
 import { TRPCError } from "@trpc/server";
@@ -148,6 +155,7 @@ export const appRouter = router({
         referrerPlatform: z.string().max(64).optional(),
         utmSource: z.string().max(255).optional(),
         utmCampaign: z.string().max(255).optional(),
+        lastQuestionReached: z.number().int().min(1).max(18).optional(),
       }))
       .mutation(async ({ input }) => {
         await saveFunnelEvent({
@@ -162,6 +170,7 @@ export const appRouter = router({
           referrerPlatform: input.referrerPlatform,
           utmSource: input.utmSource,
           utmCampaign: input.utmCampaign,
+          lastQuestionReached: input.lastQuestionReached,
         });
 
         // ── GHL tag: add "order clicked" when someone clicks Order Now ────────
@@ -284,6 +293,86 @@ export const appRouter = router({
           throw new TRPCError({ code: "FORBIDDEN" });
         }
         return getOrderClickers();
+      }),
+
+    fullFunnelStats: protectedProcedure
+      .input(z.object({
+        dateFrom: z.coerce.date().optional(),
+        dateTo: z.coerce.date().optional(),
+        adName: z.string().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getFullFunnelStats(input ?? {});
+      }),
+
+    dropoffByQuestion: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getDropoffByQuestion();
+      }),
+
+    adNames: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getAdNames();
+      }),
+
+    emailStats: protectedProcedure
+      .input(z.object({ tier: z.string().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getEmailSequenceStats(input?.tier);
+      }),
+
+    upsertEmailStat: protectedProcedure
+      .input(z.object({
+        tier: z.enum(["Red", "Yellow", "Green"]),
+        emailNumber: z.number().int().min(1).max(7),
+        subject: z.string().max(255).optional(),
+        sentCount: z.number().int().min(0).optional(),
+        openRate: z.number().min(0).max(100).optional(),
+        clickRate: z.number().min(0).max(100).optional(),
+        unsubCount: z.number().int().min(0).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await upsertEmailSequenceStat(input);
+        return { ok: true };
+      }),
+
+    manualSales: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getManualSalesSummary();
+      }),
+
+    upsertManualSales: protectedProcedure
+      .input(z.object({
+        tier: z.string().max(32),
+        periodLabel: z.string().max(64).optional(),
+        salesCount: z.number().int().min(0),
+        revenue: z.number().min(0).optional(),
+        notes: z.string().max(2000).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await upsertManualSalesSummary(input);
+        return { ok: true };
       }),
   }),
 

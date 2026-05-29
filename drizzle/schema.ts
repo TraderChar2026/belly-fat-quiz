@@ -114,6 +114,7 @@ export const funnelEvents = mysqlTable("funnel_events", {
   utmSource: varchar("utmSource", { length: 255 }),
   utmCampaign: varchar("utmCampaign", { length: 255 }),
   orderValue: decimal("orderValue", { precision: 10, scale: 2 }), // order_placed events only
+  lastQuestionReached: int("lastQuestionReached"),               // for quiz_start events: last Q# reached before drop-off (1-18)
 });
 
 export type FunnelEvent = typeof funnelEvents.$inferSelect;
@@ -134,3 +135,33 @@ export const salesLog = mysqlTable("sales_log", {
 
 export type SalesLog = typeof salesLog.$inferSelect;
 export type InsertSalesLog = typeof salesLog.$inferInsert;
+
+// ── Email Sequence Stats (manual entry from AwesomeCRM) ───────────────────────
+export const emailSequenceStats = mysqlTable("email_sequence_stats", {
+  id: int("id").autoincrement().primaryKey(),
+  tier: varchar("tier", { length: 32 }).notNull(),              // "Red" | "Yellow" | "Green"
+  emailNumber: int("emailNumber").notNull(),                    // 1–7
+  subject: varchar("subject", { length: 255 }),                 // email subject line label
+  sentCount: int("sentCount"),
+  openRate: decimal("openRate", { precision: 5, scale: 2 }),    // percentage, e.g. 42.50
+  clickRate: decimal("clickRate", { precision: 5, scale: 2 }),  // percentage
+  unsubCount: int("unsubCount"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailSequenceStat = typeof emailSequenceStats.$inferSelect;
+export type InsertEmailSequenceStat = typeof emailSequenceStats.$inferInsert;
+
+// ── Manual Sales Summary (manual entry for order_placed counts) ───────────────
+export const manualSalesSummary = mysqlTable("manual_sales_summary", {
+  id: int("id").autoincrement().primaryKey(),
+  tier: varchar("tier", { length: 32 }).notNull(),              // "Red" | "Yellow" | "Green" | "All"
+  periodLabel: varchar("periodLabel", { length: 64 }),          // e.g. "May 2026"
+  salesCount: int("salesCount").default(0).notNull(),
+  revenue: decimal("revenue", { precision: 10, scale: 2 }),
+  notes: text("notes"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ManualSalesSummary = typeof manualSalesSummary.$inferSelect;
+export type InsertManualSalesSummary = typeof manualSalesSummary.$inferInsert;

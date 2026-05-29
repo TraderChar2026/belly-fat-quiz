@@ -21,17 +21,20 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, ClipboardList, DollarSign, BarChart2, MousePointerClick } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, ClipboardList, DollarSign, BarChart2, MousePointerClick, TrendingUp, MonitorPlay, Mail, HelpCircle } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
+  { icon: TrendingUp, label: "Funnel Overview", path: "/dashboard" },
   { icon: ClipboardList, label: "Submissions", path: "/dashboard/submissions" },
+  { icon: BarChart2, label: "Ad Performance", path: "/dashboard/analytics" },
+  { icon: MonitorPlay, label: "VSL Performance", path: "/dashboard/vsl" },
+  { icon: Mail, label: "Email Stats", path: "/dashboard/email-stats" },
+  { icon: HelpCircle, label: "Question Analysis", path: "/dashboard/questions" },
   { icon: MousePointerClick, label: "Order Clickers", path: "/dashboard/order-clickers" },
-  { icon: BarChart2, label: "Analytics", path: "/dashboard/analytics" },
   { icon: DollarSign, label: "Sales Log", path: "/dashboard/sales" },
 ];
 

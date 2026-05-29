@@ -10,16 +10,21 @@ import DashboardSubmissions from "./pages/DashboardSubmissions";
 import DashboardSales from "./pages/DashboardSales";
 import DashboardAnalytics from "./pages/DashboardAnalytics";
 import DashboardOrderClickers from "./pages/DashboardOrderClickers";
+import DashboardFunnel from "./pages/DashboardFunnel";
+import DashboardEmailStats from "./pages/DashboardEmailStats";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/dashboard"} component={Dashboard} />
+      <Route path={"/dashboard"} component={DashboardFunnel} />
       <Route path={"/dashboard/submissions"} component={DashboardSubmissions} />
       <Route path={"/dashboard/sales"} component={DashboardSales} />
       <Route path={"/dashboard/order-clickers"} component={DashboardOrderClickers} />
       <Route path={"/dashboard/analytics"} component={DashboardAnalytics} />
+      <Route path={"/dashboard/email-stats"} component={DashboardEmailStats} />
+      <Route path={"/dashboard/vsl"} component={DashboardAnalytics} />
+      <Route path={"/dashboard/questions"} component={DashboardAnalytics} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
