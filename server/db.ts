@@ -632,7 +632,8 @@ export async function upsertManualSalesSummary(data: {
 
 // ── Ad Performance Table ──────────────────────────────────────────────────────
 // Returns one row per distinct ad name with full funnel counts and conversion rates.
-// Pulls from funnelEvents only (no join to quizSubmissions needed for counts).
+// Joins funnel_events with quiz_submissions on sessionId to resolve ad names,
+// since ad names are stored in quiz_submissions (via utm_medium) not funnel_events.
 export async function getAdPerformanceTable(opts?: {
   dateFrom?: Date;
   dateTo?: Date;
@@ -645,14 +646,22 @@ export async function getAdPerformanceTable(opts?: {
   if (opts?.dateTo) conditions.push(lte(funnelEvents.eventTimestamp, opts.dateTo));
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-  // Pull all relevant events with their ad name in one query
+  // Join funnel_events with quiz_submissions to get the ad name per session.
+  // quiz_submissions stores the ad name from utm_medium (Facebook ads pass ad name via utm_medium).
+  // funnelEvents.adName is a fallback for sessions that never completed the quiz.
   const rows = await db
     .select({
-      adName: sql<string>`COALESCE(${funnelEvents.adName}, 'Direct / Unknown')`,
+      adName: sql<string>`COALESCE(
+        ${quizSubmissions.utmMedium},
+        ${quizSubmissions.adName},
+        ${funnelEvents.adName},
+        'Direct / Unknown'
+      )`,
       eventType: funnelEvents.eventType,
       sessionId: funnelEvents.sessionId,
     })
     .from(funnelEvents)
+    .leftJoin(quizSubmissions, eq(funnelEvents.sessionId, quizSubmissions.sessionId))
     .where(where ?? sql`1=1`);
 
   // Aggregate in JS — group by adName, count unique sessions per event type
