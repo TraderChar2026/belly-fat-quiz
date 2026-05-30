@@ -28,6 +28,7 @@ import {
   upsertManualSalesSummary,
   getAdPerformanceTable,
 } from "./db";
+import { getBothVSLStats } from "./wistia";
 import { computeScores, getCrmTag } from "../shared/quizData";
 import { TRPCError } from "@trpc/server";
 import { ENV } from "./_core/env";
@@ -386,6 +387,14 @@ export const appRouter = router({
           throw new TRPCError({ code: "FORBIDDEN" });
         }
         return getAdPerformanceTable(input ?? {});
+      }),
+
+    wistiaStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.openId !== ENV.ownerOpenId && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getBothVSLStats();
       }),
   }),
 

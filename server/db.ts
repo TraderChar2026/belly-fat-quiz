@@ -1,4 +1,4 @@
-import { eq, desc, asc, sql, and, gte, lte, like, or, inArray } from "drizzle-orm";
+import { eq, desc, asc, sql, and, gte, lte, like, or, inArray, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser, users,
@@ -440,7 +440,7 @@ export async function getFullFunnelStats(opts: {
   const eventWhere = eventConditions.length > 0 ? and(...eventConditions) : undefined;
   const subWhere = subConditions.length > 0 ? and(...subConditions) : undefined;
 
-  const [eventRows, tierRows] = await Promise.all([
+  const [eventRows, tierRows, vslVersionRows] = await Promise.all([
     db.select({
       eventType: funnelEvents.eventType,
       sessions: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})`,
@@ -456,6 +456,22 @@ export async function getFullFunnelStats(opts: {
       .from(quizSubmissions)
       .where(subWhere)
       .groupBy(quizSubmissions.alertTier),
+
+    // Per-VSL-version counts for vsl_view and order_click
+    db.select({
+      eventType: funnelEvents.eventType,
+      vslVersion: funnelEvents.vslVersion,
+      sessions: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})`,
+    })
+      .from(funnelEvents)
+      .where(
+        and(
+          eventWhere,
+          inArray(funnelEvents.eventType, ["vsl_view", "order_click"]),
+          isNotNull(funnelEvents.vslVersion),
+        )
+      )
+      .groupBy(funnelEvents.eventType, funnelEvents.vslVersion),
   ]);
 
   const map: Record<string, number> = {};
@@ -463,6 +479,13 @@ export async function getFullFunnelStats(opts: {
 
   const tierMap: Record<string, number> = {};
   for (const r of tierRows) tierMap[r.alertTier] = Number(r.count);
+
+  // vslVersion is stored as 'red' or 'yel'
+  const vslMap: Record<string, number> = {};
+  for (const r of vslVersionRows) {
+    const key = `${r.eventType}_${r.vslVersion}`;
+    vslMap[key] = Number(r.sessions);
+  }
 
   return {
     page_view: map["page_view"] ?? 0,
@@ -478,6 +501,11 @@ export async function getFullFunnelStats(opts: {
     red_complete: tierMap["Red"] ?? 0,
     yellow_complete: tierMap["Yellow"] ?? 0,
     green_complete: tierMap["Green"] ?? 0,
+    // Per-VSL-version breakdown
+    vsl_view_red: vslMap["vsl_view_red"] ?? 0,
+    vsl_view_yellow: vslMap["vsl_view_yel"] ?? 0,
+    order_click_red: vslMap["order_click_red"] ?? 0,
+    order_click_yellow: vslMap["order_click_yel"] ?? 0,
   };
 }
 

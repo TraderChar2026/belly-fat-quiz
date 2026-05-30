@@ -13,6 +13,7 @@ import DashboardOrderClickers from "./pages/DashboardOrderClickers";
 import DashboardFunnel from "./pages/DashboardFunnel";
 import DashboardEmailStats from "./pages/DashboardEmailStats";
 import DashboardAdPerformance from "./pages/DashboardAdPerformance";
+import DashboardVSLPerformance from "./pages/DashboardVSLPerformance";
 
 function Router() {
   return (
@@ -24,7 +25,7 @@ function Router() {
       <Route path={"/dashboard/order-clickers"} component={DashboardOrderClickers} />
       <Route path={"/dashboard/analytics"} component={DashboardAdPerformance} />
       <Route path={"/dashboard/email-stats"} component={DashboardEmailStats} />
-      <Route path={"/dashboard/vsl"} component={DashboardAnalytics} />
+      <Route path={"/dashboard/vsl"} component={DashboardVSLPerformance} />
       <Route path={"/dashboard/questions"} component={DashboardAnalytics} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

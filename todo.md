@@ -131,3 +131,8 @@
 - [x] Build DashboardAdPerformance.tsx: sortable table (click any column header to sort), color-coded conversion rate cells, date range filter, "Direct / Unknown" row always present
 - [x] Wire /dashboard/analytics route to DashboardAdPerformance (replacing old DashboardAnalytics placeholder)
 - [x] Remove ad name dropdown from Funnel Overview (keep date range filter only) since Ad Performance page handles per-ad analysis
+- [x] Add WISTIA_API_TOKEN secret and video IDs (Red: 9384761b7n, Yellow: g4s4s1m6ta) to env
+- [x] Build getWistiaVideoStats server helper (calls Wistia modern API for plays, unique plays, hours watched, avg % watched, play rate)
+- [x] Add dashboard.wistiaStats tRPC query returning stats for both Red and Yellow VSL videos
+- [x] Build DashboardVSLPerformance.tsx page with live Wistia stats cards + our own funnel event data
+- [x] Wire /dashboard/vsl route to DashboardVSLPerformance
