@@ -199,7 +199,62 @@
     .good-news-box p { font-size: 17px; line-height: 1.7; color: #1e2e1e; }
     .good-news-box strong { color: #ffffff; }
 
-    /* ── Testimonials ─────────────────────────────────────────────── */
+    /* ── Testimonial headshot ─────────────────────────────────────── */
+    .testimonial-headshot {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #c8d8b8;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .testimonial-placeholder {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #c8d8b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d4a1e;
+      margin-bottom: 12px;
+      border: 3px solid #4a7c59;
+    }
+    /* ── Top Bonuses (above CTA) ─────────────────────────────────── */
+    .top-bonuses {
+      max-width: 680px;
+      margin: 28px auto 0;
+      background: #f0f7f0;
+      border: 2px dashed #4a7c59;
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+    .top-bonuses h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e2e1e;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .top-bonuses h3 span { color: #4a7c59; }
+    .top-bonus-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #d0e0d0;
+      font-size: 15px;
+      color: #1e2e1e;
+      line-height: 1.65;
+    }
+    .top-bonus-item:last-child { border-bottom: none; }
+    .top-bonus-item .gift { font-size: 22px; flex-shrink: 0; }
+    .top-bonus-item strong { color: #1e2e1e; }
+    /* ── Testimonials ───────────────────────────────────────────────────────── */
     .testimonials-section {
       background: linear-gradient(160deg, rgba(200,216,184,0.15) 0%, #f4f8f4 100%);
       padding: 30px 24px;
@@ -503,7 +558,7 @@
       <div class="result-badge">🟡 Yellow Alert — Early Warning Result</div>
       <h1>Congratulations! You Just Took The First Step To Finally Losing<br>That Stubborn Belly Fat After 40…</h1>
       <p class="hero-sub" style="background:#ffe066; color:#222; display:inline-block; padding:4px 10px; border-radius:4px; font-weight:600;">Your Quiz Results Are On Their Way To Your Email Inbox…<br>(please check your spam folder)</p>
-      <p class="hero-sub" style="margin-top:16px;">In The Meantime, Watch This 3 Min Video To Discover a Clinically Proven Way to Lose up to 25 lbs. in 12 Weeks by Boosting Your GLP-1 and Restoring Your Gut Naturally — No Meds, No Shots, No Starving.</p>
+      <p class="hero-sub" style="margin-top:16px;">Watch this short video and discover how I lost 50 pounds in my late 70s by boosting my GLP-1 hormone and restoring my gut balance naturally — No Meds, No Shots, No Starving.</p>
       <!-- Stats boxes removed -->
     </div>
   </section>
@@ -519,11 +574,61 @@
       <div class="video-wrapper">
         <wistia-player media-id="g4s4s1m6ta" aspect="1.7777777777777777"></wistia-player>
       </div>
+      <!-- Top 2 Bonuses — shown above the CTA (Ferny recommendation) -->
+      <div class="top-bonuses">
+        <h3>🎁 &nbsp; When you order today, you also get: &nbsp;<span>(Value $294)</span></h3>
+        <div class="top-bonus-item">
+          <span class="gift">📞</span>
+          <div><strong>Free 30-Minute Private Consultation with Char</strong> — I'll personally walk you through exactly what I did, step by step, to lose 50 pounds in my late 70s. ($197 value)</div>
+        </div>
+        <div class="top-bonus-item">
+          <span class="gift">📋</span>
+          <div><strong>Char's Personal Weight Loss Protocol</strong> — The exact steps I used to lose 50 pounds in my late 70s — what I took, when, and how I accelerated my results. ($97 value)</div>
+        </div>
+      </div>
+
       <div style="text-align:center; margin-top:28px;">
         <a href="https://cart.lifevantage.com/US/shoppingcart/share/792b7ca9-b39b-445b-9cfe-00128d01555f" target="_blank" class="cta-primary" id="order-cta-video">
           👉 &nbsp; Click Here to Order Now — Yes, I'm Ready to Reclaim My Body
         </a>
         <p style="margin-top:12px; font-size:13px; color:#5a7a5a;">✅ <strong>100% Money-Back Guarantee</strong> &nbsp;·&nbsp; No risk. No fear. Just results.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials with headshots — immediately after order CTA per Ferny's recommendation -->
+  <section class="testimonials-section">
+    <div class="container">
+      <h2>Real Women. Real Results.</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card" style="text-align:center;">
+          <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663297752565/KPxCyY62mCsecb8cbLpLNE/jane_8c6cf62e.png" alt="Jane" class="testimonial-headshot" style="margin:0 auto 12px;" />
+          <div class="stars">★★★★★</div>
+          <blockquote>"What an incredible journey it has been! After 64 years, I've finally discovered what truly works for me. Embracing a lifestyle change with the MindBody GLP-1 system has been nothing short of transformative."</blockquote>
+          <div class="attribution">— Jane</div>
+        </div>
+        <div class="testimonial-card" style="text-align:center;">
+          <div class="testimonial-placeholder" style="margin:0 auto 12px;">M</div>
+          <div class="stars">★★★★★</div>
+          <blockquote>"The best part — no cravings because I love to eat! Feeling energized and great throughout the whole process."</blockquote>
+          <div class="attribution">— Mark, lost 9 lbs in 3 weeks</div>
+        </div>
+        <div class="testimonial-card" style="text-align:center;">
+          <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663297752565/KPxCyY62mCsecb8cbLpLNE/mary_1f9c0ee8.png" alt="Mary" class="testimonial-headshot" style="margin:0 auto 12px;" />
+          <div class="stars">★★★★★</div>
+          <blockquote>"In 12 weeks, I went from a size 14 to a size 10, losing 29.5 pounds. I can't believe how different I feel."</blockquote>
+          <div class="attribution">— Mary, lost 29.5 lbs in 12 weeks</div>
+        </div>
+        <div class="testimonial-card" style="text-align:center;">
+          <div class="testimonial-placeholder" style="margin:0 auto 12px;">D</div>
+          <div class="stars">★★★★★</div>
+          <blockquote>"I never expected my sugar cravings to stop after just being on the system one day!"</blockquote>
+          <div class="attribution">— Diane</div>
+        </div>
+      </div>
+      <div class="char-testimonial">
+        <p>"I used this exact system to lose 50 pounds — and I did it in my late 70s. You caught this early. That means your results will come even faster than mine did."</p>
+        <div class="char-name">— Char Winnen Ed.D., Nutritionist</div>
       </div>
     </div>
   </section>
@@ -564,39 +669,6 @@
         <h3>But Here's The Good News</h3>
         <p style="color:#ffffff;font-weight:700;font-size:19px;margin-bottom:12px;">You caught this early. That's a huge advantage.</p>
         <p>Once you restore your gut balance with good bacteria, inflammation calms, and your body increases its production of the <strong style="color:#1e2e1e;">GLP-1 hormone</strong> — <span style="color:#ffffff;font-weight:600;">making it dramatically easier to lose weight and belly fat.</span></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section class="testimonials-section">
-    <div class="container">
-      <h2>Real Women. Real Results.</h2>
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <blockquote>"What an incredible journey it has been! After 64 years, I've finally discovered what truly works for me. Embracing a lifestyle change with the MindBody GLP-1 system has been nothing short of transformative."</blockquote>
-          <div class="attribution">— Jane</div>
-        </div>
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <blockquote>"The best part — no cravings because I love to eat! Feeling energized and great throughout the whole process."</blockquote>
-          <div class="attribution">— Mark, lost 9 lbs in 3 weeks</div>
-        </div>
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <blockquote>"In 12 weeks, I went from a size 14 to a size 10, losing 29.5 pounds. I can't believe how different I feel."</blockquote>
-          <div class="attribution">— Mary, lost 29.5 lbs in 12 weeks</div>
-        </div>
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <blockquote>"I never expected my sugar cravings to stop after just being on the system one day!"</blockquote>
-          <div class="attribution">— Diane</div>
-        </div>
-      </div>
-      <div class="char-testimonial">
-        <p>"I used this exact system to lose 50 pounds — and I did it in my late 70s. You caught this early. That means your results will come even faster than mine did."</p>
-        <div class="char-name">— Char Winnen Ed.D., Nutritionist</div>
       </div>
     </div>
   </section>
@@ -652,7 +724,7 @@
               <li><span class="gift">📋</span><div><strong>Char's Personal Weight Loss Protocol</strong> — The exact steps she used to lose 50 pounds in her late 70s. ($97 value)</div></li>
               <li><span class="gift">🥗</span><div><strong>Protein Guide for Weight Loss</strong> — Know exactly what to eat to fuel your gut restoration and speed up fat loss. ($47 value)</div></li>
               <li><span class="gift">📊</span><div><strong>GLP-1 Hormone Weight Loss Tracker</strong> — Track your progress week by week and stay motivated. ($47 value)</div></li>
-              <li><span class="gift">🥦</span><div><strong>Foods To Eat &amp; Foods To Avoid Guide</strong> — The complete gut-friendly food list for faster results. ($47 value)</div></li>
+              <li><span class="gift">🥦</span><div><strong>Gut-Friendly Food List</strong> — The complete list of foods that support your gut restoration and speed up fat loss. ($47 value)</div></li>
             </ul>
             <div class="bonus-value">Total Bonus Value: $435 &nbsp;→&nbsp; <span class="free">FREE with your order today</span></div>
           </div>

@@ -136,3 +136,9 @@
 - [x] Add dashboard.wistiaStats tRPC query returning stats for both Red and Yellow VSL videos
 - [x] Build DashboardVSLPerformance.tsx page with live Wistia stats cards + our own funnel event data
 - [x] Wire /dashboard/vsl route to DashboardVSLPerformance
+- [x] Upload Jane, Mark, Mary headshot photos to CDN; use placeholder for Diane
+- [x] Red Alert VSL: update headline to lead with 50-lb story (Ferny's recommendation)
+- [x] Red Alert VSL: move top 2 bonuses above order button (below video)
+- [x] Red Alert VSL: move testimonials with headshots to below order button
+- [x] Red Alert VSL: rename "Foods To Eat & Foods To Avoid Guide" to "Gut-Friendly Food List"
+- [x] Yellow Alert VSL: apply same 5 changes as Red Alert
