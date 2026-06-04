@@ -236,6 +236,15 @@ export interface OwnerNotificationData {
   answers: Array<{ questionId: number; points: number; optionIndex?: number }>;
   timezone?: string | null;
   submittedAt?: string;
+  highestScoreCategory?: string | null;
+  lowestScoreCategory?: string | null;
+  highestScore?: number | null;
+  lowestScore?: number | null;
+  pageUrl?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  adName?: string | null;
 }
 
 export async function sendOwnerNotificationEmail(data: OwnerNotificationData): Promise<boolean> {
@@ -306,10 +315,32 @@ export async function sendOwnerNotificationEmail(data: OwnerNotificationData): P
           <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Gut Health</strong></td>
           <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.gutScore} / 27</td>
         </tr>
-        <tr style="background:#f0f7f0;">
-          <td style="padding:10px 12px;color:#555;"><strong>Timezone</strong></td>
-          <td style="padding:10px 12px;">${data.timezone ?? "Unknown"}</td>
+        <tr>
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Highest Score</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.highestScore ?? "—"}</td>
         </tr>
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Lowest Score</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.lowestScore ?? "—"}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Highest Score Category</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.highestScoreCategory ?? "—"}</td>
+        </tr>
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Lowest Score Category</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.lowestScoreCategory ?? "—"}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Timezone</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.timezone ?? "Unknown"}</td>
+        </tr>
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Submission Date</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.submittedAt ?? "—"}</td>
+        </tr>
+        ${data.pageUrl ? `<tr><td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>URL</strong></td><td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;"><a href="${data.pageUrl}" style="color:#1a73e8;word-break:break-all;">${data.pageUrl}</a></td></tr>` : ""}
+        ${data.adName ? `<tr style="background:#f0f7f0;"><td style="padding:10px 12px;color:#555;"><strong>Ad / Source</strong></td><td style="padding:10px 12px;">${data.adName}</td></tr>` : ""}
       </table>
 
       <h2 style="font-size:16px;color:#2d4a1e;margin:0 0 12px;">Quiz Answers</h2>

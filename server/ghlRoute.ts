@@ -601,6 +601,13 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
         month: "short", day: "numeric", year: "numeric",
         hour: "numeric", minute: "2-digit", hour12: true,
       });
+      const catScores = [
+        { label: "Digestive Comfort", score: digestiveScore },
+        { label: "Appetite & Metabolism", score: appetiteScore },
+        { label: "Gut Health", score: gutScore },
+      ];
+      const highestCatEmail = catScores.reduce((a, b) => (a.score >= b.score ? a : b));
+      const lowestCatEmail = catScores.reduce((a, b) => (a.score <= b.score ? a : b));
       await sendOwnerNotificationEmail({
         fullName,
         email,
@@ -613,6 +620,15 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
         answers,
         timezone,
         submittedAt,
+        highestScore: highestCatEmail.score,
+        lowestScore: lowestCatEmail.score,
+        highestScoreCategory: highestCatEmail.label,
+        lowestScoreCategory: lowestCatEmail.label,
+        pageUrl: pageUrl ?? null,
+        adName: adName ?? null,
+        utmSource: utmSource ?? null,
+        utmMedium: utmMedium ?? null,
+        utmCampaign: utmCampaign ?? null,
       });
     } catch (ownerEmailErr) {
       console.warn("[Resend] Owner notification email failed (non-fatal):", ownerEmailErr);
