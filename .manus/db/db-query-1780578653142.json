@@ -1,0 +1,21 @@
+{
+  "query": "SELECT id, fullName, email, totalScore, alertTier, crmTag, ghlContactId, answers, createdAt FROM quiz_submissions WHERE fullName LIKE '%Ivy%' OR fullName LIKE '%Johnson%' OR email LIKE '%ivy%' ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute SELECT id, fullName, email, totalScore, alertTier, crmTag, ghlContactId, answers, createdAt FROM quiz_submissions WHERE fullName LIKE '%Ivy%' OR fullName LIKE '%Johnson%' OR email LIKE '%ivy%' ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "2460001",
+      "fullName": "Ivy Johnston",
+      "email": "belfast_girl_62@hotmail.com",
+      "totalScore": "38",
+      "alertTier": "Red",
+      "crmTag": "red alert",
+      "ghlContactId": "AUY5FBxDVUyAsVppA1QV",
+      "answers": "[{\"questionId\":1,\"points\":2,\"optionIndex\":1},{\"questionId\":2,\"points\":2,\"optionIndex\":1},{\"questionId\":3,\"points\":3,\"optionIndex\":0},{\"questionId\":4,\"points\":2,\"optionIndex\":1},{\"questionId\":5,\"points\":3,\"optionIndex\":0},{\"questionId\":6,\"points\":3,\"optionIndex\":0},{\"questionId\":7,\"points\":3,\"optionIndex\":0},{\"questionId\":8,\"points\":3,\"optionIndex\":0},{\"questionId\":9,\"points\":3,\"optionIndex\":0},{\"questionId\":10,\"points\":3,\"optionIndex\":0},{\"questionId\":11,\"points\":3,\"optionIndex\":0},{\"questionId\":12,\"points\":3,\"optionIndex\":0},{\"questionId\":13,\"points\":3,\"optionIndex\":0},{\"questionId\":14,\"points\":2,\"optionIndex\":1},{\"questionId\":15,\"points\":0,\"optionIndex\":2},{\"questionId\":16,\"points\":0,\"optionIndex\":2},{\"questionId\":17,\"points\":0,\"optionIndex\":2}]",
+      "createdAt": "2026-06-04 00:42:44"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\temail\ttotalScore\talertTier\tcrmTag\tghlContactId\tanswers\tcreatedAt\n2460001\tIvy Johnston\tbelfast_girl_62@hotmail.com\t38\tRed\tred alert\tAUY5FBxDVUyAsVppA1QV\t[{\"questionId\":1,\"points\":2,\"optionIndex\":1},{\"questionId\":2,\"points\":2,\"optionIndex\":1},{\"questionId\":3,\"points\":3,\"optionIndex\":0},{\"questionId\":4,\"points\":2,\"optionIndex\":1},{\"questionId\":5,\"points\":3,\"optionIndex\":0},{\"questionId\":6,\"points\":3,\"optionIndex\":0},{\"questionId\":7,\"points\":3,\"optionIndex\":0},{\"questionId\":8,\"points\":3,\"optionIndex\":0},{\"questionId\":9,\"points\":3,\"optionIndex\":0},{\"questionId\":10,\"points\":3,\"optionIndex\":0},{\"questionId\":11,\"points\":3,\"optionIndex\":0},{\"questionId\":12,\"points\":3,\"optionIndex\":0},{\"questionId\":13,\"points\":3,\"optionIndex\":0},{\"questionId\":14,\"points\":2,\"optionIndex\":1},{\"questionId\":15,\"points\":0,\"optionIndex\":2},{\"questionId\":16,\"points\":0,\"optionIndex\":2},{\"questionId\":17,\"points\":0,\"optionIndex\":2}]\t2026-06-04 00:42:44\n",
+  "stderr": "",
+  "execution_time_ms": 269
+}

@@ -221,3 +221,129 @@ export async function sendResultsEmail(data: ScoreData): Promise<boolean> {
     return false;
   }
 }
+
+const OWNER_EMAIL = "char@charwinnen.com";
+
+export interface OwnerNotificationData {
+  fullName: string;
+  email: string;
+  phone?: string | null;
+  totalScore: number;
+  alertTier: string;
+  digestiveScore: number;
+  appetiteScore: number;
+  gutScore: number;
+  answers: Array<{ questionId: number; points: number; optionIndex?: number }>;
+  timezone?: string | null;
+  submittedAt?: string;
+}
+
+export async function sendOwnerNotificationEmail(data: OwnerNotificationData): Promise<boolean> {
+  try {
+    const { QUESTIONS } = await import("../shared/quizData");
+
+    const qaRows = QUESTIONS.map((q) => {
+      const a = data.answers.find((ans) => ans.questionId === q.id);
+      let answerText = "(no answer)";
+      if (a) {
+        if (a.optionIndex !== undefined && q.options[a.optionIndex]) {
+          answerText = q.options[a.optionIndex]!.text;
+        } else {
+          answerText = q.options.find((o) => o.points === a.points)?.text ?? answerText;
+        }
+      }
+      return `
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #e8f0e8;color:#444;width:55%;vertical-align:top"><strong>${q.text}</strong></td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e8f0e8;vertical-align:top">${answerText}</td>
+        </tr>`;
+    }).join("");
+
+    const alertColor = data.alertTier === "Red" ? "#c0392b" : data.alertTier === "Yellow" ? "#d4a017" : "#27ae60";
+    const alertEmoji = data.alertTier === "Red" ? "🔴" : data.alertTier === "Yellow" ? "🟡" : "🟢";
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f8f4;font-family:Arial,sans-serif;">
+  <div style="max-width:680px;margin:24px auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #d0e0d0;">
+    <div style="background:#2d4a1e;padding:20px 28px;">
+      <h1 style="margin:0;color:#ffffff;font-size:20px;">New Quiz Submission</h1>
+      <p style="margin:4px 0 0;color:#c8d8b8;font-size:14px;">${data.submittedAt ?? new Date().toLocaleString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true })} CT</p>
+    </div>
+    <div style="padding:24px 28px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:15px;margin-bottom:24px;">
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;width:40%;border-bottom:1px solid #d0e0d0;"><strong>Name</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.fullName}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Email</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;"><a href="mailto:${data.email}" style="color:#1a73e8">${data.email}</a></td>
+        </tr>
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Phone</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.phone ?? "(not provided)"}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Alert Tier</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;"><span style="color:${alertColor};font-weight:700;">${alertEmoji} ${data.alertTier} Alert</span></td>
+        </tr>
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Total Score</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.totalScore} / 51</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Digestive Comfort</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.digestiveScore} / 18</td>
+        </tr>
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Appetite &amp; Metabolism</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.appetiteScore} / 12</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:#555;border-bottom:1px solid #d0e0d0;"><strong>Gut Health</strong></td>
+          <td style="padding:10px 12px;border-bottom:1px solid #d0e0d0;">${data.gutScore} / 27</td>
+        </tr>
+        <tr style="background:#f0f7f0;">
+          <td style="padding:10px 12px;color:#555;"><strong>Timezone</strong></td>
+          <td style="padding:10px 12px;">${data.timezone ?? "Unknown"}</td>
+        </tr>
+      </table>
+
+      <h2 style="font-size:16px;color:#2d4a1e;margin:0 0 12px;">Quiz Answers</h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:14px;border:1px solid #d0e0d0;border-radius:8px;overflow:hidden;">
+        <tr style="background:#2d4a1e;">
+          <th style="padding:10px 12px;color:#ffffff;text-align:left;width:55%;">Question</th>
+          <th style="padding:10px 12px;color:#ffffff;text-align:left;">Answer</th>
+        </tr>
+        ${qaRows}
+      </table>
+    </div>
+    <div style="background:#f0f7f0;padding:16px 28px;text-align:center;font-size:13px;color:#5a7a5a;border-top:1px solid #d0e0d0;">
+      Stubborn Belly Fat Quiz — quiz.charwinnen.com
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const result = await resend.emails.send({
+      from: `${FROM_NAME} <${FROM_ADDRESS}>`,
+      to: OWNER_EMAIL,
+      subject: `New Quiz Submission: ${data.fullName} — ${alertEmoji} ${data.alertTier} Alert (${data.totalScore}/51)`,
+      html,
+    });
+
+    if (result.error) {
+      console.error("[Resend] Error sending owner notification email:", result.error);
+      return false;
+    }
+
+    console.log("[Resend] Owner notification email sent for", data.fullName, "id:", result.data?.id);
+    return true;
+  } catch (err) {
+    console.error("[Resend] Exception sending owner notification email:", err);
+    return false;
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, email, first_name, last_name, score, score_band, alert_tier, ad_name, utm_medium, utm_source, utm_campaign, answers, created_at FROM quiz_submissions WHERE first_name LIKE '%Ivy%' OR last_name LIKE '%Johnson%' OR email LIKE '%ivy%' ORDER BY created_at DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute SELECT id, email, first_name, last_name, score, score_band, alert_tier, ad_name, utm_medium, utm_source, utm_campaign, answers, created_at FROM quiz_submissions WHERE first_name LIKE '%Ivy%' OR last_name LIKE '%Johnson%' OR email LIKE '%ivy%' ORDER BY created_at DESC LIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'first_name' in 'where clause'"
+  ]
+}

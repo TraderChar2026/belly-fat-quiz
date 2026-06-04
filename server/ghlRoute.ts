@@ -2,7 +2,7 @@ import { Router } from "express";
 import { computeScores, getCrmTag, getAlertLevel, CATEGORY_META, QUESTIONS } from "../shared/quizData";
 import { saveQuizSubmission, checkIsRepeatSubmission } from "./db";
 import { ENV } from "./_core/env";
-import { sendResultsEmail } from "./resendEmail";
+import { sendResultsEmail, sendOwnerNotificationEmail } from "./resendEmail";
 
 /** Send owner notification directly via Manus notification service (avoids TRPCError in Express context) */
 async function sendOwnerNotification(title: string, content: string): Promise<void> {
@@ -592,6 +592,30 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       });
     } catch (emailErr) {
       console.warn("[Resend] Results email failed (non-fatal):", emailErr);
+    }
+
+    // ── Send owner notification email via Resend ──────────────────────────────
+    try {
+      const submittedAt = new Date().toLocaleString("en-US", {
+        timeZone: "America/Chicago",
+        month: "short", day: "numeric", year: "numeric",
+        hour: "numeric", minute: "2-digit", hour12: true,
+      });
+      await sendOwnerNotificationEmail({
+        fullName,
+        email,
+        phone: phone ?? null,
+        totalScore,
+        alertTier: alertLevel.charAt(0).toUpperCase() + alertLevel.slice(1),
+        digestiveScore,
+        appetiteScore,
+        gutScore,
+        answers,
+        timezone,
+        submittedAt,
+      });
+    } catch (ownerEmailErr) {
+      console.warn("[Resend] Owner notification email failed (non-fatal):", ownerEmailErr);
     }
 
     return res.json({
