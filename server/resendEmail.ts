@@ -222,7 +222,7 @@ export async function sendResultsEmail(data: ScoreData): Promise<boolean> {
   }
 }
 
-const OWNER_EMAIL = "char@charwinnen.com";
+const OWNER_EMAIL = "cjwinnen@comcast.net";
 
 export interface OwnerNotificationData {
   fullName: string;
