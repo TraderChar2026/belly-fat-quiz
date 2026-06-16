@@ -625,6 +625,13 @@ export default function Home() {
             utmCampaign: attribution.utmCampaign,
           });
         }
+        // Fire Meta Pixel Lead event
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+          (window as any).fbq('track', 'Lead', {
+            content_name: 'Belly Fat Quiz',
+            content_category: data.crmTag?.includes('red') ? 'Red Alert' : data.crmTag?.includes('yellow') ? 'Yellow Alert' : 'Green',
+          });
+        }
         // ── Skip results page — redirect directly to tier VSL ────────────────
         const tier = data.crmTag?.includes("red") ? "red" : data.crmTag?.includes("yellow") ? "yellow" : "green";
         const vslBase = tier === "red" ? "/red-alert-preview.html" : "/yellow-alert-preview.html";

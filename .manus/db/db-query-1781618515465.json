@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, fullName, email, phone, totalScore, alertTier, ghlContactId, createdAt FROM quiz_submissions ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute SELECT id, fullName, email, phone, totalScore, alertTier, ghlContactId, createdAt FROM quiz_submissions ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "3000001",
+      "fullName": "Jules Kitson",
+      "email": "kitson904@gmail.com",
+      "phone": "0210899887",
+      "totalScore": "26",
+      "alertTier": "Red",
+      "ghlContactId": "68YOZHNt1a6L12x8SRBq",
+      "createdAt": "2026-06-15 19:36:03"
+    },
+    {
+      "id": "2970001",
+      "fullName": "Ana Dias",
+      "email": "cristina5000@hotmail.co.uk",
+      "phone": "NULL",
+      "totalScore": "34",
+      "alertTier": "Red",
+      "ghlContactId": "ymAjGPreSdEYTI6YuFrh",
+      "createdAt": "2026-06-13 17:34:25"
+    },
+    {
+      "id": "2940001",
+      "fullName": "Lorraine Brandt",
+      "email": "wlbrandt@live.com",
+      "phone": "2043458557",
+      "totalScore": "23",
+      "alertTier": "Red",
+      "ghlContactId": "xo3hXczqFTnhkPPQoNxz",
+      "createdAt": "2026-06-13 16:04:41"
+    },
+    {
+      "id": "2880001",
+      "fullName": "Emily",
+      "email": "emilydixon484@gmail.com",
+      "phone": "NULL",
+      "totalScore": "28",
+      "alertTier": "Red",
+      "ghlContactId": "Mr70hosjofIkhWxzi59H",
+      "createdAt": "2026-06-12 13:26:03"
+    },
+    {
+      "id": "2850001",
+      "fullName": "Ally Siggers",
+      "email": "atrusselle@hotmail.com",
+      "phone": "+61455239222",
+      "totalScore": "31",
+      "alertTier": "Red",
+      "ghlContactId": "BCIQ9CFwMPV2CyLm7RFa",
+      "createdAt": "2026-06-12 08:45:27"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\temail\tphone\ttotalScore\talertTier\tghlContactId\tcreatedAt\n3000001\tJules Kitson\tkitson904@gmail.com\t0210899887\t26\tRed\t68YOZHNt1a6L12x8SRBq\t2026-06-15 19:36:03\n2970001\tAna Dias\tcristina5000@hotmail.co.uk\tNULL\t34\tRed\tymAjGPreSdEYTI6YuFrh\t2026-06-13 17:34:25\n2940001\tLorraine Brandt\twlbrandt@live.com\t2043458557\t23\tRed\txo3hXczqFTnhkPPQoNxz\t2026-06-13 16:04:41\n2880001\tEmily\temilydixon484@gmail.com\tNULL\t28\tRed\tMr70hosjofIkhWxzi59H\t2026-06-12 13:26:03\n2850001\tAlly Siggers\tatrusselle@hotmail.com\t+61455239222\t31\tRed\tBCIQ9CFwMPV2CyLm7RFa\t2026-06-12 08:45:27\n",
+  "stderr": "",
+  "execution_time_ms": 268
+}

@@ -1,0 +1,66 @@
+{
+  "query": "SELECT id, fullName, email, alertTier, ghlContactId, createdAt FROM quiz_submissions WHERE createdAt >= '2026-06-12 00:00:00' ORDER BY createdAt ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute SELECT id, fullName, email, alertTier, ghlContactId, createdAt FROM quiz_submissions WHERE createdAt >= '2026-06-12 00:00:00' ORDER BY createdAt ASC;",
+  "rows": [
+    {
+      "id": "2790001",
+      "fullName": "Cate Gunn",
+      "email": "cathymsg@icloud.com",
+      "alertTier": "Red",
+      "ghlContactId": "OMxxpzfjIdkNO9zQQqhJ",
+      "createdAt": "2026-06-12 02:14:11"
+    },
+    {
+      "id": "2820001",
+      "fullName": "Sabrina Digiambattista",
+      "email": "sabrina.d.xo@gmail.com",
+      "alertTier": "Red",
+      "ghlContactId": "r40DYc8OOcwlzIpVK30q",
+      "createdAt": "2026-06-12 08:01:12"
+    },
+    {
+      "id": "2850001",
+      "fullName": "Ally Siggers",
+      "email": "atrusselle@hotmail.com",
+      "alertTier": "Red",
+      "ghlContactId": "BCIQ9CFwMPV2CyLm7RFa",
+      "createdAt": "2026-06-12 08:45:27"
+    },
+    {
+      "id": "2880001",
+      "fullName": "Emily",
+      "email": "emilydixon484@gmail.com",
+      "alertTier": "Red",
+      "ghlContactId": "Mr70hosjofIkhWxzi59H",
+      "createdAt": "2026-06-12 13:26:03"
+    },
+    {
+      "id": "2940001",
+      "fullName": "Lorraine Brandt",
+      "email": "wlbrandt@live.com",
+      "alertTier": "Red",
+      "ghlContactId": "xo3hXczqFTnhkPPQoNxz",
+      "createdAt": "2026-06-13 16:04:41"
+    },
+    {
+      "id": "2970001",
+      "fullName": "Ana Dias",
+      "email": "cristina5000@hotmail.co.uk",
+      "alertTier": "Red",
+      "ghlContactId": "ymAjGPreSdEYTI6YuFrh",
+      "createdAt": "2026-06-13 17:34:25"
+    },
+    {
+      "id": "3000001",
+      "fullName": "Jules Kitson",
+      "email": "kitson904@gmail.com",
+      "alertTier": "Red",
+      "ghlContactId": "68YOZHNt1a6L12x8SRBq",
+      "createdAt": "2026-06-15 19:36:03"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\temail\talertTier\tghlContactId\tcreatedAt\n2790001\tCate Gunn\tcathymsg@icloud.com\tRed\tOMxxpzfjIdkNO9zQQqhJ\t2026-06-12 02:14:11\n2820001\tSabrina Digiambattista\tsabrina.d.xo@gmail.com\tRed\tr40DYc8OOcwlzIpVK30q\t2026-06-12 08:01:12\n2850001\tAlly Siggers\tatrusselle@hotmail.com\tRed\tBCIQ9CFwMPV2CyLm7RFa\t2026-06-12 08:45:27\n2880001\tEmily\temilydixon484@gmail.com\tRed\tMr70hosjofIkhWxzi59H\t2026-06-12 13:26:03\n2940001\tLorraine Brandt\twlbrandt@live.com\tRed\txo3hXczqFTnhkPPQoNxz\t2026-06-13 16:04:41\n2970001\tAna Dias\tcristina5000@hotmail.co.uk\tRed\tymAjGPreSdEYTI6YuFrh\t2026-06-13 17:34:25\n3000001\tJules Kitson\tkitson904@gmail.com\tRed\t68YOZHNt1a6L12x8SRBq\t2026-06-15 19:36:03\n",
+  "stderr": "",
+  "execution_time_ms": 984
+}
