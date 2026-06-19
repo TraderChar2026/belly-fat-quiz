@@ -545,13 +545,34 @@ export async function getDropoffByQuestion() {
 
   const completions = Number(completedSessions[0]?.count ?? 0);
 
+  // Build a map of stopped_here counts per question
+  const stoppedMap: Record<number, number> = {};
+  for (const r of rows) {
+    stoppedMap[Number(r.lastQuestionReached)] = Number(r.count);
+  }
+
+  // Total tracked = everyone who had a lastQuestionReached recorded + completions
+  const totalTracked = rows.reduce((s, r) => s + Number(r.count), 0) + completions;
+
+  // Build cumulative Started/Finished/DroppedOff per question
+  // Started[q] = totalTracked - sum of stoppedMap[1..q-1]
+  // Finished[q] = Started[q] - stoppedMap[q]
+  // DroppedOff[q] = stoppedMap[q]
+  const byQuestion: { question: number; started: number; finished: number; droppedOff: number }[] = [];
+  let remaining = totalTracked;
+  for (let q = 1; q <= 17; q++) {
+    const started = remaining;
+    const droppedOff = stoppedMap[q] ?? 0;
+    const finished = started - droppedOff;
+    byQuestion.push({ question: q, started, finished, droppedOff });
+    remaining = finished;
+  }
+
   return {
-    byQuestion: rows.map(r => ({
-      question: Number(r.lastQuestionReached),
-      droppedOff: Number(r.count),
-    })),
+    byQuestion,
     completions,
     totalStarts,
+    totalTracked,
   };
 }
 

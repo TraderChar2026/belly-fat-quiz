@@ -360,12 +360,9 @@ export default function DashboardFunnel() {
               "Do you take pain pills like aspirin or ibuprofen?",
               "Recent antibiotic use?",
             ];
-            const dropMap: Record<number, number> = {};
-            dropoff.byQuestion.forEach((r: { question: number; droppedOff: number }) => {
-              dropMap[r.question] = r.droppedOff;
-            });
-            const totalTracked = dropoff.byQuestion.reduce((s: number, r: { droppedOff: number }) => s + r.droppedOff, 0) + dropoff.completions;
-            const totalStarted = (dropoff as { totalStarts?: number }).totalStarts ?? totalTracked;
+            type QRow = { question: number; started: number; finished: number; droppedOff: number };
+            const totalStarted = (dropoff as { totalStarts?: number }).totalStarts
+              ?? dropoff.byQuestion[0]?.started ?? 0;
             return (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
@@ -373,34 +370,31 @@ export default function DashboardFunnel() {
                     <tr className="border-b border-border/50 bg-muted/30">
                       <th className="text-left py-2 px-2 font-semibold text-muted-foreground w-10">#</th>
                       <th className="text-left py-2 px-2 font-semibold text-muted-foreground">Question</th>
-                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">Stopped Here</th>
-                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">% of Starters</th>
+                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">Started</th>
+                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">Finished</th>
+                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">Dropped Off</th>
                     </tr>
                   </thead>
                   <tbody>
                     {/* Header row: total who clicked Start Quiz */}
                     <tr className="bg-blue-50/60 border-b-2 border-blue-200">
                       <td className="py-2 px-2 font-bold text-blue-700">▶</td>
-                      <td className="py-2 px-2 font-semibold text-blue-700">
-                        Clicked Start Quiz
-                      </td>
+                      <td className="py-2 px-2 font-semibold text-blue-700">Clicked Start Quiz</td>
                       <td className="text-right py-2 px-2 font-bold text-blue-700">{totalStarted.toLocaleString()}</td>
                       <td className="text-right py-2 px-2 text-muted-foreground">—</td>
+                      <td className="text-right py-2 px-2 text-muted-foreground">—</td>
                     </tr>
-                    {QLABELS.map((label, i) => {
-                      const stopped = dropMap[i + 1] ?? 0;
-                      const pctStopped = totalStarted > 0 ? Math.round((stopped / totalStarted) * 100) : 0;
-                      const isHighDrop = pctStopped >= 10;
-                      const shortLabel = label.length > 60 ? label.slice(0, 60) + "…" : label;
+                    {(dropoff.byQuestion as QRow[]).map((row, i) => {
+                      const isHighDrop = row.started > 0 && (row.droppedOff / row.started) >= 0.2;
+                      const shortLabel = QLABELS[i] ? (QLABELS[i].length > 60 ? QLABELS[i].slice(0, 60) + "…" : QLABELS[i]) : `Question ${row.question}`;
                       return (
-                        <tr key={i} className="border-b border-border/20 hover:bg-muted/30">
-                          <td className="py-1.5 px-2 font-bold text-muted-foreground">Q{i + 1}</td>
+                        <tr key={row.question} className="border-b border-border/20 hover:bg-muted/30">
+                          <td className="py-1.5 px-2 font-bold text-muted-foreground">Q{row.question}</td>
                           <td className="py-1.5 px-2 text-foreground">{shortLabel}</td>
-                          <td className={`text-right py-1.5 px-2 font-semibold ${isHighDrop ? "text-red-500" : stopped > 0 ? "text-amber-600" : "text-muted-foreground"}`}>
-                            {stopped > 0 ? stopped.toLocaleString() : "—"}
-                          </td>
-                          <td className={`text-right py-1.5 px-2 font-medium ${isHighDrop ? "text-red-500" : "text-muted-foreground"}`}>
-                            {stopped > 0 ? `${pctStopped}%` : "—"}
+                          <td className="text-right py-1.5 px-2 text-foreground font-medium">{row.started.toLocaleString()}</td>
+                          <td className="text-right py-1.5 px-2 text-emerald-700 font-medium">{row.finished.toLocaleString()}</td>
+                          <td className={`text-right py-1.5 px-2 font-semibold ${isHighDrop ? "text-red-500" : row.droppedOff > 0 ? "text-amber-600" : "text-muted-foreground"}`}>
+                            {row.droppedOff > 0 ? row.droppedOff.toLocaleString() : "—"}
                           </td>
                         </tr>
                       );
@@ -409,9 +403,8 @@ export default function DashboardFunnel() {
                       <td className="py-2 px-2 font-bold text-emerald-700">✓</td>
                       <td className="py-2 px-2 font-semibold text-emerald-700">Completed &amp; Submitted</td>
                       <td className="text-right py-2 px-2 font-bold text-emerald-700">{dropoff.completions.toLocaleString()}</td>
-                      <td className="text-right py-2 px-2 font-semibold text-emerald-700">
-                        {totalStarted > 0 ? `${Math.round((dropoff.completions / totalStarted) * 100)}%` : "—"}
-                      </td>
+                      <td className="text-right py-2 px-2 text-muted-foreground">—</td>
+                      <td className="text-right py-2 px-2 text-muted-foreground">—</td>
                     </tr>
                   </tbody>
                 </table>
