@@ -328,6 +328,12 @@ export default function DashboardFunnel() {
           <p className="text-xs text-muted-foreground">
             For each question: how many people started it, how many finished (moved to next), and how many dropped off.
           </p>
+          <div className="mt-2 text-xs text-muted-foreground bg-muted/30 rounded p-2 space-y-0.5">
+            <p><span className="font-semibold text-foreground">Started:</span> Number of unique visitors who reached that question.</p>
+            <p><span className="font-semibold text-foreground">Finished:</span> Number who answered and moved to the next question (Started minus Dropped Off).</p>
+            <p><span className="font-semibold text-amber-600">Dropped Off:</span> Number who left the quiz at that question without continuing.</p>
+            <p className="pt-1 border-t border-border/30"><span className="font-semibold text-blue-700">Quiz Started</span> = clicked the Start Quiz button. <span className="font-semibold text-emerald-700">Completed &amp; Submitted</span> = filled out the contact form and submitted their info.</p>
+          </div>
         </CardHeader>
         <CardContent>
           {!dropoff || dropoff.byQuestion.length === 0 ? (
@@ -358,7 +364,9 @@ export default function DashboardFunnel() {
             dropoff.byQuestion.forEach((r: { question: number; droppedOff: number }) => {
               dropMap[r.question] = r.droppedOff;
             });
-            const totalStarted = dropoff.byQuestion.reduce((s: number, r: { droppedOff: number }) => s + r.droppedOff, 0) + dropoff.completions;
+            // Use the true quiz_start count from the server (all who clicked Start Quiz button)
+            const totalStarted = (dropoff as { totalStarts?: number }).totalStarts
+              ?? (dropoff.byQuestion.reduce((s: number, r: { droppedOff: number }) => s + r.droppedOff, 0) + dropoff.completions);
             // Build reached counts: started[i] = totalStarted - sum of all drops before question i
             const started: number[] = [];
             let remaining = totalStarted;
@@ -379,6 +387,17 @@ export default function DashboardFunnel() {
                     </tr>
                   </thead>
                   <tbody>
+                    {/* Header row: total who clicked Start Quiz */}
+                    <tr className="bg-blue-50/60 border-b-2 border-blue-200">
+                      <td className="py-2 px-2 font-bold text-blue-700">▶</td>
+                      <td className="py-2 px-2 font-semibold text-blue-700">
+                        Started Quiz
+                        <span className="ml-1 font-normal text-muted-foreground">(clicked Start Quiz button)</span>
+                      </td>
+                      <td className="text-right py-2 px-2 font-bold text-blue-700">{totalStarted.toLocaleString()}</td>
+                      <td className="text-right py-2 px-2 text-muted-foreground">—</td>
+                      <td className="text-right py-2 px-2 text-muted-foreground">—</td>
+                    </tr>
                     {QLABELS.map((label, i) => {
                       const qStarted = started[i] ?? 0;
                       const dropped = dropMap[i + 1] ?? 0;

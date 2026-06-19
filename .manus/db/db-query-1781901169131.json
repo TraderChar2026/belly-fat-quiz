@@ -1,0 +1,130 @@
+{
+  "query": "DESCRIBE funnel_events;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute DESCRIBE funnel_events;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "sessionId",
+      "Type": "varchar(128)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "eventType",
+      "Type": "enum('page_view','quiz_start','quiz_complete','vsl_view','vsl_25','vsl_50','vsl_75','vsl_100','order_click','order_placed')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "eventTimestamp",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "submissionId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "email",
+      "Type": "varchar(320)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "alertTier",
+      "Type": "varchar(32)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "scoreBand",
+      "Type": "varchar(32)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "vslVersion",
+      "Type": "varchar(4)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "adName",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "referrerPlatform",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "utmSource",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "utmCampaign",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "orderValue",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "lastQuestionReached",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\nsessionId\tvarchar(128)\tNO\t\tNULL\t\neventType\tenum('page_view','quiz_start','quiz_complete','vsl_view','vsl_25','vsl_50','vsl_75','vsl_100','order_click','order_placed')\tNO\t\tNULL\t\neventTimestamp\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nsubmissionId\tint\tYES\t\tNULL\t\nemail\tvarchar(320)\tYES\t\tNULL\t\nalertTier\tvarchar(32)\tYES\t\tNULL\t\nscoreBand\tvarchar(32)\tYES\t\tNULL\t\nvslVersion\tvarchar(4)\tYES\t\tNULL\t\nadName\tvarchar(255)\tYES\t\tNULL\t\nreferrerPlatform\tvarchar(64)\tYES\t\tNULL\t\nutmSource\tvarchar(255)\tYES\t\tNULL\t\nutmCampaign\tvarchar(255)\tYES\t\tNULL\t\norderValue\tdecimal(10,2)\tYES\t\tNULL\t\nlastQuestionReached\tint\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 273
+}

@@ -530,6 +530,13 @@ export async function getDropoffByQuestion() {
     .groupBy(funnelEvents.lastQuestionReached)
     .orderBy(asc(funnelEvents.lastQuestionReached));
 
+  // Total quiz_start sessions (all who clicked Start, regardless of question tracking)
+  const totalStartSessions = await db
+    .select({ count: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})` })
+    .from(funnelEvents)
+    .where(eq(funnelEvents.eventType, "quiz_start"));
+  const totalStarts = Number(totalStartSessions[0]?.count ?? 0);
+
   // Also get sessions that completed (so we can show completions per question)
   const completedSessions = await db
     .select({ count: sql<number>`COUNT(DISTINCT ${funnelEvents.sessionId})` })
@@ -544,6 +551,7 @@ export async function getDropoffByQuestion() {
       droppedOff: Number(r.count),
     })),
     completions,
+    totalStarts,
   };
 }
 

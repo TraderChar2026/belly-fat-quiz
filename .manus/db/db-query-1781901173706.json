@@ -1,0 +1,102 @@
+{
+  "query": "\nSELECT eventType, COUNT(*) as count FROM funnel_events GROUP BY eventType ORDER BY count DESC;\n\nSELECT lastQuestionReached, COUNT(*) as count FROM funnel_events WHERE lastQuestionReached IS NOT NULL GROUP BY lastQuestionReached ORDER BY lastQuestionReached;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute \nSELECT eventType, COUNT(*) as count FROM funnel_events GROUP BY eventType ORDER BY count DESC;\n\nSELECT lastQuestionReached, COUNT(*) as count FROM funnel_events WHERE lastQuestionReached IS NOT NULL GROUP BY lastQuestionReached ORDER BY lastQuestionReached;\n",
+  "rows": [
+    {
+      "eventType": "page_view",
+      "count": "1832"
+    },
+    {
+      "eventType": "quiz_start",
+      "count": "1358"
+    },
+    {
+      "eventType": "vsl_view",
+      "count": "109"
+    },
+    {
+      "eventType": "quiz_complete",
+      "count": "90"
+    },
+    {
+      "eventType": "order_click",
+      "count": "31"
+    },
+    {
+      "eventType": "lastQuestionReached",
+      "count": "count"
+    },
+    {
+      "eventType": "1",
+      "count": "72"
+    },
+    {
+      "eventType": "2",
+      "count": "71"
+    },
+    {
+      "eventType": "3",
+      "count": "69"
+    },
+    {
+      "eventType": "4",
+      "count": "68"
+    },
+    {
+      "eventType": "5",
+      "count": "68"
+    },
+    {
+      "eventType": "6",
+      "count": "67"
+    },
+    {
+      "eventType": "7",
+      "count": "67"
+    },
+    {
+      "eventType": "8",
+      "count": "67"
+    },
+    {
+      "eventType": "9",
+      "count": "67"
+    },
+    {
+      "eventType": "10",
+      "count": "67"
+    },
+    {
+      "eventType": "11",
+      "count": "67"
+    },
+    {
+      "eventType": "12",
+      "count": "66"
+    },
+    {
+      "eventType": "13",
+      "count": "66"
+    },
+    {
+      "eventType": "14",
+      "count": "66"
+    },
+    {
+      "eventType": "15",
+      "count": "67"
+    },
+    {
+      "eventType": "16",
+      "count": "68"
+    },
+    {
+      "eventType": "17",
+      "count": "66"
+    }
+  ],
+  "messages": [],
+  "stdout": "eventType\tcount\npage_view\t1832\nquiz_start\t1358\nvsl_view\t109\nquiz_complete\t90\norder_click\t31\nlastQuestionReached\tcount\n1\t72\n2\t71\n3\t69\n4\t68\n5\t68\n6\t67\n7\t67\n8\t67\n9\t67\n10\t67\n11\t67\n12\t66\n13\t66\n14\t66\n15\t67\n16\t68\n17\t66\n",
+  "stderr": "",
+  "execution_time_ms": 299
+}
