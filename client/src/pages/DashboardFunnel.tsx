@@ -321,50 +321,98 @@ export default function DashboardFunnel() {
         </div>
       </div>
 
-      {/* Mid-quiz drop-off chart */}
-      {dropoff && dropoff.byQuestion.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Mid-quiz drop-off by question</CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Shows how many people stopped at each question without completing.
-              {dropoff.completions > 0 && ` ${dropoff.completions} people completed all 18 questions.`}
+      {/* Question Drop-off Table */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Question Drop-off Funnel</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            For each question: how many people started it, how many finished (moved to next), and how many dropped off.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {!dropoff || dropoff.byQuestion.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No drop-off data yet. Data will appear once visitors begin the quiz.
             </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-9 sm:grid-cols-18 gap-1">
-              {Array.from({ length: 18 }, (_, i) => i + 1).map(q => {
-                const entry = dropoff.byQuestion.find(b => b.question === q);
-                const count = entry?.droppedOff ?? 0;
-                const maxDrop = Math.max(...dropoff.byQuestion.map(b => b.droppedOff), 1);
-                const heightPct = Math.round((count / maxDrop) * 100);
-                return (
-                  <div key={q} className="flex flex-col items-center gap-1">
-                    <div className="w-full flex flex-col justify-end" style={{ height: 60 }}>
-                      <div
-                        className="w-full bg-red-400 rounded-t transition-all"
-                        style={{ height: `${heightPct}%`, minHeight: count > 0 ? 4 : 0 }}
-                        title={`Q${q}: ${count} dropped off`}
-                      />
-                    </div>
-                    <span className="text-xs text-muted-foreground">{q}</span>
-                    {count > 0 && <span className="text-xs font-medium text-red-600">{count}</span>}
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">Question number (1–18). Red bars = people who stopped at that question.</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {dropoff && dropoff.byQuestion.length === 0 && (
-        <Card>
-          <CardContent className="py-6 text-center text-muted-foreground text-sm">
-            Mid-quiz drop-off data will appear here once visitors start answering questions. The quiz page needs to be updated to send question progress events.
-          </CardContent>
-        </Card>
-      )}
+          ) : (() => {
+            const QLABELS = [
+              "How would you describe your digestion?",
+              "Do you have heartburn after meals?",
+              "How do you experience unexplained weight changes?",
+              "How would you rate your energy levels throughout the day?",
+              "How do you feel after meals?",
+              "How well do you control your eating?",
+              "How difficult is it for you to lose weight?",
+              "What do you typically eat for breakfast?",
+              "Do you have problems sleeping?",
+              "Do you often experience brain fog?",
+              "Do you experience mood swings?",
+              "How would you describe your typical diet?",
+              "How often do you eat fermented foods?",
+              "How often do you eat prebiotic foods?",
+              "Do you take antacids or acid blockers?",
+              "Do you take pain pills like aspirin or ibuprofen?",
+              "Recent antibiotic use?",
+            ];
+            const dropMap: Record<number, number> = {};
+            dropoff.byQuestion.forEach((r: { question: number; droppedOff: number }) => {
+              dropMap[r.question] = r.droppedOff;
+            });
+            const totalStarted = dropoff.byQuestion.reduce((s: number, r: { droppedOff: number }) => s + r.droppedOff, 0) + dropoff.completions;
+            // Build reached counts: started[i] = totalStarted - sum of all drops before question i
+            const started: number[] = [];
+            let remaining = totalStarted;
+            for (let q = 1; q <= QLABELS.length; q++) {
+              started.push(remaining);
+              remaining -= (dropMap[q] ?? 0);
+            }
+            return (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-border/50 bg-muted/30">
+                      <th className="text-left py-2 px-2 font-semibold text-muted-foreground w-10">#</th>
+                      <th className="text-left py-2 px-2 font-semibold text-muted-foreground">Question</th>
+                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">Started</th>
+                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">Finished</th>
+                      <th className="text-right py-2 px-2 font-semibold text-muted-foreground">Dropped Off</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {QLABELS.map((label, i) => {
+                      const qStarted = started[i] ?? 0;
+                      const dropped = dropMap[i + 1] ?? 0;
+                      const finished = qStarted - dropped;
+                      const isHighDrop = qStarted > 0 && (dropped / qStarted) >= 0.2;
+                      const shortLabel = label.length > 55 ? label.slice(0, 55) + "…" : label;
+                      return (
+                        <tr key={i} className="border-b border-border/20 hover:bg-muted/30">
+                          <td className="py-1.5 px-2 font-bold text-muted-foreground">Q{i + 1}</td>
+                          <td className="py-1.5 px-2 text-foreground">{shortLabel}</td>
+                          <td className="text-right py-1.5 px-2 text-foreground font-medium">{qStarted.toLocaleString()}</td>
+                          <td className="text-right py-1.5 px-2 text-emerald-700 font-medium">{finished.toLocaleString()}</td>
+                          <td className={`text-right py-1.5 px-2 font-semibold ${isHighDrop ? "text-red-500" : dropped > 0 ? "text-amber-600" : "text-muted-foreground"}`}>
+                            {dropped > 0 ? dropped.toLocaleString() : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    <tr className="bg-emerald-50/60 border-t-2 border-emerald-200">
+                      <td className="py-2 px-2 font-bold text-emerald-700">✓</td>
+                      <td className="py-2 px-2 font-semibold text-emerald-700">Completed &amp; Submitted</td>
+                      <td className="text-right py-2 px-2 font-bold text-emerald-700">{dropoff.completions.toLocaleString()}</td>
+                      <td className="text-right py-2 px-2 text-muted-foreground">—</td>
+                      <td className="text-right py-2 px-2 font-semibold text-emerald-700">
+                        {totalStarted > 0 ? `${Math.round((dropoff.completions / totalStarted) * 100)}% completion` : "—"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
+        </CardContent>
+      </Card>
     </div>
     </DashboardLayout>
   );
