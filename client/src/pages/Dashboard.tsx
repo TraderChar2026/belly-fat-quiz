@@ -858,14 +858,65 @@ function QuestionDropoffSection() {
                 />
               </div>
             </div>
+            {/* Summary Table */}
+            <div className="mt-6 pt-4 border-t border-border/50">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Summary Table</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-border/50">
+                      <th className="text-left py-1.5 pr-3 font-semibold text-muted-foreground">Question</th>
+                      <th className="text-right py-1.5 px-2 font-semibold text-muted-foreground">Reached</th>
+                      <th className="text-right py-1.5 px-2 font-semibold text-muted-foreground">Dropped Off</th>
+                      <th className="text-right py-1.5 pl-2 font-semibold text-muted-foreground">Drop %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border/30">
+                      <td className="py-1.5 pr-3 font-medium text-foreground">Started Quiz</td>
+                      <td className="text-right px-2 font-semibold text-foreground">{totalStarted.toLocaleString()}</td>
+                      <td className="text-right px-2 text-muted-foreground">—</td>
+                      <td className="text-right pl-2 text-muted-foreground">—</td>
+                    </tr>
+                    {QUESTIONS.map((q, i) => {
+                      const reached = reachedCounts[i] ?? 0;
+                      const next = reachedCounts[i + 1];
+                      const dropped = next !== undefined ? reached - next : reached - (data?.completions ?? 0);
+                      const dropPct = reached > 0 ? Math.round((dropped / reached) * 100) : 0;
+                      const isHighDrop = dropPct >= 20;
+                      const shortLabel = q.text.length > 40 ? q.text.slice(0, 40) + '…' : q.text;
+                      return (
+                        <tr key={q.id} className="border-b border-border/20 hover:bg-muted/30">
+                          <td className="py-1.5 pr-3 text-foreground"><span className="font-semibold text-muted-foreground">Q{i + 1}</span> {shortLabel}</td>
+                          <td className="text-right px-2 text-foreground">{reached.toLocaleString()}</td>
+                          <td className={`text-right px-2 font-medium ${dropped > 0 ? (isHighDrop ? 'text-red-500' : 'text-amber-600') : 'text-muted-foreground'}`}>
+                            {dropped > 0 ? `-${dropped.toLocaleString()}` : '0'}
+                          </td>
+                          <td className={`text-right pl-2 font-semibold ${isHighDrop ? 'text-red-500' : dropPct > 0 ? 'text-amber-600' : 'text-muted-foreground'}`}>
+                            {dropPct > 0 ? `${dropPct}%` : '—'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    <tr className="bg-emerald-50/50">
+                      <td className="py-1.5 pr-3 font-semibold text-emerald-700">Completed &amp; Submitted</td>
+                      <td className="text-right px-2 font-semibold text-emerald-700">{(data?.completions ?? 0).toLocaleString()}</td>
+                      <td className="text-right px-2 text-muted-foreground">—</td>
+                      <td className="text-right pl-2 font-semibold text-emerald-700">
+                        {totalStarted > 0 ? `${Math.round(((data?.completions ?? 0) / totalStarted) * 100)}%` : '—'} completion
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>
     </Card>
   );
 }
-
-// ── Main Dashboard Page ───────────────────────────────────────────────────────
+// ── Main Dashboard Pagee ───────────────────────────────────────────────────────
 export default function Dashboard() {
   return (
     <DashboardLayout>
