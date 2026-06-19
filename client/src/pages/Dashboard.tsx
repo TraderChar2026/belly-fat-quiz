@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { QUESTIONS } from "../../../shared/quizData";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -754,8 +755,117 @@ function FunnelSection() {
   );
 }
 
-// ── Main Dashboard Page ───────────────────────────────────────────────────────
+// ── Question Drop-off Funnel Section ────────────────────────────────────────
+function QuestionDropoffSection() {
+  const { data, isLoading, refetch } = trpc.dashboard.dropoffByQuestion.useQuery();
 
+  const totalStarted = React.useMemo(() => {
+    if (!data) return 0;
+    const totalDropped = data.byQuestion.reduce((sum: number, r: { droppedOff: number }) => sum + r.droppedOff, 0);
+    return totalDropped + data.completions;
+  }, [data]);
+
+  const reachedCounts = React.useMemo(() => {
+    if (!data || totalStarted === 0) return [];
+    const dropMap: Record<number, number> = {};
+    data.byQuestion.forEach((r: { question: number; droppedOff: number }) => { dropMap[r.question] = r.droppedOff; });
+    const counts: number[] = [];
+    let remaining = totalStarted;
+    for (let q = 1; q <= QUESTIONS.length; q++) {
+      counts.push(remaining);
+      remaining -= (dropMap[q] ?? 0);
+    }
+    return counts;
+  }, [data, totalStarted]);
+
+  return (
+    <Card className="mb-6">
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <div>
+          <CardTitle className="text-base font-semibold">Question Drop-off Funnel</CardTitle>
+          <p className="text-xs text-muted-foreground mt-0.5">How many people reached each question before leaving</p>
+        </div>
+        <Button variant="ghost" size="sm" onClick={() => refetch()} className="gap-1.5 text-xs">
+          <RefreshCw className="w-3 h-3" /> Refresh
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-8 bg-border/40 rounded animate-pulse" />
+            ))}
+          </div>
+        ) : totalStarted === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No quiz start data yet. Drop-off data will appear once visitors begin the quiz.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {QUESTIONS.map((q, i) => {
+              const reached = reachedCounts[i] ?? 0;
+              const next = reachedCounts[i + 1];
+              const dropped = next !== undefined ? reached - next : reached - (data?.completions ?? 0);
+              const dropPct = reached > 0 ? Math.round((dropped / reached) * 100) : 0;
+              const pctOfStart = totalStarted > 0 ? Math.round((reached / totalStarted) * 100) : 0;
+              const isHighDrop = dropPct >= 20;
+              const shortLabel = q.text.length > 48 ? q.text.slice(0, 48) + '…' : q.text;
+              return (
+                <div key={q.id}>
+                  <div className="flex items-center justify-between mb-1 gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="text-xs font-bold text-muted-foreground w-6 flex-shrink-0">Q{i + 1}</span>
+                      <span className="text-xs text-foreground truncate">{shortLabel}</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {isHighDrop && (
+                        <span className="text-xs font-semibold text-red-500">⚠ {dropPct}% left here</span>
+                      )}
+                      {!isHighDrop && dropPct > 0 && (
+                        <span className="text-xs text-muted-foreground">↓ {dropPct}%</span>
+                      )}
+                      <span className="text-xs font-semibold text-foreground w-10 text-right">{reached.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <div className="h-2 rounded-full bg-border overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-700 ${
+                        isHighDrop ? 'bg-red-400' : pctOfStart > 70 ? 'bg-emerald-500' : pctOfStart > 40 ? 'bg-amber-400' : 'bg-orange-500'
+                      }`}
+                      style={{ width: `${pctOfStart}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            <div className="pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-emerald-600 w-6">✓</span>
+                  <span className="text-xs font-semibold text-emerald-600">Completed &amp; Submitted</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {totalStarted > 0 ? Math.round(((data?.completions ?? 0) / totalStarted) * 100) : 0}% completion rate
+                  </span>
+                  <span className="text-xs font-semibold text-emerald-600 w-10 text-right">{(data?.completions ?? 0).toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-border overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-700"
+                  style={{ width: `${totalStarted > 0 ? Math.round(((data?.completions ?? 0) / totalStarted) * 100) : 0}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ── Main Dashboard Page ───────────────────────────────────────────────────────
 export default function Dashboard() {
   return (
     <DashboardLayout>
@@ -772,6 +882,7 @@ export default function Dashboard() {
         <SummaryCards />
         <AdPerformanceTable />
         <FunnelSection />
+        <QuestionDropoffSection />
         <SubmissionsTable />
         <SalesLogTable />
       </div>
