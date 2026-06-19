@@ -1,0 +1,78 @@
+{
+  "query": "\nSELECT lastQuestionReached, COUNT(DISTINCT sessionId) as stopped_here\nFROM funnel_events\nWHERE eventType = 'quiz_start' AND lastQuestionReached IS NOT NULL\nGROUP BY lastQuestionReached\nORDER BY CAST(lastQuestionReached AS UNSIGNED);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute \nSELECT lastQuestionReached, COUNT(DISTINCT sessionId) as stopped_here\nFROM funnel_events\nWHERE eventType = 'quiz_start' AND lastQuestionReached IS NOT NULL\nGROUP BY lastQuestionReached\nORDER BY CAST(lastQuestionReached AS UNSIGNED);\n",
+  "rows": [
+    {
+      "lastQuestionReached": "1",
+      "stopped_here": "72"
+    },
+    {
+      "lastQuestionReached": "2",
+      "stopped_here": "71"
+    },
+    {
+      "lastQuestionReached": "3",
+      "stopped_here": "69"
+    },
+    {
+      "lastQuestionReached": "4",
+      "stopped_here": "68"
+    },
+    {
+      "lastQuestionReached": "5",
+      "stopped_here": "68"
+    },
+    {
+      "lastQuestionReached": "6",
+      "stopped_here": "67"
+    },
+    {
+      "lastQuestionReached": "7",
+      "stopped_here": "67"
+    },
+    {
+      "lastQuestionReached": "8",
+      "stopped_here": "67"
+    },
+    {
+      "lastQuestionReached": "9",
+      "stopped_here": "67"
+    },
+    {
+      "lastQuestionReached": "10",
+      "stopped_here": "67"
+    },
+    {
+      "lastQuestionReached": "11",
+      "stopped_here": "67"
+    },
+    {
+      "lastQuestionReached": "12",
+      "stopped_here": "66"
+    },
+    {
+      "lastQuestionReached": "13",
+      "stopped_here": "66"
+    },
+    {
+      "lastQuestionReached": "14",
+      "stopped_here": "66"
+    },
+    {
+      "lastQuestionReached": "15",
+      "stopped_here": "66"
+    },
+    {
+      "lastQuestionReached": "16",
+      "stopped_here": "66"
+    },
+    {
+      "lastQuestionReached": "17",
+      "stopped_here": "66"
+    }
+  ],
+  "messages": [],
+  "stdout": "lastQuestionReached\tstopped_here\n1\t72\n2\t71\n3\t69\n4\t68\n5\t68\n6\t67\n7\t67\n8\t67\n9\t67\n10\t67\n11\t67\n12\t66\n13\t66\n14\t66\n15\t66\n16\t66\n17\t66\n",
+  "stderr": "",
+  "execution_time_ms": 275
+}

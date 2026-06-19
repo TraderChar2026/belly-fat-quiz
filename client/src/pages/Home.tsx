@@ -535,17 +535,14 @@ export default function Home() {
   const attribution = useAttribution();
   const trackEvent = trpc.funnel.track.useMutation();
 
+  const updateLastQuestion = trpc.funnel.updateLastQuestion.useMutation();
+
   const handleNext = useCallback(() => {
-    // Update lastQuestionReached on the quiz_start event for drop-off tracking
+    // Update lastQuestionReached on the existing quiz_start row (not a new insert)
     if (attribution.sessionId) {
-      trackEvent.mutate({
-        eventType: "quiz_start",
+      updateLastQuestion.mutate({
         sessionId: attribution.sessionId,
-        lastQuestionReached: questionIndex + 1, // 1-indexed current question
-        adName: attribution.adNameRaw,
-        referrerPlatform: attribution.referrerPlatform,
-        utmSource: attribution.utmSource,
-        utmCampaign: attribution.utmCampaign,
+        questionNumber: questionIndex + 1, // 1-indexed current question
       });
     }
     if (questionIndex < QUESTIONS.length - 1) {
@@ -553,7 +550,7 @@ export default function Home() {
     } else {
       setStage("contact");
     }
-  }, [questionIndex, attribution, trackEvent]);
+  }, [questionIndex, attribution, updateLastQuestion]);
 
   const handleBack = useCallback(() => {
     if (questionIndex > 0) {

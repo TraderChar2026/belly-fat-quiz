@@ -1,0 +1,16 @@
+{
+  "query": "\nSELECT \n  (SELECT COUNT(DISTINCT sessionId) FROM funnel_events WHERE eventType = 'quiz_start') as total_quiz_start_sessions,\n  (SELECT COUNT(DISTINCT sessionId) FROM funnel_events WHERE eventType = 'quiz_start' AND lastQuestionReached IS NOT NULL) as sessions_with_question_tracked,\n  (SELECT COUNT(DISTINCT sessionId) FROM funnel_events WHERE eventType = 'quiz_complete') as completions,\n  (SELECT COUNT(*) FROM quiz_submissions) as total_submissions;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute \nSELECT \n  (SELECT COUNT(DISTINCT sessionId) FROM funnel_events WHERE eventType = 'quiz_start') as total_quiz_start_sessions,\n  (SELECT COUNT(DISTINCT sessionId) FROM funnel_events WHERE eventType = 'quiz_start' AND lastQuestionReached IS NOT NULL) as sessions_with_question_tracked,\n  (SELECT COUNT(DISTINCT sessionId) FROM funnel_events WHERE eventType = 'quiz_complete') as completions,\n  (SELECT COUNT(*) FROM quiz_submissions) as total_submissions;\n",
+  "rows": [
+    {
+      "total_quiz_start_sessions": "209",
+      "sessions_with_question_tracked": "72",
+      "completions": "90",
+      "total_submissions": "92"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_quiz_start_sessions\tsessions_with_question_tracked\tcompletions\ttotal_submissions\n209\t72\t90\t92\n",
+  "stderr": "",
+  "execution_time_ms": 975
+}

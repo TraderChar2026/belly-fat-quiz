@@ -141,6 +141,25 @@ export async function saveFunnelEvent(data: InsertFunnelEvent) {
   }
 }
 
+/** Update lastQuestionReached on the existing quiz_start row for a session */
+export async function updateLastQuestionReached(sessionId: string, questionNumber: number) {
+  const db = await getDb();
+  if (!db) { console.warn("[Database] Cannot update lastQuestionReached: db not available"); return; }
+  try {
+    await db
+      .update(funnelEvents)
+      .set({ lastQuestionReached: questionNumber })
+      .where(
+        and(
+          eq(funnelEvents.sessionId, sessionId),
+          eq(funnelEvents.eventType, "quiz_start")
+        )
+      );
+  } catch (err) {
+    console.error("[Database] Failed to update lastQuestionReached:", err);
+  }
+}
+
 export async function getFunnelEventsBySession(sessionId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

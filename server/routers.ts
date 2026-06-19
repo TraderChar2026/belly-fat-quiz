@@ -215,9 +215,19 @@ export const appRouter = router({
 
         return { ok: true };
       }),
-  }),
 
-  // ── Dashboard (owner-only) ─────────────────────────────────────────────────
+    updateLastQuestion: publicProcedure
+      .input(z.object({
+        sessionId: z.string().max(128),
+        questionNumber: z.number().int().min(1).max(17),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateLastQuestionReached } = await import("./db");
+        await updateLastQuestionReached(input.sessionId, input.questionNumber);
+        return { ok: true };
+      }),
+  }),
+  // ── Dashboard (owner-only) ──────────────────────────────────────────────────
   dashboard: router({
     summary: protectedProcedure
       .input(z.object({
