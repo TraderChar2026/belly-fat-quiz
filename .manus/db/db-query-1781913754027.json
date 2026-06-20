@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE funnel_events SET lastQuestionReached = NULL WHERE lastQuestionReached IS NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute UPDATE funnel_events SET lastQuestionReached = NULL WHERE lastQuestionReached IS NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 299
+}

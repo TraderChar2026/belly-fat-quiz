@@ -1,0 +1,60 @@
+{
+  "query": "SELECT sessionId, eventType, lastQuestionReached FROM funnel_events WHERE eventType = 'quiz_start' ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute SELECT sessionId, eventType, lastQuestionReached FROM funnel_events WHERE eventType = 'quiz_start' ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    },
+    {
+      "sessionId": "1781910253309-fl0bz75x",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "sessionId\teventType\tlastQuestionReached\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n1781910253309-fl0bz75x\tquiz_start\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 269
+}

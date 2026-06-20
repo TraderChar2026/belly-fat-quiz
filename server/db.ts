@@ -135,6 +135,21 @@ export async function saveFunnelEvent(data: InsertFunnelEvent) {
   const db = await getDb();
   if (!db) { console.warn("[Database] Cannot save funnel event: db not available"); return; }
   try {
+    // For quiz_start events, skip if a row already exists for this session
+    // This prevents duplicate rows when someone clicks Start multiple times
+    if (data.eventType === "quiz_start" && data.sessionId) {
+      const existing = await db
+        .select({ id: funnelEvents.id })
+        .from(funnelEvents)
+        .where(
+          and(
+            eq(funnelEvents.sessionId, data.sessionId),
+            eq(funnelEvents.eventType, "quiz_start")
+          )
+        )
+        .limit(1);
+      if (existing.length > 0) return; // already exists, skip
+    }
     await db.insert(funnelEvents).values(data);
   } catch (err) {
     console.error("[Database] Failed to save funnel event:", err);

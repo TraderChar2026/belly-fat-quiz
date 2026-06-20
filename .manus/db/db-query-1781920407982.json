@@ -1,0 +1,9 @@
+{
+  "query": "DELETE fe FROM funnel_events fe INNER JOIN ( SELECT MIN(id) as keep_id, sessionId FROM funnel_events WHERE eventType = 'quiz_start' GROUP BY sessionId HAVING COUNT(*) > 1 ) dups ON fe.sessionId = dups.sessionId AND fe.eventType = 'quiz_start' AND fe.id != dups.keep_id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute DELETE fe FROM funnel_events fe INNER JOIN ( SELECT MIN(id) as keep_id, sessionId FROM funnel_events WHERE eventType = 'quiz_start' GROUP BY sessionId HAVING COUNT(*) > 1 ) dups ON fe.sessionId = dups.sessionId AND fe.eventType = 'quiz_start' AND fe.id != dups.keep_id;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 306
+}

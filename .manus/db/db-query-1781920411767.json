@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(DISTINCT sessionId) as distinct_sessions, COUNT(*) as total_rows FROM funnel_events WHERE eventType = 'quiz_start';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute SELECT COUNT(DISTINCT sessionId) as distinct_sessions, COUNT(*) as total_rows FROM funnel_events WHERE eventType = 'quiz_start';",
+  "rows": [
+    {
+      "distinct_sessions": "210",
+      "total_rows": "210"
+    }
+  ],
+  "messages": [],
+  "stdout": "distinct_sessions\ttotal_rows\n210\t210\n",
+  "stderr": "",
+  "execution_time_ms": 280
+}
