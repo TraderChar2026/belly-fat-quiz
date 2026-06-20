@@ -142,3 +142,4 @@
 - [x] Red Alert VSL: move testimonials with headshots to below order button
 - [x] Red Alert VSL: rename "Foods To Eat & Foods To Avoid Guide" to "Gut-Friendly Food List"
 - [x] Yellow Alert VSL: apply same 5 changes as Red Alert
+- [x] Add quiz_complete server-side funnel event in ghlRoute.ts (fires after saveQuizSubmission, calls updateLastQuestionReached(17) + saveFunnelEvent quiz_complete)

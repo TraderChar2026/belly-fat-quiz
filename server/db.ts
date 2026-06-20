@@ -156,22 +156,41 @@ export async function saveFunnelEvent(data: InsertFunnelEvent) {
   }
 }
 
-/** Update lastQuestionReached on the existing quiz_start row for a session */
+/** Upsert lastQuestionReached: update existing quiz_start row, or insert one if missing */
 export async function updateLastQuestionReached(sessionId: string, questionNumber: number) {
   const db = await getDb();
   if (!db) { console.warn("[Database] Cannot update lastQuestionReached: db not available"); return; }
   try {
-    await db
-      .update(funnelEvents)
-      .set({ lastQuestionReached: questionNumber })
+    const existing = await db
+      .select({ id: funnelEvents.id, current: funnelEvents.lastQuestionReached })
+      .from(funnelEvents)
       .where(
         and(
           eq(funnelEvents.sessionId, sessionId),
           eq(funnelEvents.eventType, "quiz_start")
         )
-      );
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Only update if the new question is higher (never go backwards)
+      const currentQ = Number(existing[0].current ?? 0);
+      if (questionNumber > currentQ) {
+        await db
+          .update(funnelEvents)
+          .set({ lastQuestionReached: questionNumber })
+          .where(eq(funnelEvents.id, existing[0].id));
+      }
+    } else {
+      // No quiz_start row exists yet — create one with this question number
+      await db.insert(funnelEvents).values({
+        sessionId,
+        eventType: "quiz_start",
+        lastQuestionReached: questionNumber,
+      });
+    }
   } catch (err) {
-    console.error("[Database] Failed to update lastQuestionReached:", err);
+    console.error("[Database] Failed to upsert lastQuestionReached:", err);
   }
 }
 

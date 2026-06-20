@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { computeScores, getCrmTag, getAlertLevel, CATEGORY_META, QUESTIONS } from "../shared/quizData";
-import { saveQuizSubmission, checkIsRepeatSubmission } from "./db";
+import { saveQuizSubmission, checkIsRepeatSubmission, saveFunnelEvent, updateLastQuestionReached } from "./db";
 import { ENV } from "./_core/env";
 import { sendResultsEmail, sendOwnerNotificationEmail } from "./resendEmail";
 
@@ -575,6 +575,25 @@ ghlRouter.post("/api/ghl-submit", async (req, res) => {
       fbEventId,
       pageUrl,
     });
+
+    // ── Record quiz_complete funnel event server-side ────────────────────────
+    if (sessionId) {
+      try {
+        await updateLastQuestionReached(sessionId, 17);
+        await saveFunnelEvent({
+          sessionId,
+          eventType: "quiz_complete",
+          alertTier: alertLevel.charAt(0).toUpperCase() + alertLevel.slice(1),
+          scoreBand,
+          utmSource: utmSource ?? undefined,
+          utmCampaign: utmCampaign ?? undefined,
+          adName: normalizedAdName ?? undefined,
+          referrerPlatform: referrerPlatform ?? undefined,
+        });
+      } catch (funnelErr) {
+        console.warn("[Funnel] Failed to save quiz_complete event (non-fatal):", funnelErr);
+      }
+    }
 
     // ── Send personalised results email to quiz taker via Resend ────────────
     const nameParts2 = fullName.trim().split(/\s+/);
