@@ -1,0 +1,80 @@
+{
+  "query": "SELECT sessionId, eventType, lastQuestionReached, alertTier, scoreBand FROM funnel_events ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user VPNzYUEn483PL8T.root --database KPxCyY62mCsecb8cbLpLNE --execute SELECT sessionId, eventType, lastQuestionReached, alertTier, scoreBand FROM funnel_events ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "sessionId": "1781923658224-9tl1zyvt",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781923658128-jgmna1la",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781923656724-qb0mck5d",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781922642381-zhq4j0ui",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781625769588-1z6wysqa",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781625769588-1z6wysqa",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781921434128-qvxfd6wr",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781921186522-mjnk739p",
+      "eventType": "quiz_start",
+      "lastQuestionReached": "3",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781921186522-mjnk739p",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    },
+    {
+      "sessionId": "1781920673326-25750ety",
+      "eventType": "page_view",
+      "lastQuestionReached": "NULL",
+      "alertTier": "NULL",
+      "scoreBand": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "sessionId\teventType\tlastQuestionReached\talertTier\tscoreBand\n1781923658224-9tl1zyvt\tpage_view\tNULL\tNULL\tNULL\n1781923658128-jgmna1la\tpage_view\tNULL\tNULL\tNULL\n1781923656724-qb0mck5d\tpage_view\tNULL\tNULL\tNULL\n1781922642381-zhq4j0ui\tpage_view\tNULL\tNULL\tNULL\n1781625769588-1z6wysqa\tpage_view\tNULL\tNULL\tNULL\n1781625769588-1z6wysqa\tpage_view\tNULL\tNULL\tNULL\n1781921434128-qvxfd6wr\tpage_view\tNULL\tNULL\tNULL\n1781921186522-mjnk739p\tquiz_start\t3\tNULL\tNULL\n1781921186522-mjnk739p\tpage_view\tNULL\tNULL\tNULL\n1781920673326-25750ety\tpage_view\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 289
+}
