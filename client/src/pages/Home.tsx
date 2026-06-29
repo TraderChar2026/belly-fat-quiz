@@ -15,6 +15,7 @@ interface Answer {
   questionId: number;
   points: number;
   optionIndex: number;
+  answeredAt: string;
 }
 
 interface ResultData {
@@ -526,7 +527,7 @@ export default function Home() {
     (questionId: number, points: number, optionIndex: number) => {
       setAnswers((prev) => {
         const filtered = prev.filter((a) => a.questionId !== questionId);
-        return [...filtered, { questionId, points, optionIndex }];
+        return [...filtered, { questionId, points, optionIndex, answeredAt: new Date().toISOString() }];
       });
     },
     []
@@ -581,7 +582,7 @@ export default function Home() {
       try {
         const payload = {
           ...contactData,
-          answers: answers.map(({ questionId, points, optionIndex }) => ({ questionId, points, optionIndex })),
+          answers: answers.map(({ questionId, points, optionIndex, answeredAt }) => ({ questionId, points, optionIndex, answeredAt })),
           // Attribution data
           sessionId: attribution.sessionId,
           timezone: attribution.timezone,
