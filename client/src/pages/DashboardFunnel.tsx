@@ -260,6 +260,10 @@ export default function DashboardFunnel() {
                 <span className="font-bold text-sm">{pct(s.quiz_complete, s.page_view)}</span>
               </div>
               <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Start → Complete</span>
+                <span className="font-bold text-sm text-indigo-600">{pct(s.quiz_complete, s.quiz_start)}</span>
+              </div>
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Complete → VSL</span>
                 <span className="font-bold text-sm">{pct(s.vsl_view, s.quiz_complete)}</span>
               </div>
